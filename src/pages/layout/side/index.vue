@@ -1,42 +1,51 @@
 <template>
-  <q-scroll-area
-    style="height: 100%"
-    class="my-side q-py-sm shadow-4"
-    :style="{ width: NAV_ISMINI ? '56PX' : '260PX' }"
+  <div
+    class="full-height shadow-4 column no-wrap my-side"
+    :style="{ width: NAV_ISMINI ? '56PX' : '220PX' }"
   >
-    <q-list
-      padding
-      :separator="false"
-      class="q-mr-md expand-nav"
-      v-show="!NAV_ISMINI"
-    >
-      <nav-expand-item
-        v-for="item in navs"
-        :key="item.id"
-        :nav="item"
-        :level="0"
-      />
-    </q-list>
-    <q-list :separator="false" v-show="NAV_ISMINI" class="popup-nav">
-      <nav-popup-item
-        v-for="item in navs"
-        :key="item.id"
-        :nav="item"
-        :level="0"
-      />
-    </q-list>
-  </q-scroll-area>
+    <q-scroll-area class="flex1 q-py-sm">
+      <q-list class="q-mr-sm expand-nav" v-show="!NAV_ISMINI">
+        <nav-expand-item
+          v-for="item in navs"
+          :key="item.id"
+          :nav="item"
+          :level="0"
+        />
+      </q-list>
+      <q-list :separator="false" v-show="NAV_ISMINI" class="popup-nav">
+        <nav-popup-item
+          v-for="item in navs"
+          :key="item.id"
+          :nav="item"
+          :level="0"
+        />
+      </q-list>
+    </q-scroll-area>
+    <q-separator />
+    <q-btn
+      flat
+      color="primary"
+      style="height: 44px"
+      :icon="
+        NAV_ISMINI
+          ? 'keyboard_double_arrow_right'
+          : 'keyboard_double_arrow_left'
+      "
+      @click="NAV_ISMINI = !NAV_ISMINI"
+    />
+    <q-separator />
+  </div>
 </template>
 
 <script>
 import NavExpandItem from "./nav-expand-item.vue";
 import NavPopupItem from "./nav-popup-item.vue";
 
-import { inject } from "@vue/runtime-core";
+import { ref } from "vue";
 export default {
   components: { NavExpandItem, NavPopupItem },
   setup() {
-    const NAV_ISMINI = inject("NAV_ISMINI");
+    const NAV_ISMINI = ref(false);
     const navs = [
       {
         id: "01",
@@ -47,6 +56,11 @@ export default {
             id: "01-01",
             label: "设备分布",
             path: "/01-01",
+          },
+          {
+            id: "01-02",
+            label: "项目分布",
+            path: "/01-02",
           },
         ],
       },
@@ -72,7 +86,6 @@ export default {
           },
         ],
       },
-
       {
         id: "03",
         label: "监管监控",
@@ -99,7 +112,28 @@ export default {
             id: "04-01",
             label: "设备信息",
             icon: "terminal",
-            path: "/04-01",
+            children: [
+              {
+                id: "04-01-01",
+                label: "大屏",
+                path: "/04-01-01",
+              },
+              {
+                id: "04-01-02",
+                label: "打卡桩",
+                path: "/04-01-02",
+              },
+              {
+                id: "04-01-03",
+                label: "储物柜",
+                path: "/04-01-03",
+              },
+              {
+                id: "04-01-04",
+                label: "座椅",
+                path: "/04-01-04",
+              },
+            ],
           },
           {
             id: "04-02",
@@ -157,6 +191,7 @@ export default {
 </script>
 <style scoped>
 .my-side {
+  transition: all 0.3s;
   z-index: 12;
 }
 </style>

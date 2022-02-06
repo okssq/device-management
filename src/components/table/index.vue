@@ -4,7 +4,7 @@
     hide-pagination
     binary-state-sort
     align="left"
-    separator="horizontal"
+    separator="cell"
     :rows="rows"
     :columns="columns"
     :loading="loading"
@@ -57,22 +57,19 @@
       </q-tr>
       <q-tr v-if="expand" v-show="props.expand" :props="props">
         <q-td colspan="100%">
-          <slot name="expand"></slot>
-          <div class="text-left">
-            <div>这里放一些单行更详细的数据字段！</div>
-            <div>{{ props.row }}</div>
-          </div>
+          <slot name="expand" :row="props.row"></slot>
         </q-td>
       </q-tr>
     </template>
     <!-- 自定义表bottom-->
     <template #bottom>
-      <div class="full-width row items-center">
+      <div class="full-width row items-center" style="margin: -6px">
         <span class="text-subtitle2 text-grey-7">
           共搜索到
           <span class="text-primary text-bold">{{ total }} </span> 条数据
         </span>
-        <div class="q-space row items-center justify-end">
+        <q-space />
+        <div class="row items-center justify-end">
           <q-select
             outlined
             dense
@@ -95,8 +92,6 @@
             :model-value="page"
             @update:model-value="pageChange"
           />
-          <!-- icon-first="mdi-chevron-double-left" -->
-          <!-- icon-last="mdi-chevron-double-right" -->
           <q-input
             outlined
             dense

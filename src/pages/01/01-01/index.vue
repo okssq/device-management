@@ -8,7 +8,7 @@
       <q-btn
         round
         flat
-        icon="mdi-close"
+        icon="clear"
         color="grey-7"
         dense
         @click="visible = false"
@@ -32,6 +32,18 @@
       </q-item>
     </q-list>
   </q-card>
+  <div style="right: 15px;top: 15px;width: 200px" class="absolute shadow-1 bg-white">
+    <q-list class="full-width" >
+      <q-item-label header class="q-pb-none">项目查看</q-item-label>
+      <q-item>
+        <q-item-section>
+          <q-select dense outlined v-model="model" :options="options" />
+        </q-item-section>
+      </q-item>
+
+    </q-list>
+
+  </div>
 </template>
 
 <script>
@@ -60,6 +72,8 @@ export default {
     ];
     let markerArr = [];
     let infoWindow;
+    const model = ref('项目一')
+    const options = ['项目一','项目二','项目三','项目四',]
 
     const onClick = (e) => {
       const { gps: position, type } = e.target.w;
@@ -123,6 +137,8 @@ export default {
       visible,
       curType,
       tObj,
+      model,
+      options,
     };
   },
 };

@@ -29,7 +29,7 @@
     <div class="flex1 overflow-hidden">
       <my-table :rows="rows" :columns="columns" :total="20" :page="1">
         <template #custom-type="{ val }">
-          <q-badge dense class="q-pa-xs" color="indigo" :label="val" />
+          <q-badge outline dense class="q-pa-xs" color="primary" :label="val" />
         </template>
       </my-table>
     </div>

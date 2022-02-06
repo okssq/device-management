@@ -46,7 +46,7 @@
           />
         </template>
         <template #custom-time="{ val }">
-          <q-badge outline class="q-pa-sm" color="primary" :label="val" />
+          <q-badge outline dense class="q-pa-xs" color="primary" :label="val" />
         </template>
       </my-table>
     </div>

@@ -19,6 +19,13 @@ const routes = [
               crumbs: ["智慧地图", "设备分布"],
             },
           },
+          {
+            path: "/01-02",
+            component: () => import("pages/01/01-02/index.vue"),
+            meta: {
+              crumbs: ["智慧地图", "项目分布"],
+            },
+          },
         ],
       },
       {
@@ -75,15 +82,42 @@ const routes = [
           {
             path: "/04-01",
             component: () => import("pages/04/04-01/index.vue"),
-            meta: {
-              crumbs: ["信息管理", "设备管理"],
-            },
+            children: [
+              {
+                path: "/04-01-01",
+                component: () => import("pages/04/04-01/04-01-01"),
+                meta: {
+                  crumbs: ["信息管理", "设备信息", "大屏"],
+                },
+              },
+              {
+                path: "/04-01-02",
+                component: () => import("pages/04/04-01/04-01-02"),
+                meta: {
+                  crumbs: ["信息管理", "设备信息", "打卡桩"],
+                },
+              },
+              {
+                path: "/04-01-03",
+                component: () => import("pages/04/04-01/04-01-03"),
+                meta: {
+                  crumbs: ["信息管理", "设备信息", "储物柜"],
+                },
+              },
+              {
+                path: "/04-01-04",
+                component: () => import("pages/04/04-01/04-01-04"),
+                meta: {
+                  crumbs: ["信息管理", "设备信息", "座椅"],
+                },
+              },
+            ],
           },
           {
             path: "/04-02",
             component: () => import("pages/04/04-02/index.vue"),
             meta: {
-              crumbs: ["信息管理", "项目管理"],
+              crumbs: ["信息管理", "项目信息"],
             },
           },
         ],

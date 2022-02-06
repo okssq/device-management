@@ -32,11 +32,9 @@ export default {
     const MAP_ISLOAD = ref(false);
     const MAP = shallowRef(null);
     const MAP_TELEPORT_TO = ref("#hidden-map");
-    const NAV_ISMINI = ref(false);
     provide("MAP_ISLOAD", MAP_ISLOAD);
     provide("MAP", MAP);
     provide("MAP_TELEPORT_TO", MAP_TELEPORT_TO);
-    provide("NAV_ISMINI", NAV_ISMINI);
 
     const loadMap = () => {
       AMapLoader.load({

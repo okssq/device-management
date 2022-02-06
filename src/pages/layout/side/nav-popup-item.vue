@@ -1,5 +1,11 @@
 <template>
-  <q-item clickable v-ripple :class="navItemClass" :to="nav.path || void 0">
+  <q-item
+    clickable
+    v-ripple
+    class="q-mb-xs"
+    :class="navItemClass"
+    :to="nav.path || void 0"
+  >
     <div class="flex1 row items-center">
       <q-icon v-if="level === 0" size="24px" :name="nav.icon" />
       <q-icon
@@ -67,15 +73,15 @@ export default {
     const iconSize = computed(() => {
       if (props.level === 0) return "24px";
       if (props.level === 1) return "10px";
-      return "12px";
+      return "8px";
     });
     const iconName = computed(() => {
       if (props.level === 0) return props.nav.icon;
-      if (props.level === 1)
-        return activeArr.value.includes(props.nav.id)
-          ? "radio_button_checked"
-          : "radio_button_unchecked";
-      return "insert_drive_file";
+      // if (props.level === 1)
+      return activeArr.value.includes(props.nav.id)
+        ? "radio_button_checked"
+        : "radio_button_unchecked";
+      // return "insert_drive_file";
     });
     const navItemClass = computed(() => {
       const partA = activeArr.value.includes(props.nav.id)

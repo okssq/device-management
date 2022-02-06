@@ -7,7 +7,7 @@
         </template>
       </q-input>
       <div
-        class="flex1 overflow-hidden q-mt-md"
+        class="flex1 overflow-hidden q-my-sm"
         style="border: 1px solid rgb(221, 221, 221); border-radius: 4px"
       >
         <q-scroll-area class="full-height">
@@ -60,7 +60,7 @@ export default {
 
     const simple = [
       {
-        label: "教室1",
+        label: "项目1",
         children: [
           {
             label: "摄像头1",
@@ -83,7 +83,7 @@ export default {
         ],
       },
       {
-        label: "教室2",
+        label: "项目1",
         children: [
           {
             label: "摄像头1",
@@ -106,7 +106,7 @@ export default {
         ],
       },
       {
-        label: "教室3",
+        label: "项目3",
         children: [
           {
             label: "摄像头1",

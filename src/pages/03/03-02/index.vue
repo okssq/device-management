@@ -141,7 +141,7 @@ export default {
     const selected = ref("Food");
     const simple = [
       {
-        label: "教室1",
+        label: "项目1",
         children: [
           {
             label: "摄像头1",
@@ -164,7 +164,7 @@ export default {
         ],
       },
       {
-        label: "教室2",
+        label: "项目2",
         children: [
           {
             label: "摄像头1",
@@ -187,7 +187,7 @@ export default {
         ],
       },
       {
-        label: "教室3",
+        label: "项目3",
         children: [
           {
             label: "摄像头1",

@@ -1,13 +1,17 @@
 <template>
-  <q-expansion-item v-if="nav.children" class="q-mb-xs" :class="navItemClass">
+  <q-expansion-item
+    v-if="nav.children"
+    class="q-mb-xs overflow-hidden"
+    :class="navItemClass"
+  >
     <template #header>
-      <div class="flex1 row items-center">
+      <div class="flex1 row items-center no-wrap overflow-hidden">
         <q-icon
           style="margin-left: 6px; margin-right: 16px"
           :size="iconSize"
           :name="iconName"
         />
-        <div class="nav-label">{{ nav.label }}</div>
+        <div class="text-no-wrap">{{ nav.label }}</div>
       </div>
     </template>
     <q-list padding>
@@ -27,13 +31,13 @@
     :class="navItemClass"
     :to="nav.path || void 0"
   >
-    <div class="row items-center">
+    <div class="row items-center no-wrap overflow-hidden">
       <q-icon
         style="margin-left: 6px; margin-right: 16px"
         :size="iconSize"
         :name="iconName"
       />
-      <div class="nav-label">{{ nav.label }}</div>
+      <div class="text-no-wrap">{{ nav.label }}</div>
     </div>
   </q-item>
 </template>
@@ -73,15 +77,15 @@ export default {
     const iconSize = computed(() => {
       if (props.level === 0) return "24px";
       if (props.level === 1) return "10px";
-      return "12px";
+      return "8px";
     });
     const iconName = computed(() => {
       if (props.level === 0) return props.nav.icon;
-      if (props.level === 1)
-        return activeArr.value.includes(props.nav.id)
-          ? "radio_button_checked"
-          : "radio_button_unchecked";
-      return "insert_drive_file";
+      // if (props.level === 1)
+      return activeArr.value.includes(props.nav.id)
+        ? "radio_button_checked"
+        : "radio_button_unchecked";
+      // return "insert_drive_file";
     });
     const navItemClass = computed(() => {
       const partA = activeArr.value.includes(props.nav.id)
