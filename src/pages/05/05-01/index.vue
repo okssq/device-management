@@ -1,41 +1,27 @@
 <template>
   <div class="my-box column no-wrap">
-    <div class="bg-white q-pl-md q-pb-md q-mt-md">
-      <q-form class="q-gutter-sm row items-center">
-        <q-input outlined dense placeholder="主体账号"> </q-input>
-        <q-input outlined dense placeholder="创建时间">
-          <template v-slot:prepend>
-            <q-icon name="event" class="cursor-pointer">
-              <q-popup-proxy
-                cover
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-        </q-input>
-        <q-btn icon="search" color="primary" dense />
-        <q-btn icon="add" color="primary" dense />
-        <q-btn icon="file_download" color="primary" dense />
-      </q-form>
-    </div>
+    <search-bar :searching="searching" @search="onSearch" @insert="onInsert" />
     <q-separator />
     <div class="flex1 overflow-hidden">
-      <my-table :rows="rows" :columns="columns" :total="20" :page="1">
-        <template #custom-admin="{ val }">
+      <result-table
+        row-key="id"
+        :rows="rows"
+        :columns="columns"
+        :loading="searching"
+        :page="page"
+        :page-size="pageSize"
+        :total-count="totalCount"
+        :total-page="totalPage"
+        @page="onPageChange"
+      >
+        <template #custom-withCompany="{ val }">
           <q-badge
-            class="q-pa-xs"
+            size="sm"
             :color="val == 1 ? 'green' : 'red'"
             :label="val == 1 ? '是' : '否'"
           />
         </template>
-        <template #op>
+        <template #op="{ row }">
           <div class="q-gutter-sm">
             <q-btn
               title="编辑"
@@ -45,15 +31,7 @@
               size="11px"
               round
               icon="edit"
-            />
-            <q-btn
-              title="分配角色"
-              color="green"
-              flat
-              dense
-              size="11px"
-              round
-              icon="manage_accounts"
+              @click.stop="onEdit(row)"
             />
             <q-btn
               title="删除"
@@ -63,166 +41,196 @@
               size="11px"
               round
               icon="clear"
+              @click.stop="onDel(row)"
             />
           </div>
         </template>
-      </my-table>
+      </result-table>
     </div>
   </div>
 </template>
 <script>
-import MyTable from "components/table";
+import SearchBar from "./search-bar.vue";
+import ResultTable from "components/table";
+import DelConfirm from "components/del-confirm.vue";
+import DetailForm from "./detail-form.vue";
+import { reactive, ref, shallowRef, toRefs } from "vue";
+import { USER, ROLE } from "src/api/module.js";
+import { notifySuccess, notifyWarn } from "src/util/common";
+import { useQuasar } from "quasar";
 export default {
   components: {
-    MyTable,
+    SearchBar,
+    ResultTable,
   },
   setup() {
+    const $q = useQuasar();
     const columns = [
       {
-        name: "id",
-        field: "id",
-        label: "用户ID",
+        name: "userName",
+        field: "userName",
+        label: "用户账号",
         align: "left",
       },
       {
-        name: "user",
-        field: "user",
-        label: "主体账号",
-        align: "left",
-      },
-      {
-        name: "name",
-        field: "name",
+        name: "realName",
+        field: "realName",
         label: "用户昵称",
         align: "left",
       },
       {
-        name: "admin",
-        field: "admin",
-        label: "是否为管理员",
+        name: "telephone",
+        field: "telephone",
+        label: "联系电话",
+        align: "left",
+      },
+      {
+        name: "companyName",
+        field: "companyName",
+        label: "所属公司",
+        align: "left",
+      },
+      {
+        name: "withCompany",
+        field: "withCompany",
+        label: "管理员",
         align: "center",
         type: "custom",
       },
       {
-        name: "role",
-        field: "role",
-        label: "角色",
+        name: "createTime",
+        field: "createTime",
+        label: "创建时间",
         align: "left",
       },
       {
-        name: "time",
-        field: "time",
-        label: "更新时间",
+        name: "updateTime",
+        field: "updateTime",
+        label: "最后更新时间",
         align: "left",
       },
       {
         name: "op",
         label: "操作",
         field: "op",
-        align: "center",
+        align: "left",
       },
     ];
-    const rows = [
-      {
-        id: "sdfsdgs",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 1,
-        role: "角色1",
-        time: "2021/12/01",
-      },
-      {
-        id: "sdfsdfssdgs",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色2",
-        time: "2021/12/01",
-      },
-      {
-        id: "rju5ur",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色3",
-        time: "2021/12/01",
-      },
-      {
-        id: "tehtrhr",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色4",
-        time: "2021/12/01",
-      },
-      {
-        id: "sdfsdgs",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 1,
-        role: "角色1",
-        time: "2021/12/01",
-      },
-      {
-        id: "sdfsdfssdgs",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色2",
-        time: "2021/12/01",
-      },
-      {
-        id: "rju5ur",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色3",
-        time: "2021/12/01",
-      },
-      {
-        id: "tehtrhr",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色4",
-        time: "2021/12/01",
-      },
-      {
-        id: "sdfsdgs",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 1,
-        role: "角色1",
-        time: "2021/12/01",
-      },
-      {
-        id: "sdfsdfssdgs",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色2",
-        time: "2021/12/01",
-      },
-      {
-        id: "rju5ur",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色3",
-        time: "2021/12/01",
-      },
-      {
-        id: "tehtrhr",
-        user: "演示账号fdfsf",
-        name: "演示用户昵称",
-        admin: 0,
-        role: "角色4",
-        time: "2021/12/01",
-      },
-    ];
+    const rows = shallowRef([]);
+    const pagination = reactive({
+      page: 1,
+      pageSize: 10,
+      totalCount: 0,
+      totalPage: 0,
+    });
+    const searching = ref(false);
+    let searchData, roleList;
+
+    const getRoleList = () => {
+      ROLE.selectList({ CompanyId: 1 })
+        .then((res) => {
+          roleList = res;
+        })
+        .catch(() => {});
+    };
+    const getList = () => {
+      searching.value = true;
+      USER.list(searchData)
+        .then((res) => {
+          const { results, totalCount, totalPage } = res;
+          rows.value = results;
+          pagination.totalCount = totalCount;
+          pagination.totalPage = totalPage;
+        })
+        .catch(() => {})
+        .finally(() => {
+          searching.value = false;
+        });
+    };
+    // 搜索回调
+    const onSearch = (val) => {
+      pagination.page = 1;
+      searchData = {
+        ...val,
+        page: 1,
+        pageSize: pagination.pageSize,
+      };
+      getList();
+    };
+    // 表格pagination改变回调
+    const onPageChange = (val) => {
+      const { pageSize, page } = val;
+      page && (pagination.page = page);
+      pageSize && (pagination.pageSize = pageSize);
+      searchData && (searchData = { ...searchData, ...val });
+      getList();
+    };
+    // 新增按钮回调
+    const onInsert = () => {
+      if (!roleList) {
+        notifyWarn("正在下载角色数据，请稍等!");
+        return;
+      }
+      $q.dialog({
+        component: DetailForm,
+        componentProps: {
+          type: "insert",
+          roleList,
+        },
+      }).onOk(() => {
+        notifySuccess("增加成功");
+        onSearch({ page: 1 });
+      });
+    };
+    // 编辑按钮回调
+    const onEdit = (row) => {
+      if (!roleList) {
+        notifyWarn("正在下载角色数据，请稍等!");
+        return;
+      }
+      $q.dialog({
+        component: DetailForm,
+        componentProps: {
+          type: "edit",
+          formData: row,
+          roleList,
+        },
+      }).onOk(() => {
+        notifySuccess("更新成功");
+        getList();
+      });
+    };
+
+    const onDel = (row) => {
+      $q.dialog({
+        component: DelConfirm,
+        componentProps: { row },
+      }).onOk(() => {
+        searching.value = true;
+        USER.del({ id: row.id })
+          .then((res) => {
+            notifySuccess("删除成功");
+            getList();
+          })
+          .catch(() => {})
+          .finally(() => {
+            searching.value = false;
+          });
+      });
+    };
+
+    getRoleList();
+
     return {
       columns,
       rows,
+      ...toRefs(pagination),
+      searching,
+      onPageChange,
+      onSearch,
+      onInsert,
+      onEdit,
+      onDel,
     };
   },
 };

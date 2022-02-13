@@ -66,7 +66,7 @@
       <div class="full-width row items-center" style="margin: -6px">
         <span class="text-subtitle2 text-grey-7">
           共搜索到
-          <span class="text-primary text-bold">{{ total }} </span> 条数据
+          <span class="text-primary text-bold">{{ totalCount }} </span> 条数据
         </span>
         <q-space />
         <div class="row items-center justify-end">
@@ -78,14 +78,14 @@
             map-options
             hide-dropdown-icon
             style="width: 90px"
-            class="q-ma-sm"
+            class="q-mx-sm"
             :model-value="pageSize"
             :options="pageSizes"
             @update:model-value="pageSizeChange"
           />
           <q-pagination
             size="12px"
-            class="q-ma-sm"
+            class="q-mx-sm"
             boundary-links
             :max="totalPage"
             :max-pages="5"
@@ -98,7 +98,7 @@
             min="1"
             type="number"
             style="width: 140px"
-            class="q-ma-sm"
+            class="q-mx-sm"
             :max="totalPage"
             v-model.number="inputPage"
             @keyup.enter="inputPageChange"
@@ -113,13 +113,26 @@
         </div>
       </div>
     </template>
+    <template #no-data>
+      <div
+        class="full-width q-pa-md column justify-center items-center text-grey-5"
+      >
+        <q-icon class="q-pa-sm" name="hourglass_disabled" size="14px" />
+        <p class="text-center text-caption">暂无数据</p>
+      </div>
+    </template>
+    <template #loading>
+      <q-inner-loading :showing="loading" style="z-index: 100">
+        <q-spinner-tail color="primary" size="2em" />
+      </q-inner-loading>
+    </template>
   </q-table>
 </template>
 
 <script>
 import { computed, ref } from "vue";
 export default {
-  emits: ["insert", "edit", "del", "page"],
+  emits: ["edit", "del", "page"],
   props: {
     expand: {
       type: Boolean,
@@ -149,7 +162,11 @@ export default {
       type: Number,
       default: 10,
     },
-    total: {
+    totalCount: {
+      type: Number,
+      default: 0,
+    },
+    totalPage: {
       type: Number,
       default: 0,
     },
@@ -159,56 +176,38 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const totalPage = computed(() => Math.ceil(props.total / props.pageSize));
     const pageSizes = [10, 20, 30, 50, 100].map((el) => ({
       label: `${el}条/页`,
       value: el,
     }));
-
     const inputPage = ref(null);
 
-    const pageChange = (page, pageSize) => {
-      const pagination = {
-        total: props.total,
-        pageSize: pageSize || props.pageSize,
-        page,
-      };
-      if (
-        pagination.pageSize === props.pageSize &&
-        pagination.page === props.page
-      )
-        return;
-      emit("page", pagination);
+    // 当前查看页数改变
+    const pageChange = (page) => {
+      emit("page", { page });
     };
+    // 每页显示条数改变
     const pageSizeChange = (pageSize) => {
-      if (props.pageSize === pageSize) return;
-      pageChange(1, pageSize);
+      emit("page", { pageSize, page: 1 });
     };
+    // 跳转到第几页改变
     const inputPageChange = () => {
       const value = inputPage.value + 0;
       if (!/^[0-9]+$/.test(value)) return;
       if (!value && value !== 0) return;
-      if (value > totalPage.value) {
-        inputPage.value = totalPage.value;
+      if (value > props.totalPage) {
+        inputPage.value = props.totalPage;
       } else if (value < 1) {
         inputPage.value = 1;
       }
       if (inputPage.value !== props.page) {
-        const pagination = {
-          total: props.total,
-          page: inputPage.value,
-          pageSize: props.pageSize,
-        };
-        emit("page", pagination);
+        emit("page", { page: inputPage.value });
       }
     };
 
-    const handleRowClick = (props) => {
-      console.log("props", props);
-    };
+    const handleRowClick = () => {};
 
     return {
-      totalPage,
       pageSizes,
       inputPage,
 

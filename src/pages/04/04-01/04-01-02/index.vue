@@ -30,7 +30,17 @@
     </div>
     <q-separator />
     <div class="flex1 overflow-hidden">
-      <my-table :rows="rows" :columns="columns" :total="100" :page="1">
+      <my-table
+        expand
+        row-key="id"
+        :rows="rows"
+        :columns="columns"
+        :total="100"
+        :page="1"
+      >
+        <template #expand>
+          展开详情和表头字段等你发过来再改，没有我在自己去找
+        </template>
         <template #custom-active="{ val }">
           <q-badge
             class="q-pa-xs"
@@ -43,26 +53,17 @@
             class="text-primary q-pa-sm cursor-pointer"
             style="text-decoration: underline"
           >
-            {{ val }}
+            <div>经度: {{ val[0] }}</div>
+            <div>纬度: {{ val[1] }}</div>
           </div>
         </template>
-        <template #custom-sex="{ val }">
-          <q-badge class="q-pa-xs" color="deep-purple" :label="val" />
-        </template>
-        <template #custom-gps="{ val }">
-          <q-badge class="q-pa-xs" color="teal" :label="val" />
+        <template #custom-type="{ val }">
+          <q-badge class="q-pa-xs" :color="val == 1 ? 'blue-grey' : 'brown'">
+            {{ val == 1 ? "SGB-FG123" : "SVH-HJ332" }}
+          </q-badge>
         </template>
         <template #op>
           <div class="q-gutter-sm">
-            <q-btn
-              title="详情"
-              flat
-              dense
-              size="11px"
-              round
-              color="teal"
-              icon="visibility"
-            />
             <q-btn
               title="编辑"
               flat
@@ -71,6 +72,7 @@
               round
               color="primary"
               icon="edit"
+              @click.stop="onEdit(row)"
             />
             <q-btn
               title="删除"
@@ -80,6 +82,7 @@
               round
               color="red-5"
               icon="clear"
+              @click.stop="onDel(row)"
             />
             <q-btn flat dense size="11px" color="grey-7" icon="more_vert">
               <q-menu>
@@ -108,15 +111,25 @@
         </template>
       </my-table>
     </div>
+    <q-dialog v-model="isDelConfirm" persistent>
+      <del-confirm @cancel="isDelConfirm = false" @ok="isDelConfirm = false" />
+    </q-dialog>
+    <q-dialog v-model="isEdit" persistent style="width: 600px">
+      <edit-form @cancel="isEdit = false" @ok="isEdit = false" />
+    </q-dialog>
   </div>
 </template>
 
 <script>
 import MyTable from "components/table";
-
+import DelConfirm from "components/del-confirm.vue";
+import EditForm from "./edit-form.vue";
+import { ref } from "vue";
 export default {
   components: {
     MyTable,
+    DelConfirm,
+    EditForm,
   },
   setup() {
     const columns = [
@@ -125,6 +138,7 @@ export default {
         field: "no",
         label: "设备ID",
         align: "left",
+        sortable: true,
       },
       {
         name: "name",
@@ -138,6 +152,7 @@ export default {
         label: "状态",
         align: "left",
         type: "custom",
+        sortable: true,
       },
       {
         name: "location",
@@ -151,20 +166,22 @@ export default {
         field: "sex",
         label: "硬件版本",
         align: "left",
-        type: "custom",
+        sortable: true,
       },
       {
-        name: "gps",
-        field: "gps",
+        name: "type",
+        field: "type",
         label: "终端型号",
         align: "left",
         type: "custom",
+        sortable: true,
       },
       {
         name: "time",
         field: "time",
         label: "创建时间",
         align: "left",
+        sortable: true,
       },
       {
         name: "op",
@@ -175,207 +192,124 @@ export default {
     ];
     const rows = [
       {
+        id: "0",
         active: 1,
-        location: "131.224,12.34",
+        location: [131.224, 12.384],
         no: "14210388",
         name: "sdgshnhjyxf",
         sex: "ver1.0.1",
-        gps: "BSJ-GF03",
+        type: "1",
         time: "2021-06-04 13:05:05",
       },
       {
+        id: "1",
         active: 0,
-        location: "131.224,12.34",
+        location: [131.224, 12.384],
         no: "14210328",
         name: "gstewtet",
         sex: "ver1.0.4",
-        gps: "BSJ-x200",
+        type: "2",
+        time: "2021-06-06 13:05:05",
+      },
+      {
+        id: "2",
+        active: 0,
+        location: [131.224, 12.384],
+        no: "14210388",
+        name: "sdgshnhjyxf",
+        sex: "ver1.0.1",
+        type: "1",
+        time: "2021-06-04 13:05:05",
+      },
+      {
+        active: 1,
+        id: "3",
+        location: [131.224, 12.384],
+        no: "14210328",
+        name: "gstewtet",
+        sex: "ver1.0.4",
+        type: "1",
         time: "2021-06-06 13:05:05",
       },
       {
         active: 0,
-        location: "131.224,12.34",
+        id: "4",
+        location: [131.224, 12.384],
         no: "14210388",
         name: "sdgshnhjyxf",
         sex: "ver1.0.1",
-        gps: "BSJ-GF03",
+        type: "2",
         time: "2021-06-04 13:05:05",
       },
       {
         active: 1,
-
-        location: "131.224,12.34",
+        id: "5",
+        location: [131.224, 12.384],
         no: "14210328",
         name: "gstewtet",
         sex: "ver1.0.4",
-        gps: "BSJ-x200",
+        type: "2",
         time: "2021-06-06 13:05:05",
       },
       {
         active: 0,
-
-        location: "131.224,12.34",
+        id: "6",
+        location: [131.224, 12.384],
         no: "14210388",
         name: "sdgshnhjyxf",
         sex: "ver1.0.1",
-        gps: "BSJ-GF03",
+        type: "1",
         time: "2021-06-04 13:05:05",
       },
       {
         active: 1,
-
-        location: "131.224,12.34",
+        id: "7",
+        location: [131.224, 12.384],
         no: "14210328",
         name: "gstewtet",
         sex: "ver1.0.4",
-        gps: "BSJ-x200",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 0,
-
-        location: "131.224,12.34",
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        gps: "BSJ-GF03",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 1,
-
-        location: "131.224,12.34",
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        gps: "BSJ-x200",
+        type: "1",
         time: "2021-06-06 13:05:05",
       },
       {
         active: 1,
-
-        location: "131.224,12.34",
+        id: "8",
+        location: [131.224, 12.384],
         no: "14210388",
         name: "sdgshnhjyxf",
         sex: "ver1.0.1",
-        gps: "BSJ-GF03",
+        type: "2",
         time: "2021-06-04 13:05:05",
       },
       {
         active: 0,
-
-        location: "131.224,12.34",
+        id: "9",
+        location: [131.224, 12.384],
         no: "14210328",
         name: "gstewtet",
         sex: "ver1.0.4",
-        gps: "BSJ-x200",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 1,
-
-        location: "131.224,12.34",
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        gps: "BSJ-GF03",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 0,
-
-        location: "131.224,12.34",
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        gps: "BSJ-x200",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 0,
-
-        location: "131.224,12.34",
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        gps: "BSJ-GF03",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 1,
-
-        location: "131.224,12.34",
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        gps: "BSJ-x200",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 0,
-
-        location: "131.224,12.34",
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        gps: "BSJ-GF03",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 1,
-
-        location: "131.224,12.34",
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        gps: "BSJ-x200",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 0,
-
-        location: "131.224,12.34",
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        gps: "BSJ-GF03",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 1,
-
-        location: "131.224,12.34",
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        gps: "BSJ-x200",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 0,
-
-        location: "131.224,12.34",
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        gps: "BSJ-GF03",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 1,
-
-        location: "131.224,12.34",
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        gps: "BSJ-x200",
+        type: "1",
         time: "2021-06-06 13:05:05",
       },
     ];
+    const isEdit = ref(false);
+    const onEdit = (row) => {
+      isEdit.value = true;
+      console.log("onEdit", row);
+    };
+    const isDelConfirm = ref(false);
+    const onDel = (row) => {
+      isDelConfirm.value = true;
+      console.log("onDel", row);
+    };
 
     return {
       columns,
       rows,
+      isEdit,
+      onEdit,
+      isDelConfirm,
+      onDel,
     };
   },
 };

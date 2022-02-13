@@ -24,7 +24,7 @@ module.exports = configure(function (ctx) {
     boot: [],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
-    css: ["app.scss"],
+    css: ["app.scss", "zTreeStyle.css"],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
@@ -39,7 +39,6 @@ module.exports = configure(function (ctx) {
       "roboto-font", // optional, you are not bound to it
       "material-icons", // optional, you are not bound to it
     ],
-
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       vueRouterMode: "hash", // available values: 'hash', 'history'
@@ -74,6 +73,13 @@ module.exports = configure(function (ctx) {
     devServer: {
       server: {
         type: "http",
+      },
+      proxy: {
+        "/": {
+          // target: 'http://192.168.2.100:8602',
+          target: "http://dcs.free.idcfengye.com",
+          changeOrigin: true,
+        },
       },
       port: 8080,
       open: true, // opens browser window automatically

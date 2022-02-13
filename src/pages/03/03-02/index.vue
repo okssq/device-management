@@ -1,30 +1,10 @@
 <template>
-  <div class="my-box q-pa-md row no-wrap full-height full-height">
-    <div
-      class="full-height column no-wrap overflow-hidden"
-      style="width: 280px"
-    >
-      <q-input dense outlined placeholder="设备IMEI号">
-        <template #prepend>
-          <q-icon name="mdi-magnify" />
-        </template>
-      </q-input>
-      <div
-        class="flex1 q-my-sm overflow-hidden"
-        style="border: 1px solid #ddd; border-radius: 4px"
-      >
-        <q-scroll-area class="full-height">
-          <q-tree
-            class="full-width"
-            :nodes="simple"
-            node-key="label"
-            selected-color="primary"
-            v-model:selected="selected"
-            default-expand-all
-          />
-        </q-scroll-area>
+  <div class="my-box row no-wrap full-height full-height">
+    <div class="full-height column no-wrap overflow-hidden">
+      <div class="flex1">
+        <tree />
       </div>
-      <q-input outlined dense placeholder="时间">
+      <q-input outlined dense placeholder="时间" class="q-mx-md">
         <template v-slot:prepend>
           <q-icon name="event" class="cursor-pointer">
             <q-popup-proxy
@@ -59,26 +39,28 @@
       <q-select
         dense
         outlined
-        class="q-my-md"
+        class="q-ma-md"
         label="视频通道"
         dropdown-icon="mdi-chevron-down"
         :options="['通道1', '通道2', '通道3', '通道4']"
       >
       </q-select>
-      <q-btn label="搜索" color="primary" class="full-width" />
+      <div class="q-px-md q-mb-md">
+        <q-btn label="搜索" color="primary" class="full-width" />
+      </div>
     </div>
-    <q-separator vertical class="q-mx-md" />
+    <q-separator vertical />
     <div class="flex1 overflow-hidden column no-wrap">
       <div class="flex1 overflow-hidden row wrap">
         <div
-          class="wrap-video-item q-card--bordered overflow-hidden column no-wrap"
-          v-for="n in 4"
-          :key="n"
+          class="wrap-video-item shadow-4 overflow-hidden column no-wrap"
+          v-for="(n, index) in videoList"
+          :key="index"
         >
           <div class="row justify-between items-center q-pa-sm bg-grey-2">
-            <div class="text-subtitle2">线路{{ n }}</div>
-            <div class="text-caption">60kb/s</div>
-            <q-btn flat round dense icon="mdi-close" size="sm" />
+            <div class="text-subtitle2">IEMI:{{ n.name }}</div>
+            <div class="text-subtitle2">{{ n.speed }}kb/s</div>
+            <q-btn flat round dense icon="clear" size="sm" />
           </div>
           <q-separator />
           <div class="flex1 overflow-hidden video-content">
@@ -130,86 +112,23 @@
 </template>
 
 <script>
+import Tree from "components/tree";
 import MyTable from "components/table";
 import { ref } from "vue";
 
 export default {
   components: {
+    Tree,
     MyTable,
   },
   setup() {
     const selected = ref("Food");
-    const simple = [
-      {
-        label: "项目1",
-        children: [
-          {
-            label: "摄像头1",
-          },
-          {
-            label: "摄像头2",
-          },
-          {
-            label: "摄像头3",
-          },
-          {
-            label: "摄像头4",
-          },
-          {
-            label: "摄像头5",
-          },
-          {
-            label: "摄像头6",
-          },
-        ],
-      },
-      {
-        label: "项目2",
-        children: [
-          {
-            label: "摄像头1",
-          },
-          {
-            label: "摄像头2",
-          },
-          {
-            label: "摄像头3",
-          },
-          {
-            label: "摄像头4",
-          },
-          {
-            label: "摄像头5",
-          },
-          {
-            label: "摄像头6",
-          },
-        ],
-      },
-      {
-        label: "项目3",
-        children: [
-          {
-            label: "摄像头1",
-          },
-          {
-            label: "摄像头2",
-          },
-          {
-            label: "摄像头3",
-          },
-          {
-            label: "摄像头4",
-          },
-          {
-            label: "摄像头5",
-          },
-          {
-            label: "摄像头6",
-          },
-        ],
-      },
-    ];
+    const videoList = ref([
+      { name: "111", speed: "78" },
+      { name: "112", speed: "68" },
+      { name: "211", speed: "46" },
+      { name: "314", speed: "99" },
+    ]);
     const columns = [
       {
         name: "sTime",
@@ -340,7 +259,7 @@ export default {
 
     return {
       selected,
-      simple,
+      videoList,
       columns,
       rows,
     };

@@ -120,6 +120,13 @@ const routes = [
               crumbs: ["信息管理", "项目信息"],
             },
           },
+          {
+            path: "/04-03",
+            component: () => import("pages/04/04-03/index.vue"),
+            meta: {
+              crumbs: ["信息管理", "公司信息"],
+            },
+          },
         ],
       },
       {

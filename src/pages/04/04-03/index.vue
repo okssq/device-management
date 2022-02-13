@@ -18,21 +18,21 @@
           <div class="q-gutter-sm">
             <q-btn
               title="编辑"
-              color="primary"
               flat
               dense
-              size="11px"
+              size="10px"
               round
+              color="blue-5"
               icon="edit"
               @click.stop="onEdit(row)"
             />
             <q-btn
               title="删除"
-              color="red-5"
               flat
               dense
-              size="11px"
+              size="10px"
               round
+              color="red-5"
               icon="clear"
               @click.stop="onDel(row)"
             />
@@ -42,14 +42,15 @@
     </div>
   </div>
 </template>
+
 <script>
 import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
 import { reactive, ref, shallowRef, toRefs } from "vue";
+import { COMPANY } from "src/api/module.js";
 import { notifySuccess } from "src/util/common";
-import { ROLE } from "src/api/module.js";
 import { useQuasar } from "quasar";
 export default {
   components: {
@@ -60,29 +61,42 @@ export default {
     const $q = useQuasar();
     const columns = [
       {
-        name: "roleName",
-        field: "roleName",
-        label: "角色名称",
-        align: "left",
-      },
-      {
-        name: "userName",
-        field: "userName",
-        label: "用户账号",
+        name: "id",
+        field: "id",
+        label: "公司ID",
         align: "left",
       },
       {
         name: "companyName",
         field: "companyName",
-        label: "所属公司",
+        label: "公司名称",
         align: "left",
       },
       {
-        name: "remark",
-        field: "remark",
-        label: "备注",
+        name: "companyCode",
+        field: "companyCode",
+        label: "公司编号",
         align: "left",
       },
+      {
+        name: "contact",
+        field: "contact",
+        label: "联系人",
+        align: "left",
+      },
+      {
+        name: "contactPhone",
+        field: "contactPhone",
+        label: "联系电话",
+        align: "left",
+      },
+      {
+        name: "companyAddress",
+        field: "companyAddress",
+        label: "公司地址",
+        align: "left",
+      },
+
       {
         name: "createTime",
         field: "createTime",
@@ -95,12 +109,11 @@ export default {
         label: "最后更新时间",
         align: "left",
       },
-
       {
         name: "op",
         label: "操作",
         field: "op",
-        align: "center",
+        align: "left",
       },
     ];
     const rows = shallowRef([]);
@@ -115,7 +128,7 @@ export default {
 
     const getList = () => {
       searching.value = true;
-      ROLE.list(searchData)
+      COMPANY.list(searchData)
         .then((res) => {
           const { results, totalCount, totalPage } = res;
           rows.value = results;
@@ -146,7 +159,6 @@ export default {
       searchData && (searchData = { ...searchData, ...val });
       getList();
     };
-
     // 新增按钮回调
     const onInsert = () => {
       $q.dialog({
@@ -159,7 +171,6 @@ export default {
         onSearch({ page: 1 });
       });
     };
-
     // 编辑按钮回调
     const onEdit = (row) => {
       $q.dialog({
@@ -180,7 +191,7 @@ export default {
         componentProps: { row },
       }).onOk(() => {
         searching.value = true;
-        ROLE.del({ id: row.id })
+        COMPANY.del({ id: row.id })
           .then((res) => {
             notifySuccess("删除成功");
             getList();
@@ -191,6 +202,7 @@ export default {
           });
       });
     };
+
     return {
       columns,
       rows,

@@ -4,7 +4,8 @@
     "esbenp.prettier-vscode",
     "editorconfig.editorconfig",
     "johnsoncodehk.volar",
-    "wayou.vscode-todo-highlight"
+    "wayou.vscode-todo-highlight",
+    "MS-CEINTL.vscode-language-pack-zh-hans"
   ],
   "unwantedRecommendations": [
     "octref.vetur",

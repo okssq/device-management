@@ -1,88 +1,58 @@
 <template>
   <div class="absolute-full" id="t-map"></div>
-  <q-card ref="refInfoWindow" v-show="visible" style="width: 320px">
-    <div class="row no-wrap items-center justify-between q-px-md q-py-sm">
-      <span class="text-subtitle2 text-bold text-primary">
-        {{ tObj[curType] }}-2384tfg45</span
-      >
-      <q-btn
-        round
-        flat
-        icon="clear"
-        color="grey-7"
-        dense
-        @click="visible = false"
-      />
-    </div>
-    <q-separator />
-    <q-list class="text-bold text-grey-10 q-pb-md" dense>
-      <q-item>
-        <q-item-section side>状态</q-item-section>
-        <q-item-section side>
-          <q-badge color="green" label="在线" />
-        </q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section side>时间</q-item-section>
-        <q-item-section> 2021/12/01 20:02:02</q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section side> 其他信息</q-item-section>
-        <q-item-section> xxxxxxxxxxxx</q-item-section>
-      </q-item>
-    </q-list>
-  </q-card>
-  <div style="right: 15px;top: 15px;width: 200px" class="absolute shadow-1 bg-white">
-    <q-list class="full-width" >
-      <q-item-label header class="q-pb-none">项目查看</q-item-label>
-      <q-item>
-        <q-item-section>
-          <q-select dense outlined v-model="model" :options="options" />
-        </q-item-section>
-      </q-item>
-
-    </q-list>
-
+  <cust-info-window
+    ref="refInfoWindow"
+    v-show="visible"
+    :info="info"
+    @video="videoShow = true"
+    @close="visible = false"
+  />
+  <video-panel v-if="videoShow" @close="videoShow = false" />
+  <div
+    class="absolute-top-right shadow-2 bg-white"
+    style="max-height: 100%; top: 15px; right: 15px"
+  >
+    <tree
+      :default-id="defaultId"
+      @select="onSelect"
+      @tab-change="onTabChange"
+    />
   </div>
 </template>
 
 <script>
+import Tree from "components/tree";
+import custInfoWindow from "./info-window.vue";
+import VideoPanel from "./video-panel.vue";
+import { vList } from "components/tree/tree-date";
 import { ref, inject, onBeforeUnmount, onMounted } from "vue";
 export default {
+  components: {
+    Tree,
+    custInfoWindow,
+    VideoPanel,
+  },
   setup() {
     const MAP = inject("MAP");
     const MAP_ISLOAD = inject("MAP_ISLOAD");
     const MAP_TELEPORT_TO = inject("MAP_TELEPORT_TO");
     const refInfoWindow = ref(null);
     const visible = ref(false);
-    const curType = ref(0);
-    const tObj = {
-      0: "监控设备",
-      1: "打卡设备",
-      2: "充电设备",
-    };
-
-    let gpsArr = [
-      [114.056996, 22.542088],
-      [114.057082, 22.5407],
-      [114.058369, 22.54074],
-      [114.062704, 22.540383],
-      [114.062446, 22.542286],
-      [114.059099, 22.541929],
-    ];
+    const curTab = ref("0");
+    const videoShow = ref(false);
     let markerArr = [];
     let infoWindow;
-    const model = ref('项目一')
-    const options = ['项目一','项目二','项目三','项目四',]
-
+    const defaultId = ref("");
+    const info = ref(null);
+    // Marker点击
     const onClick = (e) => {
-      const { gps: position, type } = e.target.w;
-      curType.value = type;
+      const { id, gps } = e.target.w.el;
+      info.value = e.target.w.el;
+      defaultId.value = id;
       visible.value = true;
-      infoWindow.setPosition(position);
-      infoWindow.open(MAP.value, position);
-      MAP.value.panTo(position);
-      console.log(type);
+      infoWindow.setPosition(gps);
+      infoWindow.open(MAP.value, gps);
+      MAP.value.panTo(gps);
     };
     const fnMap = () => {
       // 加载infowindow
@@ -94,24 +64,35 @@ export default {
         offset: new window.AMap.Pixel(3, 0),
       });
       // 加载marker
-      gpsArr.forEach((el, index) => {
-        const type = index % 3;
+      vList.forEach((el) => {
+        const { gps, status } = el;
         const marker = new AMap.Marker({
-          type,
-          gps: el,
-          position: el,
+          el,
+          gps: gps,
+          position: gps,
           offset: new AMap.Pixel(-10, 0),
-          icon: `images/tt${type}.png`, // 添加 Icon 图标 URL
+          icon: `images/status${status}.png`, // 添加 Icon 图标 URL
         });
         marker.on("click", onClick);
         MAP.value.add(marker);
         markerArr.push(marker);
       });
-      // infoWindow.open(map,[116.401337,39.907886])
-      // 加载infoWindow
+      fnTabMarkers();
       setTimeout(() => {
         MAP.value.setFitView(markerArr, false, [60, 60, 60, 60], 17);
       }, 500);
+    };
+    // 树列表设备点击
+    const onSelect = (data) => {
+      const { id } = data;
+      const item = vList.find((el) => el.id == id);
+      if (!item) return;
+      const { gps } = item;
+      visible.value = true;
+      infoWindow.setPosition(gps);
+      infoWindow.open(MAP.value, gps);
+      MAP.value.panTo(gps);
+      info.value = item;
     };
     onMounted(() => {
       MAP_TELEPORT_TO.value = "#t-map";
@@ -130,15 +111,39 @@ export default {
       MAP_TELEPORT_TO.value = "#hidden-map";
     });
 
+    const fnTabMarkers = () => {
+      const tab = curTab.value;
+      markerArr.forEach((el) => {
+        const { status } = el.w.el;
+        if (status == 0) {
+          if (tab != 1) {
+            el.show();
+          } else {
+            el.hide();
+          }
+        } else {
+          if (tab == 2) {
+            el.hide();
+          } else {
+            el.show();
+          }
+        }
+      });
+    };
+    const onTabChange = (val) => {
+      curTab.value = val;
+      fnTabMarkers();
+    };
     return {
       MAP,
       MAP_ISLOAD,
       refInfoWindow,
       visible,
-      curType,
-      tObj,
-      model,
-      options,
+      videoShow,
+      defaultId,
+      onSelect,
+      info,
+      onTabChange,
     };
   },
 };

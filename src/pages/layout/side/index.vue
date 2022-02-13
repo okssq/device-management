@@ -6,6 +6,7 @@
     <q-scroll-area class="flex1 q-py-sm">
       <q-list class="q-mr-sm expand-nav" v-show="!NAV_ISMINI">
         <nav-expand-item
+          :router-keys="routerKeys"
           v-for="item in navs"
           :key="item.id"
           :nav="item"
@@ -14,6 +15,7 @@
       </q-list>
       <q-list :separator="false" v-show="NAV_ISMINI" class="popup-nav">
         <nav-popup-item
+          :router-keys="routerKeys"
           v-for="item in navs"
           :key="item.id"
           :nav="item"
@@ -41,11 +43,28 @@
 import NavExpandItem from "./nav-expand-item.vue";
 import NavPopupItem from "./nav-popup-item.vue";
 
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useRoute } from "vue-router";
 export default {
   components: { NavExpandItem, NavPopupItem },
   setup() {
     const NAV_ISMINI = ref(false);
+    const route = useRoute();
+    const routerKeys = computed(() => {
+      const str = route.path.substring(1);
+      const length = str.split("-").length;
+      const arr = [];
+      for (let i = 0; i < length; i++) {
+        if (i === 0) {
+          arr.push(str.substring(0, 2));
+        } else if (i === length - 1) {
+          arr.push(str.substring(0));
+        } else {
+          arr.push(str.substring(0, 2 * (i + 1) + 2 * i - 1));
+        }
+      }
+      return arr;
+    });
     const navs = [
       {
         id: "01",
@@ -140,6 +159,11 @@ export default {
             label: "项目信息",
             path: "/04-02",
           },
+          {
+            id: "04-03",
+            label: "公司信息",
+            path: "/04-03",
+          },
         ],
       },
       {
@@ -185,6 +209,7 @@ export default {
     return {
       NAV_ISMINI,
       navs,
+      routerKeys,
     };
   },
 };

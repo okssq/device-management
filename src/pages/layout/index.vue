@@ -83,11 +83,11 @@ export default {
 
 <style scoped>
 .layout-main {
+  z-index: 8;
   background-color: rgb(244, 245, 250);
 }
 
 .layout-content {
   overflow: hidden;
-  z-index: 8;
 }
 </style>

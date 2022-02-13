@@ -35,6 +35,7 @@
         :page="1"
         expand
       >
+        <template #expand> 展开详情和表头字段等你发过来再改 </template>
         <template #custom-active="{ val }">
           <q-badge
             class="q-pa-xs"
@@ -56,17 +57,8 @@
         <template #custom-gps="{ val }">
           <q-badge class="q-pa-xs" color="teal" :label="val" />
         </template>
-        <template #op>
+        <template #op="{ row }">
           <div class="q-gutter-sm">
-            <q-btn
-              title="详情"
-              flat
-              dense
-              size="10px"
-              round
-              color="teal"
-              icon="visibility"
-            />
             <q-btn
               title="编辑"
               flat
@@ -75,6 +67,7 @@
               round
               color="primary"
               icon="edit"
+              @click.stop="onEdit(row)"
             />
             <q-btn
               title="删除"
@@ -84,8 +77,9 @@
               round
               color="red-5"
               icon="clear"
+              @click.stop="onDel(row)"
             />
-            <q-btn flat dense size="11px" color="grey-7" icon="more_vert">
+            <!-- <q-btn flat dense size="11px" color="grey-7" icon="more_vert">
               <q-menu>
                 <q-list>
                   <q-item clickable v-close-popup @click="onItemClick">
@@ -107,20 +101,31 @@
                   </q-item>
                 </q-list>
               </q-menu>
-            </q-btn>
+            </q-btn> -->
           </div>
         </template>
       </my-table>
     </div>
+    <q-dialog v-model="isDelConfirm" persistent>
+      <del-confirm @cancel="isDelConfirm = false" @ok="isDelConfirm = false" />
+    </q-dialog>
+    <q-dialog v-model="isEdit" persistent style="width: 600px">
+      <edit-form @cancel="isEdit = false" @ok="isEdit = false" />
+    </q-dialog>
   </div>
 </template>
 
 <script>
 import MyTable from "components/table";
+import DelConfirm from "components/del-confirm.vue";
+import EditForm from "./edit-form.vue";
+import { ref } from "vue";
 
 export default {
   components: {
     MyTable,
+    DelConfirm,
+    EditForm,
   },
   setup() {
     const columns = [
@@ -215,10 +220,23 @@ export default {
         time: "2021-06-04 13:05:05",
       },
     ];
-
+    const isEdit = ref(false);
+    const onEdit = (row) => {
+      isEdit.value = true;
+      console.log("onEdit", row);
+    };
+    const isDelConfirm = ref(false);
+    const onDel = (row) => {
+      isDelConfirm.value = true;
+      console.log("onDel", row);
+    };
     return {
       columns,
       rows,
+      isEdit,
+      onEdit,
+      isDelConfirm,
+      onDel,
     };
   },
 };
