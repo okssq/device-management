@@ -129,7 +129,13 @@ export default {
     const getRoleList = () => {
       ROLE.selectList({ CompanyId: 1 })
         .then((res) => {
-          roleList = res;
+          roleList = res.map((el) => {
+            const { label, id } = el;
+            return {
+              label,
+              value: id,
+            };
+          });
         })
         .catch(() => {});
     };

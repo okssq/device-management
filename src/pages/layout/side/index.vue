@@ -27,7 +27,7 @@
     <q-btn
       flat
       color="primary"
-      style="height: 44px"
+      style="height: 48px"
       :icon="
         NAV_ISMINI
           ? 'keyboard_double_arrow_right'
@@ -188,17 +188,17 @@ export default {
             children: [
               {
                 id: "05-03-01",
-                label: "平台使用日志",
+                label: "登录日志",
                 path: "/05-03-01",
               },
               {
                 id: "05-03-02",
-                label: "设备日志",
+                label: "操作日志",
                 path: "/05-03-02",
               },
               {
                 id: "05-03-03",
-                label: "系统日志",
+                label: "TTS日志",
                 path: "/05-03-03",
               },
             ],

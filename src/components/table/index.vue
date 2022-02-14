@@ -63,7 +63,7 @@
     </template>
     <!-- 自定义表bottom-->
     <template #bottom>
-      <div class="full-width row items-center" style="margin: -6px">
+      <div class="full-width row items-center">
         <span class="text-subtitle2 text-grey-7">
           共搜索到
           <span class="text-primary text-bold">{{ totalCount }} </span> 条数据

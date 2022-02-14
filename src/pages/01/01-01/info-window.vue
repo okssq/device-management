@@ -98,7 +98,7 @@
     <q-dialog v-model="dialogPhoto" persistent>
       <q-card>
         <div class="row q-px-md q-py-xs items-center justify-between">
-          <div class="text-body1">拍照</div>
+          <div class="text-subtitle2 text-bold">拍照</div>
           <q-btn flat round size="12px" icon="clear" v-close-popup />
         </div>
         <q-separator />
@@ -125,7 +125,7 @@
     <q-dialog v-model="dialogTTS" persistent>
       <q-card>
         <div class="row q-px-md q-py-xs items-center justify-between">
-          <div class="text-body1">文本下发</div>
+          <div class="text-text-subtitle2 text-bold">文本下发</div>
           <q-btn flat round size="12px" icon="clear" v-close-popup />
         </div>
         <q-separator />

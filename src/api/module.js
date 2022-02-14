@@ -23,6 +23,60 @@ export const COMPANY = {
     return post("/company/company_level.json", param);
   },
 };
+
+// 项目相关接口
+export const PROJECT = {
+  // 项目列表
+  list(param) {
+    return post("/project/project_list.json", param);
+  },
+  // 新增项目
+  insert(param) {
+    return post("/project/insert_project.json", param);
+  },
+  // 修改项目（不修改密码）
+  update(param) {
+    return post("/project/update_project.json", param);
+  },
+  // 删除项目
+  del(param) {
+    return post("/project/delete_project.json", param);
+  },
+};
+// 设备相关接口
+export const TERMINAL = {
+  // 设备列表
+  list(param) {
+    return post("/terminal/terminal_list.json", param);
+  },
+  // 修改设备
+  update(param) {
+    return post("/terminal/update_terminal.json", param);
+  },
+  // 删除设备
+  del(param) {
+    return post("/terminal/unbind_terminal.json", param);
+  },
+  // 未绑定设备列表
+  unbindList(param) {
+    return post("/terminal/unKnown_terminal_list.json", param);
+  },
+  // 绑定设备
+  bind(param) {
+    return post("/terminal/bind_terminal.json", param);
+  },
+};
+// 登录相关接口
+export const login = {
+  // 登录
+  login(param) {
+    return get("/login/login.json", param);
+  },
+  // 退出登录
+  insert() {
+    return post("/login/quit_login.json");
+  },
+};
 // 角色相关
 export const ROLE = {
   // 角色列表
@@ -69,33 +123,14 @@ export const USER = {
     return post("/user/update_password.json", param);
   },
 };
-// 项目相关接口
-export const PROJECT = {
-  // 项目列表
-  list(param) {
-    return post("/project/project_list.json", param);
+// 日志相关接口
+export const LOGS = {
+  // 登录日志列表
+  loginList(param) {
+    return post("/logs/login_log_list.json", param);
   },
-  // 新增项目
-  insert(param) {
-    return post("/project/insert_project.json", param);
-  },
-  // 修改项目（不修改密码）
-  update(param) {
-    return post("/project/update_project.json", param);
-  },
-  // 删除项目
-  del(param) {
-    return post("/project/delete_project.json", param);
-  },
-};
-// 登录相关接口
-export const login = {
-  // 登录
-  login(param) {
-    return get("/login/login.json", param);
-  },
-  // 退出登录
-  insert() {
-    return post("/login/quit_login.json");
+  // 操作日志列表
+  operationList(param) {
+    return post("/logs/operation_log_list.json", param);
   },
 };

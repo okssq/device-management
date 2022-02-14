@@ -2,33 +2,28 @@
   <q-dialog persistent ref="dialogRef">
     <q-card
       class="relative-positon overflow-hidden"
-      style="max-width: 98vw"
-      :style="{ width: type === 'insert' ? '570px' : '292px' }"
+      style="width: 570px; max-width: 98vw"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-subtitle2 text-bold">
-          {{ type === "insert" ? "新增" : "更新" }}用户信息
+          {{ type === "insert" ? "新增" : "更新" }}项目信息
         </div>
         <q-btn flat round size="12px" icon="clear" @click="onDialogHide" />
       </div>
       <q-separator />
 
-      <q-scroll-area
-        style="max-height: 50vh; padding: 16px"
-        :style="{ height: type === 'insert' ? '240px' : '130px' }"
-      >
+      <q-scroll-area style="max-height: 50vh; padding: 16px; height: 230px">
         <q-form class="row q-gutter-md items-center">
           <q-input
             dense
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="userName"
-            v-if="type === 'insert'"
+            v-model="projectName"
           >
             <template #prepend>
               <span class="text-subtitle2 text-grey-8 text-bold"
-                >用户账号：</span
+                >项目名称:</span
               >
             </template>
           </q-input>
@@ -37,12 +32,10 @@
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="realName"
+            v-model="concat"
           >
             <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >用户昵称：</span
-              >
+              <span class="text-subtitle2 text-grey-8 text-bold">负责人：</span>
             </template>
           </q-input>
           <q-input
@@ -50,67 +43,12 @@
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="telephone"
+            v-model="concatPhone"
           >
             <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >联系电话：</span
-              >
-            </template>
-          </q-input>
-          <q-select
-            dense
-            outlined
-            lazy-rules
-            class="my-form-item"
-            v-model="roleId"
-            emit-value
-            :options="roleList"
-            v-if="type === 'insert'"
-          >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold">角色：</span>
-            </template>
-          </q-select>
-          <q-input
-            dense
-            outlined
-            lazy-rules
-            class="my-form-item"
-            model-value="1"
-            disable
-            v-if="type === 'insert'"
-          >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >所属公司：</span
-              >
-            </template>
-          </q-input>
-          <q-field dense outlined class="my-form-item" v-if="type === 'insert'">
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >是否为管理员：</span
-              >
-            </template>
-            <q-toggle
-              dense
-              color="green"
-              :false-value="0"
-              :true-value="1"
-              v-model="withCompany"
-            />
-          </q-field>
-          <q-input
-            dense
-            outlined
-            lazy-rules
-            class="my-form-item"
-            v-model="userPassword"
-            v-if="type === 'insert'"
-          >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold">密码：</span>
+              <span class="text-subtitle2 text-grey-8 text-bold">
+                联系电话：
+              </span>
             </template>
           </q-input>
           <q-input
@@ -118,13 +56,52 @@
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="confirmUserPassword"
-            v-if="type === 'insert'"
+            v-model="mapStr"
           >
             <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >确认密码：</span
-              >
+              <span class="text-subtitle2 text-grey-8 text-bold">
+                地图围栏：
+              </span>
+            </template>
+          </q-input>
+          <q-input
+            dense
+            outlined
+            lazy-rules
+            class="my-form-item"
+            v-model="projectCity"
+          >
+            <template #prepend>
+              <span class="text-subtitle2 text-grey-8 text-bold">
+                所属区域：
+              </span>
+            </template>
+          </q-input>
+          <q-input
+            dense
+            outlined
+            lazy-rules
+            class="my-form-item"
+            v-model="projectAddress"
+          >
+            <template #prepend>
+              <span class="text-subtitle2 text-grey-8 text-bold">
+                详细地址：
+              </span>
+            </template>
+          </q-input>
+          <q-input
+            dense
+            outlined
+            lazy-rules
+            class="my-form-item"
+            type="text-area"
+            v-model="describeStr"
+          >
+            <template #prepend>
+              <span class="text-subtitle2 text-grey-8 text-bold">
+                项目简介：
+              </span>
             </template>
           </q-input>
         </q-form>
@@ -143,7 +120,7 @@
 <script>
 import { useDialogPluginComponent } from "quasar";
 import { reactive, ref, toRaw, toRefs } from "vue";
-import { USER } from "src/api/module";
+import { PROJECT } from "src/api/module";
 export default {
   emits: [...useDialogPluginComponent.emits],
   props: {
@@ -155,29 +132,23 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    roleList: {
-      type: Array,
-      default: () => [],
-    },
   },
   setup(props) {
     const { dialogRef, onDialogOK, onDialogHide } = useDialogPluginComponent();
     let formData = reactive({
-      userName: "",
-      realName: "",
-      telephone: "",
-      roleId: "",
-      companyId: 1,
-      withCompany: 0,
-      userPassword: "",
-      confirmUserPassword: "",
+      companyId: "1",
+      projectName: "",
+      concat: "",
+      concatPhone: "",
+      mapStr: "",
+      projectCity: "",
+      projectAddress: "",
+      describeStr: "",
     });
     const loading = ref(false);
     if (props.type === "edit") {
       console.log("formData", props.formData);
-      const { createTime, updateTime, userId, ...param } = toRaw(
-        props.formData
-      );
+      const { createTime, updateTime, ...param } = toRaw(props.formData);
       formData = reactive({ ...param });
     }
 
@@ -185,7 +156,7 @@ export default {
       loading.value = true;
       const param = toRaw(formData);
       if (props.type === "insert") {
-        USER.insert(param)
+        PROJECT.insert(param)
           .then(() => {
             onDialogOK();
           })
@@ -194,7 +165,7 @@ export default {
             loading.value = false;
           });
       } else {
-        USER.update(param)
+        PROJECT.update(param)
           .then(() => {
             onDialogOK();
           })

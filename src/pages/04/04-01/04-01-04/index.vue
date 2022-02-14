@@ -1,76 +1,87 @@
 <template>
   <div class="my-box column no-wrap">
-    <div class="bg-white q-pl-md q-pb-md q-mt-md">
-      <q-form class="q-gutter-sm row items-center">
-        <q-input outlined dense placeholder="终端ID" />
-        <q-input outlined dense placeholder="设备IMEI" />
-        <q-input outlined dense placeholder="版本号" />
-        <q-input outlined dense placeholder="ROM" />
-        <q-input outlined dense placeholder="创建日期">
-          <template v-slot:prepend>
-            <q-icon name="event" class="cursor-pointer">
-              <q-popup-proxy
-                cover
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-date mask="YYYY-MM-DD HH:mm">
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-        </q-input>
-        <q-btn icon="search" color="primary" dense />
-        <q-btn icon="add" color="primary" dense />
-        <q-btn icon="file_download" color="primary" dense />
-      </q-form>
-    </div>
+    <search-bar :searching="searching" @search="onSearch" @bind="onBind" />
     <q-separator />
     <div class="flex1 overflow-hidden">
-      <my-table
+      <result-table
         expand
-        row-key="id"
+        row-key="rIndex"
         :rows="rows"
         :columns="columns"
-        :total="100"
-        :page="1"
+        :loading="searching"
+        :page="page"
+        :page-size="pageSize"
+        :total-count="totalCount"
+        :total-page="totalPage"
+        @page="onPageChange"
       >
-        <template #expand>
-          展开详情和表头字段等你发过来再改，没有我在自己去找
-        </template>
-        <template #custom-active="{ val }">
-          <q-badge
-            class="q-pa-xs"
-            :label="val == 1 ? '启用' : '关闭'"
-            :color="val == 1 ? 'green' : 'red'"
-          />
-        </template>
-        <template #custom-location="{ val }">
-          <div
-            class="text-primary q-pa-sm cursor-pointer"
-            style="text-decoration: underline"
-          >
-            <div>经度: {{ val[0] }}</div>
-            <div>纬度: {{ val[1] }}</div>
+        <template #expand="{ row }">
+          <div class="q-gutter-sm q-ml-sm text-body2">
+            <div class="item row">
+              <div class="label">设备别名:</div>
+              <div class="value">{{ row.terminalName }}</div>
+            </div>
+            <div class="item row">
+              <div class="label">所属公司:</div>
+              <div class="value">{{ row.companyName }}</div>
+            </div>
+            <div class="item row">
+              <div class="label">项目ID:</div>
+              <div class="value">{{ row.projectId }}</div>
+            </div>
+            <div class="item row">
+              <div class="label">项目名称:</div>
+              <div class="value">{{ row.projectName }}</div>
+            </div>
+            <div class="item row">
+              <div class="label">当前位置:</div>
+              <div class="value">{{ row.address }}</div>
+            </div>
+            <div class="item row">
+              <div class="label">创建时间:</div>
+              <div class="value">{{ row.createTime }}</div>
+            </div>
+            <div class="item row">
+              <div class="label">最后更新时间:</div>
+              <div class="value">{{ row.updateTime }}</div>
+            </div>
           </div>
         </template>
-        <template #custom-type="{ val }">
-          <q-badge class="q-pa-xs" :color="val == 1 ? 'blue-grey' : 'brown'">
-            {{ val == 1 ? "SGB-FG123" : "SVH-HJ332" }}
-          </q-badge>
+        <template #custom-gpsInfo="{ val }">
+          <div
+            class="text-primary cursor-pointer"
+            style="text-decoration: underline"
+          >
+            <div>经度: {{ (val || "").split(",")[0] || "-" }}</div>
+            <div>纬度: {{ (val || "").split(",")[1] || "-" }}</div>
+          </div>
         </template>
-        <template #op>
+        <template #custom-checkType="{ val }">
+          <q-badge dense :label="val" :color="val === '1' ? 'green' : 'red'" />
+        </template>
+        <template #custom-nowStatus="{ val }">
+          <q-badge
+            dense
+            :label="val === '1' ? '启用' : '关闭'"
+            :color="val === '1' ? 'green' : 'grey'"
+          />
+        </template>
+        <template #custom-onlineStatus="{ val }">
+          <q-badge
+            dense
+            :label="onlineStatusText[val] || '未知'"
+            :color="onlineStatusColor[val] || 'brown'"
+          />
+        </template>
+        <template #op="{ row }">
           <div class="q-gutter-sm">
             <q-btn
               title="编辑"
               flat
               dense
-              size="11px"
+              size="10px"
               round
-              color="primary"
+              color="blue-5"
               icon="edit"
               @click.stop="onEdit(row)"
             />
@@ -78,239 +89,208 @@
               title="删除"
               flat
               dense
-              size="11px"
+              size="10px"
               round
               color="red-5"
               icon="clear"
               @click.stop="onDel(row)"
             />
-            <q-btn flat dense size="11px" color="grey-7" icon="more_vert">
-              <q-menu>
-                <q-list>
-                  <q-item clickable v-close-popup @click="onItemClick">
-                    <q-item-section>
-                      <q-item-label>功能1</q-item-label>
-                    </q-item-section>
-                  </q-item>
-
-                  <q-item clickable v-close-popup @click="onItemClick">
-                    <q-item-section>
-                      <q-item-label>功能2</q-item-label>
-                    </q-item-section>
-                  </q-item>
-
-                  <q-item clickable v-close-popup @click="onItemClick">
-                    <q-item-section>
-                      <q-item-label>功能3</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-btn>
           </div>
         </template>
-      </my-table>
+      </result-table>
     </div>
-    <q-dialog v-model="isDelConfirm" persistent>
-      <del-confirm @cancel="isDelConfirm = false" @ok="isDelConfirm = false" />
-    </q-dialog>
-    <q-dialog v-model="isEdit" persistent style="width: 600px">
-      <edit-form @cancel="isEdit = false" @ok="isEdit = false" />
-    </q-dialog>
   </div>
 </template>
 
 <script>
-import MyTable from "components/table";
+import SearchBar from "./search-bar.vue";
+import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
-import EditForm from "./edit-form.vue";
-import { ref } from "vue";
+import DetailForm from "./detail-form.vue";
+import UnbindPanel from "./unbind-panel.vue";
+import { reactive, ref, shallowRef, toRefs } from "vue";
+import { TERMINAL } from "src/api/module.js";
+import { notifySuccess } from "src/util/common";
+import { useQuasar } from "quasar";
 export default {
   components: {
-    MyTable,
-    DelConfirm,
-    EditForm,
+    SearchBar,
+    ResultTable,
   },
   setup() {
+    const onlineStatusText = {
+      0: "状态零",
+      1: "状态一",
+      2: "状态二",
+      3: "状态三",
+    };
+    const onlineStatusColor = {
+      0: "grey",
+      1: "orange",
+      2: "green",
+      3: "blue",
+    };
+    const $q = useQuasar();
     const columns = [
       {
-        name: "no",
-        field: "no",
-        label: "设备ID",
-        align: "left",
-        sortable: true,
-      },
-      {
-        name: "name",
-        field: "name",
-        label: "ICCID",
+        name: "terminalId",
+        field: "terminalId",
+        label: "设备IMEI",
         align: "left",
       },
       {
-        name: "active",
-        field: "active",
+        name: "gpsInfo",
+        field: "gpsInfo",
+        label: "GPS定位",
+        align: "left",
+        type: "custom",
+      },
+      {
+        name: "checkType",
+        field: "checkType",
+        label: "checkType",
+        align: "left",
+        type: "custom",
+      },
+      {
+        name: "nowStatus",
+        field: "nowStatus",
+        label: "启用",
+        align: "left",
+        type: "custom",
+      },
+      {
+        name: "onlineStatus",
+        field: "onlineStatus",
         label: "状态",
         align: "left",
         type: "custom",
-        sortable: true,
       },
-      {
-        name: "location",
-        field: "location",
-        label: "位置",
-        align: "left",
-        type: "custom",
-      },
-      {
-        name: "sex",
-        field: "sex",
-        label: "硬件版本",
-        align: "left",
-        sortable: true,
-      },
-      {
-        name: "type",
-        field: "type",
-        label: "终端型号",
-        align: "left",
-        type: "custom",
-        sortable: true,
-      },
-      {
-        name: "time",
-        field: "time",
-        label: "创建时间",
-        align: "left",
-        sortable: true,
-      },
+
       {
         name: "op",
         label: "操作",
         field: "op",
-        align: "center",
+        align: "left",
       },
     ];
-    const rows = [
-      {
-        id: "0",
-        active: 1,
-        location: [131.224, 12.384],
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        type: "1",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        id: "1",
-        active: 0,
-        location: [131.224, 12.384],
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        type: "2",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        id: "2",
-        active: 0,
-        location: [131.224, 12.384],
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        type: "1",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 1,
-        id: "3",
-        location: [131.224, 12.384],
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        type: "1",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 0,
-        id: "4",
-        location: [131.224, 12.384],
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        type: "2",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 1,
-        id: "5",
-        location: [131.224, 12.384],
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        type: "2",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 0,
-        id: "6",
-        location: [131.224, 12.384],
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        type: "1",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 1,
-        id: "7",
-        location: [131.224, 12.384],
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        type: "1",
-        time: "2021-06-06 13:05:05",
-      },
-      {
-        active: 1,
-        id: "8",
-        location: [131.224, 12.384],
-        no: "14210388",
-        name: "sdgshnhjyxf",
-        sex: "ver1.0.1",
-        type: "2",
-        time: "2021-06-04 13:05:05",
-      },
-      {
-        active: 0,
-        id: "9",
-        location: [131.224, 12.384],
-        no: "14210328",
-        name: "gstewtet",
-        sex: "ver1.0.4",
-        type: "1",
-        time: "2021-06-06 13:05:05",
-      },
-    ];
-    const isEdit = ref(false);
-    const onEdit = (row) => {
-      isEdit.value = true;
-      console.log("onEdit", row);
+    const rows = shallowRef([]);
+    const pagination = reactive({
+      page: 1,
+      pageSize: 10,
+      totalCount: 0,
+      totalPage: 0,
+    });
+    const searching = ref(false);
+    let searchData;
+
+    const getList = () => {
+      searching.value = true;
+      TERMINAL.list(searchData)
+        .then((res) => {
+          const { results, totalCount, totalPage } = res;
+          results.forEach((el, index) => {
+            el.rIndex = index;
+          });
+          rows.value = results;
+          pagination.totalCount = totalCount;
+          pagination.totalPage = totalPage;
+        })
+        .catch(() => {})
+        .finally(() => {
+          searching.value = false;
+        });
     };
-    const isDelConfirm = ref(false);
+    // 搜索回调
+    const onSearch = (val) => {
+      pagination.page = 1;
+      searchData = {
+        ...val,
+        page: 1,
+        pageSize: pagination.pageSize,
+      };
+      getList();
+      console.log("searchData", searchData);
+    };
+    // 表格pagination改变回调
+    const onPageChange = (val) => {
+      const { pageSize, page } = val;
+      page && (pagination.page = page);
+      pageSize && (pagination.pageSize = pageSize);
+      searchData && (searchData = { ...searchData, ...val });
+      getList();
+    };
+    // 未注册设备按钮回调
+    const onBind = () => {
+      $q.dialog({
+        component: UnbindPanel,
+      });
+    };
+    // 新增按钮回调
+    // const onInsert = () => {
+    //   $q.dialog({
+    //     component: DetailForm,
+    //     componentProps: {
+    //       type: "insert",
+    //     },
+    //   }).onOk(() => {
+    //     notifySuccess("增加成功");
+    //     onSearch({ page: 1 });
+    //   });
+    // };
+    // 编辑按钮回调
+    const onEdit = (row) => {
+      $q.dialog({
+        component: DetailForm,
+        componentProps: {
+          type: "edit",
+          formData: row,
+        },
+      }).onOk(() => {
+        notifySuccess("更新成功");
+        getList();
+      });
+    };
+
     const onDel = (row) => {
-      isDelConfirm.value = true;
-      console.log("onDel", row);
+      $q.dialog({
+        component: DelConfirm,
+        componentProps: { row },
+      }).onOk(() => {
+        searching.value = true;
+        TERMINAL.del({ terminalId: row.terminalId })
+          .then(() => {
+            notifySuccess("删除成功");
+            getList();
+          })
+          .catch(() => {})
+          .finally(() => {
+            searching.value = false;
+          });
+      });
     };
 
     return {
+      onlineStatusText,
+      onlineStatusColor,
       columns,
       rows,
-      isEdit,
+      ...toRefs(pagination),
+      searching,
+      onPageChange,
+      onSearch,
+      onBind,
+      // onInsert,
       onEdit,
-      isDelConfirm,
       onDel,
     };
   },
 };
 </script>
+<style scoped>
+.label {
+  margin-right: 8px;
+  color: #446ba4;
+  font-weight: bold;
+}
+</style>

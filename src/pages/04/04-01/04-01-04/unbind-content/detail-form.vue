@@ -5,26 +5,24 @@
       style="width: 292px; max-width: 98vw"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
-        <div class="text-text-subtitle2 text-bold">
-          {{ type === "insert" ? "新增" : "更新" }}角色信息
-        </div>
+        <div class="text-subtitle2 text-bold">绑定项目</div>
         <q-btn flat round size="12px" icon="clear" @click="onDialogHide" />
       </div>
       <q-separator />
 
-      <q-scroll-area style="height: 130px; max-height: 50vh; padding: 16px">
+      <q-scroll-area style="max-height: 50vh; padding: 16px; height: 230px">
         <q-form class="row q-gutter-md items-center">
           <q-input
             dense
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="roleName"
+            v-model="projectId"
           >
             <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >角色名称：</span
-              >
+              <span class="text-subtitle2 text-grey-8 text-bold">
+                项目ID:
+              </span>
             </template>
           </q-input>
           <q-input
@@ -32,10 +30,23 @@
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="remark"
+            v-model="gpsInfo"
           >
             <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold">备注：</span>
+              <span class="text-subtitle2 text-grey-8 text-bold">GPS定位:</span>
+            </template>
+          </q-input>
+          <q-input
+            dense
+            outlined
+            lazy-rules
+            class="my-form-item"
+            v-model="address"
+          >
+            <template #prepend>
+              <span class="text-subtitle2 text-grey-8 text-bold">
+                设备地址:
+              </span>
             </template>
           </q-input>
         </q-form>
@@ -54,14 +65,10 @@
 <script>
 import { useDialogPluginComponent } from "quasar";
 import { reactive, ref, toRaw, toRefs } from "vue";
-import { ROLE } from "src/api/module";
+import { TERMINAL } from "src/api/module";
 export default {
   emits: [...useDialogPluginComponent.emits],
   props: {
-    type: {
-      type: String,
-      default: "",
-    },
     formData: {
       type: Object,
       default: () => ({}),
@@ -69,46 +76,28 @@ export default {
   },
   setup(props) {
     const { dialogRef, onDialogOK, onDialogHide } = useDialogPluginComponent();
-    let formData = reactive({
-      companyId: 1,
-      remark: "",
-      roleName: "",
-    });
     const loading = ref(false);
-
-    if (props.type === "edit") {
-      console.log("formData", props.formData);
-      const { id, companyId, remark, roleName } = toRaw(props.formData);
-      formData = reactive({
-        id,
-        companyId,
-        roleName,
-        remark,
-      });
-    }
-
+    let formData = reactive({
+      address: "",
+      gpsInfo: "",
+      projectId: "",
+    });
+    formData = reactive({
+      projectId: "1",
+      ...toRaw(props.formData),
+    });
     const onSubmit = () => {
       loading.value = true;
       const param = toRaw(formData);
-      if (props.type === "insert") {
-        ROLE.insert(param)
-          .then(() => {
-            onDialogOK();
-          })
-          .catch(() => {})
-          .finally(() => {
-            loading.value = false;
-          });
-      } else {
-        ROLE.update(param)
-          .then(() => {
-            onDialogOK();
-          })
-          .catch(() => {})
-          .finally(() => {
-            loading.value = false;
-          });
-      }
+      param.type = 1;
+      TERMINAL.bind(param)
+        .then(() => {
+          onDialogOK();
+        })
+        .catch(() => {})
+        .finally(() => {
+          loading.value = false;
+        });
     };
 
     return {

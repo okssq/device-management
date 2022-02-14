@@ -5,7 +5,7 @@
       style="width: 570px; max-width: 98vw"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
-        <div class="text-body1">
+        <div class="text-text-subtitle2 text-bold">
           {{ type === "insert" ? "新增" : "更新" }}公司信息
         </div>
         <q-btn flat round size="12px" icon="clear" @click="onDialogHide" />
