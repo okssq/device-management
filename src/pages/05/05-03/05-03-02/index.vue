@@ -1,6 +1,10 @@
 <template>
   <div class="my-box column no-wrap">
-    <search-bar :searching="searching" @search="onSearch" />
+    <search-bar
+      :searching="searching"
+      :tree-list="treeList"
+      @search="onSearch"
+    />
     <q-separator />
     <div class="flex1 overflow-hidden">
       <result-table
@@ -36,6 +40,7 @@ import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import { reactive, ref, shallowRef, toRefs } from "vue";
 import { LOGS } from "src/api/module.js";
+import { useCompanyTree } from "components/company/useCompayTree";
 export default {
   components: {
     SearchBar,
@@ -99,7 +104,7 @@ export default {
     });
     const searching = ref(false);
     let searchData;
-
+    const { treeList } = useCompanyTree();
     const getList = () => {
       searching.value = true;
       LOGS.operationList(searchData)
@@ -137,6 +142,7 @@ export default {
       rows,
       ...toRefs(pagination),
       searching,
+      treeList,
       onSearch,
       onPageChange,
     };

@@ -2,8 +2,7 @@
   <q-dialog persistent ref="dialogRef">
     <q-card
       class="relative-positon overflow-hidden"
-      style="max-width: 98vw"
-      :style="{ width: type === 'insert' ? '570px' : '292px' }"
+      style="max-width: 98vw; width: 680px"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-subtitle2 text-bold">
@@ -15,21 +14,66 @@
 
       <q-scroll-area
         style="max-height: 50vh; padding: 16px"
-        :style="{ height: type === 'insert' ? '240px' : '130px' }"
+        :style="{ height: type === 'insert' ? '240px' : '190px' }"
       >
         <q-form class="row q-gutter-md items-center">
+          <input-filter-company
+            v-if="type == 'insert'"
+            style="width: 310px"
+            label-style="
+              min-width: 100px;
+              max-width: 100px;
+              text-align: right;
+              word-wrap: break-word;"
+            :filter-text="selectCompanyName"
+            :tree-list="treeList"
+            v-model="companyId"
+            @update:model-value="onChangeCompanyId"
+          />
           <q-input
+            v-else
+            dense
+            outlined
+            lazy-rules
+            disable
+            class="my-form-item"
+            v-model="companyName"
+          >
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
+                >公司名称：</span
+              >
+            </template>
+          </q-input>
+
+          <q-select
+            v-if="type == 'insert'"
             dense
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="userName"
-            v-if="type === 'insert'"
+            v-model="roleId"
+            emit-value
+            map-options
+            :options="roleList"
+            :disable="type !== 'insert'"
+            :loading="roleLoading"
           >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >用户账号：</span
-              >
+            <template #before>
+              <span class="text-caption text-bold my-form-label">角色：</span>
+            </template>
+          </q-select>
+          <q-input
+            v-else
+            dense
+            outlined
+            lazy-rules
+            class="my-form-item"
+            v-model="realName"
+            disable
+          >
+            <template #before>
+              <span class="text-caption text-bold my-form-label">角色：</span>
             </template>
           </q-input>
           <q-input
@@ -39,9 +83,50 @@
             class="my-form-item"
             v-model="realName"
           >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
                 >用户昵称：</span
+              >
+            </template>
+          </q-input>
+          <q-input
+            dense
+            outlined
+            lazy-rules
+            class="my-form-item"
+            v-model="userName"
+          >
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
+                >用户账号：</span
+              >
+            </template>
+          </q-input>
+          <q-input
+            dense
+            outlined
+            lazy-rules
+            class="my-form-item"
+            type="password"
+            v-model="userPassword"
+            v-if="type === 'insert'"
+          >
+            <template #before>
+              <span class="text-caption text-bold my-form-label">密码：</span>
+            </template>
+          </q-input>
+          <q-input
+            dense
+            outlined
+            lazy-rules
+            type="password"
+            class="my-form-item"
+            v-model="confirmUserPassword"
+            v-if="type === 'insert'"
+          >
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
+                >确认密码：</span
               >
             </template>
           </q-input>
@@ -52,78 +137,9 @@
             class="my-form-item"
             v-model="telephone"
           >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
                 >联系电话：</span
-              >
-            </template>
-          </q-input>
-          <q-select
-            dense
-            outlined
-            lazy-rules
-            class="my-form-item"
-            v-model="roleId"
-            emit-value
-            :options="roleList"
-            v-if="type === 'insert'"
-          >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold">角色：</span>
-            </template>
-          </q-select>
-          <q-input
-            dense
-            outlined
-            lazy-rules
-            class="my-form-item"
-            model-value="1"
-            disable
-            v-if="type === 'insert'"
-          >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >所属公司：</span
-              >
-            </template>
-          </q-input>
-          <q-field dense outlined class="my-form-item" v-if="type === 'insert'">
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >是否为管理员：</span
-              >
-            </template>
-            <q-toggle
-              dense
-              color="green"
-              :false-value="0"
-              :true-value="1"
-              v-model="withCompany"
-            />
-          </q-field>
-          <q-input
-            dense
-            outlined
-            lazy-rules
-            class="my-form-item"
-            v-model="userPassword"
-            v-if="type === 'insert'"
-          >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold">密码：</span>
-            </template>
-          </q-input>
-          <q-input
-            dense
-            outlined
-            lazy-rules
-            class="my-form-item"
-            v-model="confirmUserPassword"
-            v-if="type === 'insert'"
-          >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
-                >确认密码：</span
               >
             </template>
           </q-input>
@@ -142,11 +158,27 @@
 </template>
 <script>
 import { useDialogPluginComponent } from "quasar";
-import { reactive, ref, toRaw, toRefs } from "vue";
-import { USER } from "src/api/module";
+import InputFilterCompany from "components/company/input-filter-company.vue";
+import { reactive, ref, shallowRef, toRaw, toRefs } from "vue";
+import { USER, ROLE } from "src/api/module";
 export default {
   emits: [...useDialogPluginComponent.emits],
+  components: {
+    InputFilterCompany,
+  },
   props: {
+    selectCompanyId: {
+      type: String,
+      default: "",
+    },
+    selectCompanyName: {
+      type: String,
+      default: "",
+    },
+    treeList: {
+      type: Array,
+      default: () => [],
+    },
     type: {
       type: String,
       default: "",
@@ -155,30 +187,63 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    roleList: {
-      type: Array,
-      default: () => [],
-    },
   },
   setup(props) {
     const { dialogRef, onDialogOK, onDialogHide } = useDialogPluginComponent();
     let formData = reactive({
+      companyId: "",
+      companyName: "",
+      roleId: "",
+      roleName: "",
       userName: "",
       realName: "",
-      telephone: "",
-      roleId: "",
-      companyId: 1,
-      withCompany: 0,
       userPassword: "",
       confirmUserPassword: "",
+      telephone: "",
     });
     const loading = ref(false);
-    if (props.type === "edit") {
+    const roleLoading = ref(false);
+    const roleList = shallowRef([]);
+    // 获取角色列表
+    const getRoleList = (CompanyId) => {
+      roleLoading.value = true;
+      ROLE.selectList({ CompanyId })
+        .then((res) => {
+          if (CompanyId !== formData.companyId) return;
+          const arr = res.map((el) => {
+            const { id, label } = el;
+            return {
+              label,
+              value: id,
+            };
+          });
+          roleList.value = arr;
+        })
+        .finally(() => {
+          roleLoading.value = false;
+        });
+    };
+    // 选择公司改变时
+    const onChangeCompanyId = (val) => {
+      roleList.value = [];
+      formData.roleId = "";
+      if (!val) {
+        roleLoading.value = false;
+      } else {
+        getRoleList(val);
+      }
+    };
+    if (props.type === "insert") {
+      formData.companyId = props.selectCompanyId.toString();
+      getRoleList(props.selectCompanyId);
+    } else {
       console.log("formData", props.formData);
       const { createTime, updateTime, userId, ...param } = toRaw(
         props.formData
       );
-      formData = reactive({ ...param });
+      formData = reactive({
+        ...param,
+      });
     }
 
     const onSubmit = () => {
@@ -209,7 +274,9 @@ export default {
       dialogRef,
       ...toRefs(formData),
       loading,
-
+      roleList,
+      roleLoading,
+      onChangeCompanyId,
       onSubmit,
       onDialogHide,
     };
@@ -218,9 +285,12 @@ export default {
 </script>
 <style scoped>
 .my-form-item {
-  width: 260px;
+  width: 310px;
 }
 .my-form-label {
-  max-width: 80px;
+  min-width: 100px;
+  max-width: 100px;
+  text-align: right;
+  word-wrap: break-word;
 }
 </style>

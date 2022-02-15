@@ -1,6 +1,11 @@
 <template>
   <div class="my-box column no-wrap">
-    <search-bar :searching="searching" @search="onSearch" @insert="onInsert" />
+    <search-bar
+      :tree-list="treeList"
+      :searching="searching"
+      @search="onSearch"
+      @insert="onInsert"
+    />
     <q-separator />
     <div class="flex1 overflow-hidden">
       <result-table
@@ -36,6 +41,16 @@
               icon="clear"
               @click.stop="onDel(row)"
             />
+            <q-btn
+              title="菜单授权"
+              color="green"
+              flat
+              dense
+              size="11px"
+              round
+              icon="tune"
+              @click.stop="onAssign(row)"
+            />
           </div>
         </template>
       </result-table>
@@ -48,15 +63,17 @@ import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
 import { reactive, ref, shallowRef, toRefs } from "vue";
-import { notifySuccess } from "src/util/common";
+import { notifySuccess, notifyWarn } from "src/util/common";
 import { ROLE } from "src/api/module.js";
 import { useQuasar } from "quasar";
+import { useCompanyTree } from "components/company/useCompayTree";
 export default {
   components: {
     SearchBar,
     ResultTable,
   },
   setup() {
+    const { treeList } = useCompanyTree();
     const $q = useQuasar();
     const columns = [
       {
@@ -65,12 +82,7 @@ export default {
         label: "角色名称",
         align: "left",
       },
-      {
-        name: "userName",
-        field: "userName",
-        label: "用户账号",
-        align: "left",
-      },
+
       {
         name: "companyName",
         field: "companyName",
@@ -84,18 +96,17 @@ export default {
         align: "left",
       },
       {
+        name: "userName",
+        field: "userName",
+        label: "创建人",
+        align: "left",
+      },
+      {
         name: "createTime",
         field: "createTime",
         label: "创建时间",
         align: "left",
       },
-      {
-        name: "updateTime",
-        field: "updateTime",
-        label: "最后更新时间",
-        align: "left",
-      },
-
       {
         name: "op",
         label: "操作",
@@ -149,10 +160,22 @@ export default {
 
     // 新增按钮回调
     const onInsert = () => {
+      if (!treeList.value.length) {
+        notifyWarn("数据加载中，请稍后重试！");
+        return;
+      }
+      const item = treeList.value.find((el) => {
+        return el.id == 1;
+      });
+
+      const { id, label } = item || { id: "", label: "" };
       $q.dialog({
         component: DetailForm,
         componentProps: {
           type: "insert",
+          selectCompanyId: id + "",
+          selectCompanyName: label,
+          treeList: treeList.value,
         },
       }).onOk(() => {
         notifySuccess("增加成功");
@@ -191,7 +214,12 @@ export default {
           });
       });
     };
+
+    const onAssign = () => {
+      notifyWarn("此功能暂未开放！");
+    };
     return {
+      treeList,
       columns,
       rows,
       ...toRefs(pagination),
@@ -201,6 +229,7 @@ export default {
       onInsert,
       onEdit,
       onDel,
+      onAssign,
     };
   },
 };

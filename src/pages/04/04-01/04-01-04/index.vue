@@ -1,6 +1,11 @@
 <template>
   <div class="my-box column no-wrap">
-    <search-bar :searching="searching" @search="onSearch" @bind="onBind" />
+    <search-bar
+      :tree-list="treeList"
+      :searching="searching"
+      @search="onSearch"
+      @bind="onBind"
+    />
     <q-separator />
     <div class="flex1 overflow-hidden">
       <result-table
@@ -56,22 +61,38 @@
             <div>纬度: {{ (val || "").split(",")[1] || "-" }}</div>
           </div>
         </template>
-        <template #custom-checkType="{ val }">
-          <q-badge dense :label="val" :color="val === '1' ? 'green' : 'red'" />
-        </template>
-        <template #custom-nowStatus="{ val }">
-          <q-badge
-            dense
-            :label="val === '1' ? '启用' : '关闭'"
-            :color="val === '1' ? 'green' : 'grey'"
-          />
-        </template>
-        <template #custom-onlineStatus="{ val }">
-          <q-badge
-            dense
-            :label="onlineStatusText[val] || '未知'"
-            :color="onlineStatusColor[val] || 'brown'"
-          />
+
+        <template #custom-onlineStatus="{ row, val }">
+          <div class="row no-wrap justify-center">
+            <q-icon
+              v-if="val"
+              size="22px"
+              class="q-mr-sm"
+              :color="
+                row.checkType !== row.type
+                  ? 'red'
+                  : onlineStatusColor[val] || 'primary'
+              "
+              :name="
+                row.checkType !== row.type
+                  ? 'device_unknown'
+                  : onlineStatusIcon[val] || 'primary'
+              "
+            />
+            <q-badge
+              dense
+              :label="
+                row.checkType !== row.type
+                  ? '设备类型不匹配'
+                  : onlineStatusText[val] || '-'
+              "
+              :color="
+                row.checkType !== row.type
+                  ? 'red'
+                  : onlineStatusColor[val] || 'pramary'
+              "
+            />
+          </div>
         </template>
         <template #op="{ row }">
           <div class="q-gutter-sm">
@@ -112,30 +133,52 @@ import { reactive, ref, shallowRef, toRefs } from "vue";
 import { TERMINAL } from "src/api/module.js";
 import { notifySuccess } from "src/util/common";
 import { useQuasar } from "quasar";
+import { useCompanyTree } from "components/company/useCompayTree";
 export default {
   components: {
     SearchBar,
     ResultTable,
   },
   setup() {
+    const { treeList } = useCompanyTree();
     const onlineStatusText = {
-      0: "状态零",
-      1: "状态一",
-      2: "状态二",
-      3: "状态三",
+      0: "离线",
+      1: "在线",
     };
     const onlineStatusColor = {
-      0: "grey",
-      1: "orange",
-      2: "green",
-      3: "blue",
+      0: "grey-8",
+      1: "green",
+    };
+    const onlineStatusIcon = {
+      0: "power_off",
+      1: "electrical_services",
     };
     const $q = useQuasar();
     const columns = [
       {
+        name: "onlineStatus",
+        field: "onlineStatus",
+        label: "状态",
+        align: "left",
+        type: "custom",
+      },
+      {
         name: "terminalId",
         field: "terminalId",
-        label: "设备IMEI",
+        label: "设备号",
+        align: "left",
+      },
+      {
+        name: "projectName",
+        field: "projectName",
+        label: "所属项目",
+        align: "left",
+      },
+
+      {
+        name: "companyName",
+        field: "companyName",
+        label: "所属公司",
         align: "left",
       },
       {
@@ -146,25 +189,16 @@ export default {
         type: "custom",
       },
       {
-        name: "checkType",
-        field: "checkType",
-        label: "checkType",
+        name: "address",
+        field: "address",
+        label: "项目所在位置",
         align: "left",
-        type: "custom",
       },
       {
-        name: "nowStatus",
-        field: "nowStatus",
-        label: "启用",
+        name: "onlineTime",
+        field: "onlineTime",
+        label: "最近在线时间",
         align: "left",
-        type: "custom",
-      },
-      {
-        name: "onlineStatus",
-        field: "onlineStatus",
-        label: "状态",
-        align: "left",
-        type: "custom",
       },
 
       {
@@ -226,18 +260,6 @@ export default {
         component: UnbindPanel,
       });
     };
-    // 新增按钮回调
-    // const onInsert = () => {
-    //   $q.dialog({
-    //     component: DetailForm,
-    //     componentProps: {
-    //       type: "insert",
-    //     },
-    //   }).onOk(() => {
-    //     notifySuccess("增加成功");
-    //     onSearch({ page: 1 });
-    //   });
-    // };
     // 编辑按钮回调
     const onEdit = (row) => {
       $q.dialog({
@@ -271,8 +293,10 @@ export default {
     };
 
     return {
+      treeList,
       onlineStatusText,
       onlineStatusColor,
+      onlineStatusIcon,
       columns,
       rows,
       ...toRefs(pagination),

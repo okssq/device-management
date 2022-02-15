@@ -1,6 +1,11 @@
 <template>
   <div class="my-box column no-wrap">
-    <search-bar :searching="searching" @search="onSearch" @insert="onInsert" />
+    <search-bar
+      :tree-list="treeList"
+      :searching="searching"
+      @search="onSearch"
+      @insert="onInsert"
+    />
     <q-separator />
     <div class="flex1 overflow-hidden">
       <result-table
@@ -44,7 +49,6 @@
           </div>
         </template>
         <template #custom-mapStr="{ row }">
-          <div>这里点击查看地图区域位置！</div>
           <span>{{ row.mapStr }}</span>
         </template>
         <template #op="{ row }">
@@ -85,12 +89,14 @@ import { reactive, ref, shallowRef, toRefs } from "vue";
 import { PROJECT } from "src/api/module.js";
 import { notifySuccess } from "src/util/common";
 import { useQuasar } from "quasar";
+import { useCompanyTree } from "components/company/useCompayTree";
 export default {
   components: {
     SearchBar,
     ResultTable,
   },
   setup() {
+    const { treeList } = useCompanyTree();
     const $q = useQuasar();
     const columns = [
       {
@@ -114,46 +120,16 @@ export default {
       {
         name: "concatPhone",
         field: "concatPhone",
-        label: "联系电话",
+        label: "负责人电话",
         align: "left",
       },
       {
         name: "mapStr",
         field: "mapStr",
-        label: "地图围栏",
+        label: "项目所属地区",
         align: "left",
         type: "custom",
       },
-      // {
-      //   name: "projectCity",
-      //   field: "projectCity",
-      //   label: "区域",
-      //   align: "left",
-      // },
-      // {
-      //   name: "projectAddress",
-      //   field: "projectAddress",
-      //   label: "详细地址",
-      //   align: "left",
-      // },
-      // {
-      //   name: "describeStr",
-      //   field: "describeStr",
-      //   label: "项目描述",
-      //   align: "left",
-      // },
-      // {
-      //   name: "createTime",
-      //   field: "createTime",
-      //   label: "创建时间",
-      //   align: "left",
-      // },
-      // {
-      //   name: "updateTime",
-      //   field: "updateTime",
-      //   label: "最后更新时间",
-      //   align: "left",
-      // },
       {
         name: "op",
         label: "操作",
@@ -249,6 +225,7 @@ export default {
     };
 
     return {
+      treeList,
       columns,
       rows,
       ...toRefs(pagination),

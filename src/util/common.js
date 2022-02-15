@@ -18,6 +18,14 @@ export const notifySuccess = (message) => {
   });
 };
 
+export const notifyInfo = (message) => {
+  Notify.create({
+    message,
+    color: "primary",
+    position: "top",
+  });
+};
+
 export const fn3001 = () => {
   notifyWarn("当前为未登录状态");
   localStorage.removeItem("userInfo");

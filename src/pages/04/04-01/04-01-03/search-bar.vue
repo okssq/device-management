@@ -1,19 +1,19 @@
 <template>
   <div class="bg-white q-pl-md q-pb-md q-mt-md">
     <q-form class="q-gutter-sm row items-center" @submit="onSubmit">
-      <q-input outlined dense v-model="companyId">
-        <template #prepend>
-          <span class="text-caption text-bold">公司ID</span>
+      <q-input input-class="text-caption" outlined dense v-model="companyId">
+        <template #before>
+          <span class="text-caption text-bold">公司ID：</span>
         </template>
       </q-input>
-      <q-input outlined dense v-model="projectId">
-        <template #prepend>
-          <span class="text-caption text-bold">项目ID</span>
+      <q-input input-class="text-caption" outlined dense v-model="projectId">
+        <template #before>
+          <span class="text-caption text-bold">项目ID：</span>
         </template>
       </q-input>
-      <q-input outlined dense v-model="terminalId">
-        <template #prepend>
-          <span class="text-caption text-bold">设备IMEI</span>
+      <q-input input-class="text-caption" outlined dense v-model="terminalId">
+        <template #before>
+          <span class="text-caption text-bold">设备IMEI：</span>
         </template>
       </q-input>
       <q-btn

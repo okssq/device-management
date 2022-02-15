@@ -51,7 +51,7 @@
             <slot name="op" :val="col.value" :row="props.row" />
           </template>
           <template v-else>
-            {{ col.value }}
+            {{ col.value || "-" }}
           </template>
         </q-td>
       </q-tr>

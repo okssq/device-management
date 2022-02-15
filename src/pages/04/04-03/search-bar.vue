@@ -1,14 +1,20 @@
 <template>
   <div class="bg-white q-pl-md q-pb-md q-mt-md">
     <q-form class="q-gutter-sm row items-center" @submit="onSubmit">
-      <q-input outlined dense v-model="companyId">
+      <!-- <q-input outlined dense v-model="companyId">
         <template #prepend>
           <span class="text-caption text-bold">公司ID</span>
         </template>
-      </q-input>
-      <q-input outlined dense v-model="companyName">
-        <template #prepend>
-          <span class="text-caption text-bold">公司名称</span>
+      </q-input> -->
+      <q-input
+        outlined
+        dense
+        v-model="companyName"
+        input-class="text-caption"
+        placeholder="请输入公司名称"
+      >
+        <template #before>
+          <span class="text-caption text-bold">公司名称：</span>
         </template>
       </q-input>
       <q-btn
@@ -33,18 +39,18 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const companyId = ref("");
+    // const companyId = ref("");
     const companyName = ref("");
     const onSubmit = () => {
       emit("search", {
-        companyId: companyId.value,
+        // companyId: companyId.value,
         companyName: companyName.value,
       });
     };
     onSubmit();
 
     return {
-      companyId,
+      // companyId,
       companyName,
       onSubmit,
     };

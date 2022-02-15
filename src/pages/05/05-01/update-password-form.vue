@@ -2,28 +2,26 @@
   <q-dialog persistent ref="dialogRef">
     <q-card
       class="relative-positon overflow-hidden"
-      style="width: 690px; max-width: 98vw"
+      style="max-width: 98vw; width: 330px"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
-        <div class="text-subtitle2 text-bold">
-          {{ type === "insert" ? "新增" : "更新" }}项目信息
-        </div>
+        <div class="text-subtitle2 text-bold">更新密码</div>
         <q-btn flat round size="12px" icon="clear" @click="onDialogHide" />
       </div>
       <q-separator />
-
-      <q-scroll-area style="max-height: 50vh; padding: 16px; height: 260px">
+      <q-scroll-area style="max-height: 50vh; padding: 16px; height: 240px">
         <q-form class="row q-gutter-md items-center">
           <q-input
             dense
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="projectName"
+            v-model="realName"
+            disable
           >
             <template #before>
               <span class="text-caption text-bold my-form-label"
-                >项目名称:</span
+                >用户昵称：</span
               >
             </template>
           </q-input>
@@ -32,10 +30,13 @@
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="concat"
+            v-model="userName"
+            disable
           >
             <template #before>
-              <span class="text-caption text-bold my-form-label">负责人：</span>
+              <span class="text-caption text-bold my-form-label"
+                >用户账号：</span
+              >
             </template>
           </q-input>
           <q-input
@@ -43,39 +44,25 @@
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="concatPhone"
+            type="password"
+            v-model="userPassword"
           >
             <template #before>
-              <span class="text-caption text-bold my-form-label">
-                负责人电话：
-              </span>
+              <span class="text-caption text-bold my-form-label">密码：</span>
             </template>
           </q-input>
           <q-input
             dense
             outlined
             lazy-rules
+            type="password"
             class="my-form-item"
-            v-model="mapStr"
+            v-model="confirmUserPassword"
           >
             <template #before>
-              <span class="text-caption text-bold my-form-label">
-                项目所属地区：
-              </span>
-            </template>
-          </q-input>
-          <q-input
-            dense
-            outlined
-            lazy-rules
-            class="my-form-item"
-            type="textarea"
-            v-model="describeStr"
-          >
-            <template #before>
-              <span class="text-caption text-bold my-form-label">
-                项目简介：
-              </span>
+              <span class="text-caption text-bold my-form-label"
+                >确认密码：</span
+              >
             </template>
           </q-input>
         </q-form>
@@ -94,14 +81,10 @@
 <script>
 import { useDialogPluginComponent } from "quasar";
 import { reactive, ref, toRaw, toRefs } from "vue";
-import { PROJECT } from "src/api/module";
+import { USER } from "src/api/module";
 export default {
   emits: [...useDialogPluginComponent.emits],
   props: {
-    type: {
-      type: String,
-      default: "",
-    },
     formData: {
       type: Object,
       default: () => ({}),
@@ -110,44 +93,34 @@ export default {
   setup(props) {
     const { dialogRef, onDialogOK, onDialogHide } = useDialogPluginComponent();
     let formData = reactive({
-      companyId: "1",
-      projectName: "",
-      concat: "",
-      concatPhone: "",
-      mapStr: "",
-      projectCity: "",
-      projectAddress: "",
-      describeStr: "",
+      userName: "",
+      userName: "",
+      userPassword: "",
+      confirmUserPassword: "",
     });
     const loading = ref(false);
-    if (props.type === "edit") {
-      console.log("formData", props.formData);
-      const { createTime, updateTime, ...param } = toRaw(props.formData);
-      formData = reactive({ ...param });
-    }
+
+    const { realName, userName, id } = toRaw(props.formData);
+    formData = reactive({
+      realName,
+      userName,
+      id,
+      userPassword: "",
+      confirmUserPassword: "",
+    });
 
     const onSubmit = () => {
       loading.value = true;
       const param = toRaw(formData);
-      if (props.type === "insert") {
-        PROJECT.insert(param)
-          .then(() => {
-            onDialogOK();
-          })
-          .catch(() => {})
-          .finally(() => {
-            loading.value = false;
-          });
-      } else {
-        PROJECT.update(param)
-          .then(() => {
-            onDialogOK();
-          })
-          .catch(() => {})
-          .finally(() => {
-            loading.value = false;
-          });
-      }
+
+      USER.updatePassword(param)
+        .then(() => {
+          onDialogOK();
+        })
+        .catch(() => {})
+        .finally(() => {
+          loading.value = false;
+        });
     };
 
     return {
@@ -163,11 +136,11 @@ export default {
 </script>
 <style scoped>
 .my-form-item {
-  width: 310px;
+  width: 280px;
 }
 .my-form-label {
-  min-width: 100px;
-  max-width: 100px;
+  min-width: 70px;
+  max-width: 70px;
   text-align: right;
   word-wrap: break-word;
 }

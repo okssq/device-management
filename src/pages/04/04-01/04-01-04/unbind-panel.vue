@@ -23,17 +23,27 @@
             :total-page="totalPage"
             @page="onPageChange"
           >
-            <template #custom-host="{ val }">
-              <div class="text-subtitle2 text-primary" style="font-size: 13px">
-                {{ val }}
-              </div>
+            <template #custom-type="{ val }">
+              <q-badge
+                dense
+                :label="typeText[val] || '未知类型'"
+                :color="typeColor[val] || 'blue-grey'"
+              />
             </template>
-            <template #custom-createTime="{ val }">
-              <div
-                class="text-subtitle2 text-deep-orange"
-                style="font-size: 13px"
-              >
-                {{ val }}
+            <template #custom-onlineStatus="{ val }">
+              <div class="row no-wrap justify-center">
+                <q-icon
+                  v-if="val"
+                  size="22px"
+                  class="q-mr-sm"
+                  :color="onlineStatusColor[val] || 'primary'"
+                  :name="onlineStatusIcon[val]"
+                />
+                <q-badge
+                  dense
+                  :label="onlineStatusText[val] || '-'"
+                  :color="onlineStatusColor[val] || 'primary'"
+                />
               </div>
             </template>
             <template #op="{ row }">
@@ -72,6 +82,30 @@ export default {
     ResultTable,
   },
   setup() {
+    const onlineStatusText = {
+      0: "离线",
+      1: "在线",
+    };
+    const onlineStatusColor = {
+      0: "grey-8",
+      1: "green",
+    };
+    const onlineStatusIcon = {
+      0: "power_off",
+      1: "electrical_services",
+    };
+    const typeText = {
+      1: "座椅",
+      2: "储物柜",
+      3: "打卡桩",
+      4: "大屏",
+    };
+    const typeColor = {
+      1: "pink",
+      2: "purple",
+      3: "indigo",
+      4: "blue",
+    };
     const { dialogRef, onDialogHide } = useDialogPluginComponent();
     const loading = ref(false);
     const $q = useQuasar();
@@ -83,24 +117,23 @@ export default {
         align: "left",
       },
       {
-        name: "terminalName",
-        field: "terminalName",
-        label: "设备别名",
+        name: "type",
+        field: "type",
+        label: "设备类型",
         align: "left",
       },
       {
-        name: "gpsInfo",
-        field: "gpsInfo",
-        label: "GPS定位",
+        name: "onlineStatus",
+        field: "onlineStatus",
+        label: "在线状态",
         align: "left",
         type: "custom",
       },
       {
-        name: "address",
-        field: "address",
-        label: "位置",
+        name: "onlineTime",
+        field: "onlineTime",
+        label: "在线时间",
         align: "left",
-        type: "custom",
       },
       {
         name: "op",
@@ -131,14 +164,6 @@ export default {
         .catch(() => {})
         .finally(() => {
           searching.value = false;
-          rows.value = [
-            {
-              terminalId: "1111",
-              terminalName: "这是设备别名",
-              gpsInfo: "116.424391,39.934744",
-              address: "北京市朝阳区航管南路北京首都国际机场",
-            },
-          ];
         });
     };
     // 表格pagination改变回调
@@ -168,6 +193,11 @@ export default {
       });
     };
     return {
+      onlineStatusText,
+      onlineStatusColor,
+      onlineStatusIcon,
+      typeText,
+      typeColor,
       dialogRef,
       loading,
 

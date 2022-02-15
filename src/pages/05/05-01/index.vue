@@ -1,6 +1,11 @@
 <template>
   <div class="my-box column no-wrap">
-    <search-bar :searching="searching" @search="onSearch" @insert="onInsert" />
+    <search-bar
+      :tree-list="treeList"
+      :searching="searching"
+      @search="onSearch"
+      @insert="onInsert"
+    />
     <q-separator />
     <div class="flex1 overflow-hidden">
       <result-table
@@ -14,13 +19,6 @@
         :total-page="totalPage"
         @page="onPageChange"
       >
-        <template #custom-withCompany="{ val }">
-          <q-badge
-            size="sm"
-            :color="val == 1 ? 'green' : 'red'"
-            :label="val == 1 ? '是' : '否'"
-          />
-        </template>
         <template #op="{ row }">
           <div class="q-gutter-sm">
             <q-btn
@@ -33,6 +31,17 @@
               icon="edit"
               @click.stop="onEdit(row)"
             />
+            <q-btn
+              title="修改密码"
+              color="green"
+              flat
+              dense
+              size="11px"
+              round
+              icon="vpn_key"
+              @click.stop="onUpdatePassword(row)"
+            />
+
             <q-btn
               title="删除"
               color="red-5"
@@ -54,18 +63,28 @@ import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
+import UpdatePasswordForm from "./update-password-form.vue";
+
 import { reactive, ref, shallowRef, toRefs } from "vue";
-import { USER, ROLE } from "src/api/module.js";
+import { USER } from "src/api/module.js";
 import { notifySuccess, notifyWarn } from "src/util/common";
 import { useQuasar } from "quasar";
+import { useCompanyTree } from "components/company/useCompayTree";
 export default {
   components: {
     SearchBar,
     ResultTable,
   },
   setup() {
+    const { treeList } = useCompanyTree();
     const $q = useQuasar();
     const columns = [
+      {
+        name: "userId",
+        field: "userId",
+        label: "用户ID",
+        align: "left",
+      },
       {
         name: "userName",
         field: "userName",
@@ -91,11 +110,10 @@ export default {
         align: "left",
       },
       {
-        name: "withCompany",
-        field: "withCompany",
-        label: "管理员",
-        align: "center",
-        type: "custom",
+        name: "roleName",
+        field: "roleName",
+        label: "角色",
+        align: "left",
       },
       {
         name: "createTime",
@@ -103,12 +121,12 @@ export default {
         label: "创建时间",
         align: "left",
       },
-      {
-        name: "updateTime",
-        field: "updateTime",
-        label: "最后更新时间",
-        align: "left",
-      },
+      // {
+      //   name: "updateTime",
+      //   field: "updateTime",
+      //   label: "最后更新时间",
+      //   align: "left",
+      // },
       {
         name: "op",
         label: "操作",
@@ -124,21 +142,8 @@ export default {
       totalPage: 0,
     });
     const searching = ref(false);
-    let searchData, roleList;
+    let searchData;
 
-    const getRoleList = () => {
-      ROLE.selectList({ CompanyId: 1 })
-        .then((res) => {
-          roleList = res.map((el) => {
-            const { label, id } = el;
-            return {
-              label,
-              value: id,
-            };
-          });
-        })
-        .catch(() => {});
-    };
     const getList = () => {
       searching.value = true;
       USER.list(searchData)
@@ -173,15 +178,21 @@ export default {
     };
     // 新增按钮回调
     const onInsert = () => {
-      if (!roleList) {
-        notifyWarn("正在下载角色数据，请稍等!");
+      if (!treeList.value.length) {
+        notifyWarn("数据加载中，请稍后重试！");
         return;
       }
+      const item = treeList.value.find((el) => {
+        return el.id == 1;
+      });
+      const { id, label } = item || { id: "", label: "" };
       $q.dialog({
         component: DetailForm,
         componentProps: {
           type: "insert",
-          roleList,
+          selectCompanyId: id + "",
+          selectCompanyName: label,
+          treeList: treeList.value,
         },
       }).onOk(() => {
         notifySuccess("增加成功");
@@ -190,23 +201,30 @@ export default {
     };
     // 编辑按钮回调
     const onEdit = (row) => {
-      if (!roleList) {
-        notifyWarn("正在下载角色数据，请稍等!");
-        return;
-      }
       $q.dialog({
         component: DetailForm,
         componentProps: {
           type: "edit",
           formData: row,
-          roleList,
         },
       }).onOk(() => {
         notifySuccess("更新成功");
         getList();
       });
     };
-
+    // 修改密码回调
+    const onUpdatePassword = (row) => {
+      $q.dialog({
+        component: UpdatePasswordForm,
+        componentProps: {
+          formData: row,
+        },
+      }).onOk(() => {
+        notifySuccess("更新成功");
+        // getList();
+      });
+    };
+    // 删除按钮回调
     const onDel = (row) => {
       $q.dialog({
         component: DelConfirm,
@@ -225,9 +243,8 @@ export default {
       });
     };
 
-    getRoleList();
-
     return {
+      treeList,
       columns,
       rows,
       ...toRefs(pagination),
@@ -237,6 +254,7 @@ export default {
       onInsert,
       onEdit,
       onDel,
+      onUpdatePassword,
     };
   },
 };

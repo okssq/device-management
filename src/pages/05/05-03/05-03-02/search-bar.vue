@@ -1,14 +1,16 @@
 <template>
   <div class="bg-white q-pl-md q-pb-md q-mt-md">
     <q-form class="q-gutter-sm row items-center" @submit="onSubmit">
-      <q-input outlined dense v-model="companyId">
-        <template #prepend>
-          <span class="text-caption text-bold">公司ID</span>
-        </template>
-      </q-input>
-      <q-input outlined dense v-model="userName">
-        <template #prepend>
-          <span class="text-caption text-bold">用户账号</span>
+      <input-filter-company :treeList="treeList" v-model="companyId" />
+      <q-input
+        input-class="text-caption"
+        outlined
+        dense
+        v-model="userName"
+        placeholder="请输入用户账号"
+      >
+        <template #before>
+          <span class="text-caption text-bold">用户账号：</span>
         </template>
       </q-input>
       <q-input outlined dense v-model="time" placeholder="时间控件，未完成">
@@ -27,10 +29,18 @@
   </div>
 </template>
 <script>
+import InputFilterCompany from "components/company/input-filter-company.vue";
 import { ref } from "vue";
 export default {
+  components: {
+    InputFilterCompany,
+  },
   emits: ["search"],
   props: {
+    treeList: {
+      type: Array,
+      default: () => [],
+    },
     searching: {
       type: Boolean,
       default: false,

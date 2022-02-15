@@ -60,12 +60,12 @@ export default {
   setup() {
     const $q = useQuasar();
     const columns = [
-      {
-        name: "id",
-        field: "id",
-        label: "公司ID",
-        align: "left",
-      },
+      // {
+      //   name: "id",
+      //   field: "id",
+      //   label: "公司ID",
+      //   align: "left",
+      // },
       {
         name: "companyName",
         field: "companyName",
@@ -103,12 +103,12 @@ export default {
         label: "创建时间",
         align: "left",
       },
-      {
-        name: "updateTime",
-        field: "updateTime",
-        label: "最后更新时间",
-        align: "left",
-      },
+      // {
+      //   name: "updateTime",
+      //   field: "updateTime",
+      //   label: "最后更新时间",
+      //   align: "left",
+      // },
       {
         name: "op",
         label: "操作",

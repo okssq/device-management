@@ -12,7 +12,7 @@
       </div>
       <q-separator />
 
-      <q-scroll-area style="height: 180px; max-height: 50vh; padding: 16px">
+      <q-scroll-area style="height: 290px; max-height: 50vh; padding: 16px">
         <q-form class="row q-gutter-md items-center">
           <q-input
             dense
@@ -21,8 +21,8 @@
             class="my-form-item"
             v-model="companyName"
           >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
                 >公司名称：</span
               >
             </template>
@@ -34,8 +34,8 @@
             class="my-form-item"
             v-model="companyCode"
           >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
                 >公司编号：</span
               >
             </template>
@@ -47,8 +47,8 @@
             class="my-form-item"
             v-model="contact"
           >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold">联系人：</span>
+            <template #before>
+              <span class="text-caption text-bold my-form-label">联系人：</span>
             </template>
           </q-input>
           <q-input
@@ -58,8 +58,8 @@
             class="my-form-item"
             v-model="contactPhone"
           >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
                 >联系电话：</span
               >
             </template>
@@ -68,11 +68,12 @@
             dense
             outlined
             lazy-rules
+            type="textarea"
             class="my-form-item"
             v-model="companyAddress"
           >
-            <template #prepend>
-              <span class="text-subtitle2 text-grey-8 text-bold"
+            <template #before>
+              <span class="text-caption text-bold my-form-label"
                 >公司地址：</span
               >
             </template>
@@ -118,7 +119,6 @@ export default {
     const loading = ref(false);
 
     if (props.type === "edit") {
-      console.log("formData", props.formData);
       const { createTime, updateTime, ...param } = toRaw(props.formData);
       formData = reactive({ ...param });
     }
@@ -163,6 +163,9 @@ export default {
   width: 260px;
 }
 .my-form-label {
-  max-width: 80px;
+  min-width: 70px;
+  max-width: 70px;
+  text-align: right;
+  word-wrap: break-word;
 }
 </style>

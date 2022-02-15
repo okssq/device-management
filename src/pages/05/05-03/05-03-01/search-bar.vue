@@ -1,21 +1,21 @@
 <template>
   <div class="bg-white q-pl-md q-pb-md q-mt-md">
     <q-form class="q-gutter-sm row items-center" @submit="onSubmit">
-      <q-input outlined dense v-model="companyId">
-        <template #prepend>
-          <span class="text-caption text-bold">公司ID</span>
+      <input-filter-company :treeList="treeList" v-model="companyId" />
+      <q-input
+        outlined
+        dense
+        style="width: 240px"
+        input-class="text-caption"
+        placeholder="请输入用户账号"
+        v-model="userName"
+      >
+        <template #before>
+          <span class="text-caption text-bold">用户账号：</span>
         </template>
       </q-input>
-      <q-input outlined dense v-model="userName">
-        <template #prepend>
-          <span class="text-caption text-bold">用户账号</span>
-        </template>
-      </q-input>
-      <q-input outlined dense v-model="time" placeholder="时间控件，未完成">
-        <template #prepend>
-          <span class="text-caption text-bold">登录时间</span>
-        </template>
-      </q-input>
+
+      <date-picker-range />
       <q-btn
         icon="search"
         color="primary"
@@ -27,10 +27,22 @@
   </div>
 </template>
 <script>
+import InputFilterCompany from "components/company/input-filter-company.vue";
+import DatePickerRange from "components/dateTimePicker/range.vue";
+import "vue-datepicker-next/index.css";
 import { ref } from "vue";
 export default {
   emits: ["search"],
+  components: {
+    InputFilterCompany,
+    DatePickerRange,
+  },
   props: {
+    treeList: {
+      type: Array,
+      default: () => [],
+    },
+
     searching: {
       type: Boolean,
       default: false,

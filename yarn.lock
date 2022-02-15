@@ -2437,6 +2437,11 @@ csstype@^2.6.8:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.19.tgz#feeb5aae89020bb389e1f63669a5ed490e391caa"
   integrity sha512-ZVxXaNy28/k3kJg0Fou5MiYpp88j7H9hLZp8PDC3jV0WFjfH5E9xHb56L0W59cPbKbcHXeP4qyT8PrHp8t6LcQ==
 
+date-format-parse@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/date-format-parse/-/date-format-parse-0.2.7.tgz#a2f78bca857a821785b48abedd4426c65aa7b918"
+  integrity sha512-/+lyMUKoRogMuTeOVii6lUwjbVlesN9YRYLzZT/g3TEZ3uD9QnpjResujeEqUW+OSNbT7T1+SYdyEkTcRv+KDQ==
+
 debug@2.6.9:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
@@ -5764,6 +5769,14 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
+
+vue-datepicker-next@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/vue-datepicker-next/-/vue-datepicker-next-1.0.2.tgz#47d49822547394f7edb24f18bb768043506f605d"
+  integrity sha512-gGXLT9x0oTFcMc1yCX1boVAflT8nifb+lsFQXLNdRptt2QK2gvFh1MvhqZx5L2x1YO7Ft28uuugXGhUcJxox+A==
+  dependencies:
+    date-format-parse "^0.2.7"
+    vue "^3.0.0"
 
 vue-eslint-parser@^7.10.0:
   version "7.11.0"
