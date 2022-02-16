@@ -158,6 +158,9 @@ website:	http://code.google.com/p/jquerytree/
   position: relative;
 }
 
+.ztree li span.button.noline_docu {
+  /* display: none; */
+}
 /*ul.tmpTargetzTree {background-color:#FFE6B0; opacity:0.8; filter:alpha(opacity=80)}*/
 /*span.tmpzTreeMove_arrow {width:16px; height:16px; display: inline-block; padding:0; margin:2px 0 0 1px; border:0 none; position:absolute;*/
 /*	background-color:transparent; background-repeat:no-repeat; background-attachment: scroll;*/

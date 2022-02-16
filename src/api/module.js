@@ -134,3 +134,11 @@ export const LOGS = {
     return post("/logs/operation_log_list.json", param);
   },
 };
+
+// 树
+export const LEVEL = {
+  // 公司->项目->设备
+  treeList() {
+    return post("/level/tree_list.json");
+  },
+};

@@ -15,7 +15,11 @@
         </template>
       </q-input>
 
-      <date-picker-range />
+      <date-time-range
+        label-text="登录时间"
+        v-model:from="startTime"
+        v-model:to="endTime"
+      />
       <q-btn
         icon="search"
         color="primary"
@@ -28,21 +32,20 @@
 </template>
 <script>
 import InputFilterCompany from "components/company/input-filter-company.vue";
-import DatePickerRange from "components/dateTimePicker/range.vue";
-import "vue-datepicker-next/index.css";
-import { ref } from "vue";
+import DateTimeRange from "components/dateTimePicker/date-time-range.vue";
+
+import { ref, onMounted } from "vue";
 export default {
   emits: ["search"],
   components: {
     InputFilterCompany,
-    DatePickerRange,
+    DateTimeRange,
   },
   props: {
     treeList: {
       type: Array,
       default: () => [],
     },
-
     searching: {
       type: Boolean,
       default: false,
@@ -51,21 +54,25 @@ export default {
   setup(props, { emit }) {
     const companyId = ref("");
     const userName = ref("");
-    const time = ref("");
+    const startTime = ref("");
+    const endTime = ref("");
     const onSubmit = () => {
       emit("search", {
         companyId: companyId.value,
         userName: userName.value,
-        startTime: "",
-        endTime: "",
+        startTime: startTime.value,
+        endTime: endTime.value,
       });
     };
-    onSubmit();
+    onMounted(() => {
+      onSubmit();
+    });
 
     return {
       companyId,
       userName,
-      time,
+      startTime,
+      endTime,
       onSubmit,
     };
   },

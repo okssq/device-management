@@ -1,7 +1,7 @@
 <template>
   <div
     class="full-height shadow-4 column no-wrap my-side"
-    :style="{ width: NAV_ISMINI ? '56PX' : '220PX' }"
+    :style="{ width: NAV_ISMINI ? '56PX' : '230PX' }"
   >
     <q-scroll-area class="flex1 q-py-sm">
       <q-list class="q-mr-sm expand-nav" v-show="!NAV_ISMINI">
