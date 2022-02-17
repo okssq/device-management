@@ -198,7 +198,7 @@ export default {
               },
               {
                 id: "05-03-03",
-                label: "TTS日志",
+                label: "命令日志",
                 path: "/05-03-03",
               },
             ],

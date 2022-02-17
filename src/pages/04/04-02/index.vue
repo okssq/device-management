@@ -85,7 +85,7 @@ import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
-import { reactive, ref, shallowRef, toRefs } from "vue";
+import { reactive, ref, shallowRef, toRefs, inject } from "vue";
 import { PROJECT } from "src/api/module.js";
 import { notifySuccess } from "src/util/common";
 import { useQuasar } from "quasar";
@@ -96,6 +96,7 @@ export default {
     ResultTable,
   },
   setup() {
+    const LOAD = inject("LOAD");
     const { treeList } = useCompanyTree();
     const $q = useQuasar();
     const columns = [
@@ -186,6 +187,7 @@ export default {
         component: DetailForm,
         componentProps: {
           type: "insert",
+          loginCompanyId: LOAD.loginInfo.companyId,
         },
       }).onOk(() => {
         notifySuccess("增加成功");

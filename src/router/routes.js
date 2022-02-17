@@ -169,7 +169,7 @@ const routes = [
                 path: "/05-03-03",
                 component: () => import("pages/05/05-03/05-03-03"),
                 meta: {
-                  crumbs: ["系统服务", "日志中心", "TTS日志"],
+                  crumbs: ["系统服务", "日志中心", "命令日志"],
                 },
               },
             ],

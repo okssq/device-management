@@ -98,6 +98,10 @@ import { PROJECT } from "src/api/module";
 export default {
   emits: [...useDialogPluginComponent.emits],
   props: {
+    loginCompanyId: {
+      type: [String, Number],
+      default: "",
+    },
     type: {
       type: String,
       default: "",
@@ -110,7 +114,7 @@ export default {
   setup(props) {
     const { dialogRef, onDialogOK, onDialogHide } = useDialogPluginComponent();
     let formData = reactive({
-      companyId: "1",
+      companyId: "",
       projectName: "",
       concat: "",
       concatPhone: "",
@@ -120,7 +124,9 @@ export default {
       describeStr: "",
     });
     const loading = ref(false);
-    if (props.type === "edit") {
+    if (props.type === "insert") {
+      formData.companyId = props.loginCompanyId + "";
+    } else if (props.type === "edit") {
       console.log("formData", props.formData);
       const { createTime, updateTime, ...param } = toRaw(props.formData);
       formData = reactive({ ...param });

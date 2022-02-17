@@ -11,7 +11,12 @@
     <crumbs />
     <q-space />
     <qr-code />
-    <q-btn-dropdown flat icon="account_circle" color="grey-7" label="Admin">
+    <q-btn-dropdown
+      flat
+      icon="account_circle"
+      color="grey-7"
+      :label="LOAD.user ? LOAD.loginInfo.realName : ''"
+    >
       <div class="q-pa-sm text-right">
         <q-btn
           class="full-width"
@@ -20,7 +25,7 @@
           push
           size="sm"
           v-close-popup
-          to="/login"
+          @click="onLoginOut"
         />
       </div>
     </q-btn-dropdown>
@@ -29,11 +34,26 @@
 <script>
 import Crumbs from "./crumbs.vue";
 import QrCode from "./qr-code.vue";
+import { useQuasar } from "quasar";
+import { useRouter } from "vue-router";
+import { inject } from "vue";
 export default {
   components: { Crumbs, QrCode },
   setup() {
-    const handleSelect = () => {};
-    return {};
+    const $q = useQuasar();
+    const router = useRouter();
+    const LOAD = inject("LOAD");
+    const onLoginOut = () => {
+      $q.localStorage.remove("loginInfo");
+      $q.localStorage.remove("router-path");
+      LOAD.loginInfo = null;
+      LOAD.user = false;
+      router.push("/login");
+    };
+    return {
+      LOAD,
+      onLoginOut,
+    };
   },
 };
 </script>

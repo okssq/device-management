@@ -14,6 +14,7 @@
         outlined
         v-model="name"
         lazy-rules
+        autofocus
         :rules="[(val) => (val && val.length > 0) || '用户名不能为空']"
       >
         <template #prepend>
@@ -52,25 +53,41 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import { ref, inject } from "vue";
+import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { login } from "src/api/module";
+import { notifySuccess } from "src/util/common";
 export default {
   emits: ["ok"],
   setup() {
-    const name = ref("admin");
-    const pass = ref("123456");
-    const loading = ref(false);
+    const $q = useQuasar();
     const router = useRouter();
+    const LOAD = inject("LOAD");
+    const name = ref("");
+    const pass = ref("");
+    const loading = ref(false);
+
+    LOAD.user = false;
+    LOAD.loginInfo = null;
+    const fnLogin = (res) => {
+      $q.localStorage.set("loginInfo", res);
+      const routerPath = $q.localStorage.getItem("router-path");
+
+      LOAD.loginInfo = res;
+      LOAD.user = true;
+      router.push(routerPath || "/01-01");
+      notifySuccess("登录成功！");
+    };
     const onSubmit = () => {
       loading.value = true;
       login
         .login({
-          userName: "admin",
-          password: "1qaz2wsx3edc",
+          userName: name.value,
+          password: pass.value,
         })
         .then((res) => {
-          router.push("/01-01");
+          fnLogin(res);
         })
         .catch((err) => {})
         .finally(() => {
