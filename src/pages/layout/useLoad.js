@@ -4,9 +4,9 @@ const useLoad = () => {
   const LOAD = inject("LOAD");
   const mapTeleportTo = computed(() => LOAD.mapTeleportTo);
   const loadMap = () => {
-    console.log(LOAD, mapTeleportTo);
     AMapLoader.load({
-      key: "7c93197f8661b907705f9fe87c9ed782",
+      // key: "7c93197f8661b907705f9fe87c9ed782",
+      key: "e8d109fb99779238b1cac35cbc0598e9",
       // version: "1.4.15",
       version: "2.0",
     })
@@ -24,8 +24,8 @@ const useLoad = () => {
           showBuildingBlock: false,
           buildingAnimation: false,
         });
-        mapObj.on("complete", (res, res1) => {
-          console.log("全局地图加载成功！", res, res1);
+        mapObj.on("complete", () => {
+          console.log("全局地图加载成功！");
           LOAD.mapObj = mapObj;
           LOAD.map = true;
         });

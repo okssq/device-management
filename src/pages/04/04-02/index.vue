@@ -78,6 +78,12 @@
       </result-table>
     </div>
   </div>
+  <detail-form
+    v-if="detailVisible"
+    :login-company-id="loginCompanyId"
+    :type="detailType"
+    :form-data="detailData"
+  />
 </template>
 
 <script>
@@ -94,6 +100,7 @@ export default {
   components: {
     SearchBar,
     ResultTable,
+    DetailForm,
   },
   setup() {
     const LOAD = inject("LOAD");
@@ -146,6 +153,11 @@ export default {
       totalPage: 0,
     });
     const searching = ref(false);
+
+    const detailVisible = ref(false);
+    const detailType = ref("inset");
+    const loginCompanyId = LOAD.loginInfo.companyId;
+    const detailData = ref(null);
     let searchData;
 
     const getList = () => {
@@ -183,29 +195,20 @@ export default {
     };
     // 新增按钮回调
     const onInsert = () => {
-      $q.dialog({
-        component: DetailForm,
-        componentProps: {
-          type: "insert",
-          loginCompanyId: LOAD.loginInfo.companyId,
-        },
-      }).onOk(() => {
-        notifySuccess("增加成功");
-        onSearch({ page: 1 });
-      });
+      detailData.value = null;
+      detailType.value = "insert";
+      detailVisible.value = true;
+      // notifySuccess("增加成功");
+      // onSearch({ page: 1 });
     };
     // 编辑按钮回调
     const onEdit = (row) => {
-      $q.dialog({
-        component: DetailForm,
-        componentProps: {
-          type: "edit",
-          formData: row,
-        },
-      }).onOk(() => {
-        notifySuccess("更新成功");
-        getList();
-      });
+      detailData.value = row;
+      detailType.value = "edit";
+      detailVisible.value = true;
+
+      // notifySuccess("更新成功");
+      // getList();
     };
 
     const onDel = (row) => {
@@ -232,6 +235,12 @@ export default {
       rows,
       ...toRefs(pagination),
       searching,
+
+      detailVisible,
+      detailType,
+      loginCompanyId,
+      detailData,
+
       onPageChange,
       onSearch,
       onInsert,

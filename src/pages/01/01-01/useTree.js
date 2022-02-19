@@ -71,7 +71,6 @@ const useTree = () => {
       const { tree, vList } = FORMAT_VEHICLE_TREE([res]);
       treeList.value = vList;
       treeNode.value = tree;
-      console.log(tree);
       // console.log("arr", arr, "list", list);
     });
   };

@@ -4,7 +4,6 @@
       :tree-list="treeList"
       :searching="searching"
       @search="onSearch"
-      @bind="onBind"
     />
     <q-separator />
     <div class="flex1 overflow-hidden">
@@ -52,10 +51,11 @@
             </div>
           </div>
         </template>
-        <template #custom-gpsInfo="{ val }">
+        <template #custom-gpsInfo="{ row, val }">
           <div
             class="text-primary cursor-pointer"
             style="text-decoration: underline"
+            @click="viewGps(row)"
           >
             <div>经度: {{ (val || "").split(",")[0] || "-" }}</div>
             <div>纬度: {{ (val || "").split(",")[1] || "-" }}</div>
@@ -121,14 +121,29 @@
       </result-table>
     </div>
   </div>
+  <gps-dialog
+    v-if="gpsDialogVisible"
+    :gps-data="gpsData"
+    @cancel="gpsDialogVisible = false"
+  ></gps-dialog>
+  <detail-dialog
+    v-if="detailDialogVisible"
+    :form-data="detailData"
+    @cancel="detailDialogVisible = false"
+    @ok="onConfirmEdit"
+  ></detail-dialog>
 </template>
 
 <script>
 import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
-import DetailForm from "./detail-form.vue";
-import UnbindPanel from "./unbind-panel.vue";
+
+import GpsDialog from "./gps-dialog/index.vue";
+import useGps from "./useGps";
+import DetailDialog from "./detail-dialog/index.vue";
+import useDetail from "./useDetail";
+
 import { reactive, ref, shallowRef, toRefs } from "vue";
 import { TERMINAL } from "src/api/module.js";
 import { notifySuccess } from "src/util/common";
@@ -138,6 +153,8 @@ export default {
   components: {
     SearchBar,
     ResultTable,
+    GpsDialog,
+    DetailDialog,
   },
   setup() {
     const { treeList } = useCompanyTree();
@@ -191,7 +208,7 @@ export default {
       {
         name: "address",
         field: "address",
-        label: "项目所在位置",
+        label: "设备所在位置",
         align: "left",
       },
       {
@@ -254,26 +271,7 @@ export default {
       searchData && (searchData = { ...searchData, ...val });
       getList();
     };
-    // 未注册设备按钮回调
-    const onBind = () => {
-      $q.dialog({
-        component: UnbindPanel,
-      });
-    };
-    // 编辑按钮回调
-    const onEdit = (row) => {
-      $q.dialog({
-        component: DetailForm,
-        componentProps: {
-          type: "edit",
-          formData: row,
-        },
-      }).onOk(() => {
-        notifySuccess("更新成功");
-        getList();
-      });
-    };
-
+    // 表格item删除回调
     const onDel = (row) => {
       $q.dialog({
         component: DelConfirm,
@@ -292,6 +290,10 @@ export default {
       });
     };
 
+    const { gpsData, gpsDialogVisible, viewGps } = useGps();
+    const { detailData, detailDialogVisible, onEdit, onConfirmEdit } =
+      useDetail(getList);
+
     return {
       treeList,
       onlineStatusText,
@@ -303,10 +305,17 @@ export default {
       searching,
       onPageChange,
       onSearch,
-      onBind,
       // onInsert,
-      onEdit,
       onDel,
+
+      gpsData,
+      gpsDialogVisible,
+      viewGps,
+
+      detailData,
+      detailDialogVisible,
+      onEdit,
+      onConfirmEdit,
     };
   },
 };

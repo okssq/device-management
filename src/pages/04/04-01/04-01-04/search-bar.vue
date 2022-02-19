@@ -31,13 +31,6 @@
         type="submit"
         :disable="searching"
       />
-      <q-btn
-        icon="app_registration"
-        label="未注册设备 "
-        color="primary"
-        dense
-        @click="$emit('bind')"
-      />
     </q-form>
   </div>
 </template>
@@ -45,7 +38,7 @@
 import { ref } from "vue";
 import InputFilterCompany from "components/company/input-filter-company.vue";
 export default {
-  emits: ["search", "bind"],
+  emits: ["search"],
   components: {
     InputFilterCompany,
   },

@@ -1,12 +1,20 @@
 <template>
   <div class="bg-white q-pl-md q-pb-md q-mt-md">
     <q-form class="q-gutter-sm row items-center" @submit="onSubmit">
-      <q-input outlined dense v-model="terminalId">
+      <q-input
+        outlined
+        dense
+        v-model="terminalId"
+        input-class="text-caption"
+        placeholder="请输入设备ID"
+      >
         <template #before>
           <span class="text-caption text-bold">设备ID：</span>
         </template>
       </q-input>
       <q-select
+        input-class="text-caption"
+        placeholder="请选择设备类型"
         style="width: 240px"
         dense
         outlined
@@ -43,7 +51,7 @@ export default {
   },
   setup(props, { emit }) {
     const terminalId = ref("");
-    const type = ref("1");
+    const type = ref("");
     const options = [
       { label: "座椅", value: "1" },
       { label: "储物柜", value: "2" },

@@ -65,7 +65,7 @@ import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
 import UpdatePasswordForm from "./update-password-form.vue";
 
-import { reactive, ref, shallowRef, toRefs } from "vue";
+import { inject, reactive, ref, shallowRef, toRefs } from "vue";
 import { USER } from "src/api/module.js";
 import { notifySuccess, notifyWarn } from "src/util/common";
 import { useQuasar } from "quasar";
@@ -77,6 +77,7 @@ export default {
   },
   setup() {
     const { treeList } = useCompanyTree();
+    const LOAD = inject("LOAD");
     const $q = useQuasar();
     const columns = [
       {
@@ -183,7 +184,7 @@ export default {
         return;
       }
       const item = treeList.value.find((el) => {
-        return el.id == 1;
+        return el.id == LOAD.loginInfo.companyId;
       });
       const { id, label } = item || { id: "", label: "" };
       $q.dialog({
