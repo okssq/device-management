@@ -62,7 +62,7 @@ import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
-import { reactive, ref, shallowRef, toRefs } from "vue";
+import { reactive, ref, shallowRef, toRefs, inject } from "vue";
 import { notifySuccess, notifyWarn } from "src/util/common";
 import { ROLE } from "src/api/module.js";
 import { useQuasar } from "quasar";
@@ -73,6 +73,7 @@ export default {
     ResultTable,
   },
   setup() {
+    const LOAD = inject("LOAD");
     const { treeList } = useCompanyTree();
     const $q = useQuasar();
     const columns = [
@@ -147,7 +148,6 @@ export default {
         pageSize: pagination.pageSize,
       };
       getList();
-      console.log("searchData", searchData);
     };
     // 表格pagination改变回调
     const onPageChange = (val) => {
@@ -165,7 +165,7 @@ export default {
         return;
       }
       const item = treeList.value.find((el) => {
-        return el.id == 1;
+        return el.id == LOAD.loginInfo.companyId;
       });
 
       const { id, label } = item || { id: "", label: "" };

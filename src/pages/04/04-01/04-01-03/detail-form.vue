@@ -105,7 +105,6 @@ export default {
     });
     const loading = ref(false);
     if (props.type === "edit") {
-      console.log("formData", props.formData);
       const { createTime, updateTime, ...param } = toRaw(props.formData);
       formData = reactive({ ...param });
     }

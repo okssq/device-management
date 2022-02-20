@@ -29,7 +29,7 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import { ref, inject, computed } from "vue";
 export default {
   emits: ["search", "insert"],
   props: {
@@ -39,18 +39,20 @@ export default {
     },
   },
   setup(props, { emit }) {
-    // const companyId = ref("");
+    const LOAD = inject("LOAD");
+    const isAdmin = computed(() => {
+      return !!(LOAD.loginInfo && LOAD.loginInfo.companyId == 1);
+    });
     const companyName = ref("");
     const onSubmit = () => {
       emit("search", {
-        // companyId: companyId.value,
         companyName: companyName.value,
       });
     };
     onSubmit();
 
     return {
-      // companyId,
+      isAdmin,
       companyName,
       onSubmit,
     };

@@ -49,7 +49,12 @@
           </div>
         </template>
         <template #custom-mapStr="{ row }">
-          <span>{{ row.mapStr }}</span>
+          <span
+            class="text-primary cursor-pointer"
+            style="text-decoration: underline"
+            @click="onFenceMap(row)"
+            >{{ row.projectCity + row.projectAddress }}</span
+          >
         </template>
         <template #op="{ row }">
           <div class="q-gutter-sm">
@@ -80,30 +85,43 @@
   </div>
   <detail-form
     v-if="detailVisible"
-    :login-company-id="loginCompanyId"
+    :select-company-id="loginCompanyId"
+    :select-company-name="loginCompanyName"
+    :tree-list="treeList"
     :type="detailType"
     :form-data="detailData"
+    @cancel="detailVisible = false"
+    @ok="onConfirmDetail"
   />
+  <fence-map
+    v-if="fenceMapDialogVisible"
+    :row="fenceMapData"
+    @cancel="fenceMapDialogVisible = false"
+  >
+  </fence-map>
 </template>
 
 <script>
 import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
-import DetailForm from "./detail-form.vue";
-import { reactive, ref, shallowRef, toRefs, inject } from "vue";
+import { reactive, ref, shallowRef, toRefs } from "vue";
 import { PROJECT } from "src/api/module.js";
 import { notifySuccess } from "src/util/common";
 import { useQuasar } from "quasar";
 import { useCompanyTree } from "components/company/useCompayTree";
+import DetailForm from "./detail-from/index.vue";
+import useDetail from "./useDetail";
+import fenceMap from "./fence-map/index.vue";
+import useFenceMap from "./fence-map/useFenceMap";
 export default {
   components: {
     SearchBar,
     ResultTable,
     DetailForm,
+    fenceMap,
   },
   setup() {
-    const LOAD = inject("LOAD");
     const { treeList } = useCompanyTree();
     const $q = useQuasar();
     const columns = [
@@ -153,11 +171,6 @@ export default {
       totalPage: 0,
     });
     const searching = ref(false);
-
-    const detailVisible = ref(false);
-    const detailType = ref("inset");
-    const loginCompanyId = LOAD.loginInfo.companyId;
-    const detailData = ref(null);
     let searchData;
 
     const getList = () => {
@@ -183,7 +196,6 @@ export default {
         pageSize: pagination.pageSize,
       };
       getList();
-      console.log("searchData", searchData);
     };
     // 表格pagination改变回调
     const onPageChange = (val) => {
@@ -192,23 +204,6 @@ export default {
       pageSize && (pagination.pageSize = pageSize);
       searchData && (searchData = { ...searchData, ...val });
       getList();
-    };
-    // 新增按钮回调
-    const onInsert = () => {
-      detailData.value = null;
-      detailType.value = "insert";
-      detailVisible.value = true;
-      // notifySuccess("增加成功");
-      // onSearch({ page: 1 });
-    };
-    // 编辑按钮回调
-    const onEdit = (row) => {
-      detailData.value = row;
-      detailType.value = "edit";
-      detailVisible.value = true;
-
-      // notifySuccess("更新成功");
-      // getList();
     };
 
     const onDel = (row) => {
@@ -229,23 +224,41 @@ export default {
       });
     };
 
+    const { fenceMapDialogVisible, fenceMapData, onFenceMap } = useFenceMap();
+
+    const {
+      detailVisible,
+      loginCompanyId,
+      loginCompanyName,
+      detailType,
+      detailData,
+      onInsert,
+      onEdit,
+      onConfirmDetail,
+    } = useDetail(onSearch, getList, treeList);
+
     return {
       treeList,
       columns,
       rows,
       ...toRefs(pagination),
       searching,
-
-      detailVisible,
-      detailType,
-      loginCompanyId,
-      detailData,
-
       onPageChange,
       onSearch,
+      onDel,
+
+      detailVisible,
+      loginCompanyId,
+      loginCompanyName,
+      detailType,
+      detailData,
       onInsert,
       onEdit,
-      onDel,
+      onConfirmDetail,
+
+      fenceMapDialogVisible,
+      fenceMapData,
+      onFenceMap,
     };
   },
 };

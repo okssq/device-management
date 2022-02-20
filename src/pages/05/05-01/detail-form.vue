@@ -237,7 +237,6 @@ export default {
       formData.companyId = props.selectCompanyId.toString();
       getRoleList(props.selectCompanyId);
     } else {
-      console.log("formData", props.formData);
       const { createTime, updateTime, userId, ...param } = toRaw(
         props.formData
       );

@@ -2,7 +2,7 @@
   <q-dialog persistent ref="dialogRef">
     <q-card
       class="relative-positon overflow-hidden"
-      style="width: 312px; max-width: 98vw"
+      style="width: 342px; max-width: 98vw"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-text-subtitle2 text-bold">
@@ -16,7 +16,7 @@
         <q-form class="row q-gutter-md items-center">
           <input-filter-company
             v-if="type == 'insert'"
-            style="width: 280px"
+            style="width: 310px"
             label-style="
               min-width: 70px;
               max-width: 70px;
@@ -125,7 +125,6 @@ export default {
     if (props.type === "insert") {
       formData.companyId = props.selectCompanyId.toString();
     } else {
-      console.log("formData", props.formData);
       const { id, companyId, companyName, remark, roleName } = toRaw(
         props.formData
       );
@@ -175,7 +174,7 @@ export default {
 </script>
 <style scoped>
 .my-form-item {
-  width: 280px;
+  width: 310px;
 }
 .my-form-label {
   min-width: 70px;

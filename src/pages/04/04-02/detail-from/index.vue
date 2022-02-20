@@ -10,12 +10,30 @@
             <div class="text-subtitle2 text-bold">
               {{ type === "insert" ? "新增" : "更新" }}项目信息
             </div>
-            <q-btn flat round size="12px" icon="clear" />
+            <q-btn
+              flat
+              round
+              size="12px"
+              icon="clear"
+              @click="$emit('cancel')"
+            />
           </div>
           <q-separator />
-
           <q-scroll-area style="max-height: 50vh; padding: 16px; height: 260px">
             <q-form class="row q-gutter-md items-center">
+              <input-filter-company
+                style="width: 310px"
+                label-style="
+                  min-width: 100px;
+                  max-width: 100px;
+                  text-align: right;
+                  word-wrap: break-word;"
+                :filter-text="
+                  type == 'insert' ? selectCompanyName : companyName
+                "
+                :tree-list="treeList"
+                v-model="companyId"
+              />
               <q-input
                 dense
                 outlined
@@ -56,6 +74,20 @@
                 </template>
               </q-input>
 
+              <q-input
+                dense
+                outlined
+                lazy-rules
+                class="my-form-item"
+                type="textarea"
+                v-model="describeStr"
+              >
+                <template #before>
+                  <span class="text-caption text-bold my-form-label">
+                    项目简介：
+                  </span>
+                </template>
+              </q-input>
               <q-field
                 dense
                 outlined
@@ -71,29 +103,15 @@
                 <q-btn
                   unelevated
                   icon="place"
-                  label="选择地区"
+                  label="地图选择围栏"
                   @click="onSelectArea"
                 />
               </q-field>
-              <q-input
-                dense
-                outlined
-                lazy-rules
-                class="my-form-item"
-                type="textarea"
-                v-model="describeStr"
-              >
-                <template #before>
-                  <span class="text-caption text-bold my-form-label">
-                    项目简介：
-                  </span>
-                </template>
-              </q-input>
             </q-form>
           </q-scroll-area>
           <q-separator />
           <q-card-actions align="right">
-            <q-btn flat label="取消" color="primary" />
+            <q-btn flat label="取消" color="primary" @click="$emit('cancel')" />
             <q-btn label="确定" color="primary" @click="onSubmit" />
           </q-card-actions>
           <q-inner-loading :showing="loading" style="z-index: 100">
@@ -102,20 +120,33 @@
         </q-card>
       </div>
     </div>
-    <search-area v-if="searchVisible" />
+    <search-area-dialog
+      v-if="selectAreaDialogVisible"
+      :row="selectAreaData"
+      @cancel="selectAreaDialogVisible = false"
+      @ok="onConfirmSelectArea"
+    />
   </teleport>
 </template>
 <script>
-import { reactive, ref, toRaw, toRefs } from "vue";
+import { reactive, ref, toRaw, toRefs, inject } from "vue";
 import { PROJECT } from "src/api/module";
-import SearchArea from "./select-area.vue";
+import InputFilterCompany from "components/company/input-filter-company.vue";
+import SearchAreaDialog from "./select-area-dialog.vue";
+import useSelectArea from "./useSelectArea";
 export default {
+  emits: ["cancel", "ok"],
   components: {
-    SearchArea,
+    InputFilterCompany,
+    SearchAreaDialog,
   },
   props: {
-    loginCompanyId: {
-      type: [String, Number],
+    selectCompanyId: {
+      type: String,
+      default: "",
+    },
+    selectCompanyName: {
+      type: String,
       default: "",
     },
     type: {
@@ -126,10 +157,16 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    treeList: {
+      type: Array,
+      default: () => [],
+    },
   },
-  setup(props) {
+  setup(props, { emit }) {
+    const LOAD = inject("LOAD");
     let formData = reactive({
       companyId: "",
+      companyName: "",
       projectName: "",
       concat: "",
       concatPhone: "",
@@ -139,11 +176,11 @@ export default {
       describeStr: "",
     });
     const loading = ref(false);
-    const searchVisible = ref(false);
+
     if (props.type === "insert") {
-      formData.companyId = props.loginCompanyId + "";
-    } else if (props.type === "edit") {
-      console.log("formData", props.formData);
+      formData.companyId = props.selectCompanyId + "";
+      formData.companyName = props.selectCompanyName + "";
+    } else {
       const { createTime, updateTime, ...param } = toRaw(props.formData);
       formData = reactive({ ...param });
     }
@@ -151,10 +188,11 @@ export default {
     const onSubmit = () => {
       loading.value = true;
       const param = toRaw(formData);
+
       if (props.type === "insert") {
         PROJECT.insert(param)
           .then(() => {
-            onDialogOK();
+            emit("ok", "insertSuccess");
           })
           .catch(() => {})
           .finally(() => {
@@ -163,7 +201,7 @@ export default {
       } else {
         PROJECT.update(param)
           .then(() => {
-            onDialogOK();
+            emit("ok", "updateSuccess");
           })
           .catch(() => {})
           .finally(() => {
@@ -172,18 +210,22 @@ export default {
       }
     };
 
-    const onSelectArea = () => {
-      searchVisible.value = true;
-    };
+    const {
+      selectAreaDialogVisible,
+      selectAreaData,
+      onSelectArea,
+      onConfirmSelectArea,
+    } = useSelectArea(formData);
 
     return {
       ...toRefs(formData),
       loading,
-      searchVisible,
-
       onSubmit,
 
+      selectAreaDialogVisible,
+      selectAreaData,
       onSelectArea,
+      onConfirmSelectArea,
     };
   },
 };

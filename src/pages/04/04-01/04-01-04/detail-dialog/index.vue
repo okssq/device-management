@@ -27,7 +27,7 @@
                 class="my-form-item"
                 v-model="terminalName"
               >
-                <template #prepend>
+                <template #before>
                   <span class="text-subtitle2 text-grey-8 text-bold"
                     >设备别名:</span
                   >
@@ -40,7 +40,7 @@
                 class="my-form-item"
                 v-model="address"
               >
-                <template #prepend>
+                <template #before>
                   <span class="text-subtitle2 text-grey-8 text-bold"
                     >设备地址:</span
                   >

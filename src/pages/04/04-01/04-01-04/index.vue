@@ -261,7 +261,6 @@ export default {
         pageSize: pagination.pageSize,
       };
       getList();
-      console.log("searchData", searchData);
     };
     // 表格pagination改变回调
     const onPageChange = (val) => {
