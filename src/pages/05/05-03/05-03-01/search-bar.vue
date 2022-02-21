@@ -3,10 +3,7 @@
     <q-form class="q-gutter-sm row items-center" @submit="onSubmit">
       <input-filter-company :treeList="treeList" v-model="companyId" />
       <q-input
-        outlined
-        dense
-        style="width: 240px"
-        input-class="text-caption"
+        v-bind="baseInputProps"
         placeholder="请输入用户账号"
         v-model="userName"
       >
@@ -52,6 +49,11 @@ export default {
     },
   },
   setup(props, { emit }) {
+    const baseInputProps = {
+      outlined: true,
+      dense: true,
+      inputClass: "text-caption",
+    };
     const companyId = ref("");
     const userName = ref("");
     const startTime = ref("");
@@ -69,6 +71,7 @@ export default {
     });
 
     return {
+      baseInputProps,
       companyId,
       userName,
       startTime,

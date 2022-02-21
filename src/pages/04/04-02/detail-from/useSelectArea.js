@@ -6,8 +6,12 @@ const useSelectArea = (formData) => {
     selectAreaData.value = toRaw(formData);
     selectAreaDialogVisible.value = true;
   };
-  const onConfirmSelectArea = ({ mapStr, city, address }) => {
-    formData.projectCity = city;
+  const onConfirmSelectArea = (param) => {
+    const { mapStr, province, city, district, township, address } = param;
+    formData.province = province;
+    formData.city = city;
+    formData.district = district;
+    formData.township = township;
     formData.projectAddress = address;
     formData.mapStr = mapStr;
     selectAreaDialogVisible.value = false;

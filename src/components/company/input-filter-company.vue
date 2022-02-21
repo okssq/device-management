@@ -15,7 +15,7 @@
     >
       <template #before>
         <span :style="labelStyle" class="text-caption text-bold"
-          >公司名称：</span
+          >{{ labelText }}：</span
         >
       </template>
       <!-- <template #prepend>
@@ -67,6 +67,10 @@ import { ref, shallowRef, computed, watch } from "vue";
 export default {
   emit: ["update:modelValue", "select"],
   props: {
+    labelText: {
+      type: String,
+      default: "公司名称",
+    },
     labelStyle: {
       type: [String, Array],
       default: "",

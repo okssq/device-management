@@ -22,52 +22,28 @@
           </div>
           <q-separator />
           <div class="q-pa-md">
-            <q-form class="items-center">
+            <q-form class="row q-gutter-md items-center">
               <q-input
                 dense
                 outlined
                 lazy-rules
-                class="my-form-item"
-                v-model="city"
-              >
-                <template #prepend>
-                  <span class="text-subtitle2 text-grey-8 text-bold"
-                    >省/市/区/镇:</span
-                  >
-                </template>
-              </q-input>
-              <q-input
-                dense
-                outlined
-                lazy-rules
-                class="my-form-item q-mt-md"
+                class="flex1 q-mt-md"
                 v-model="address"
               >
                 <template #prepend>
                   <span class="text-subtitle2 text-grey-8 text-bold"
-                    >详细地址:</span
+                    >项目所在详细地址:</span
                   >
                 </template>
               </q-input>
-              <!-- <q-btn
-                flat
-                class="q-mx-md"
-                label="取消"
-                color="primary"
-                @click="$emit('cancel')"
-              />
-              <q-btn label="确定" color="primary" @click="onSubmit" /> -->
-            </q-form>
-            <q-card-actions align="right">
               <q-btn
                 flat
-                class="q-mx-md"
                 label="取消"
                 color="primary"
                 @click="$emit('cancel')"
               />
               <q-btn label="确定" color="primary" @click="onSubmit" />
-            </q-card-actions>
+            </q-form>
           </div>
           <section
             class="absolute-top-left bg-white q-pa-sm shadow-5"
@@ -91,7 +67,7 @@
                 anchor="bottom left"
                 self="top left"
               >
-                <q-list padding dense bordered>
+                <q-list padding dense bordered v-show="filterList.length">
                   <template v-for="(item, index) in filterList" :key="index">
                     <q-item clickable @click="filterSelectItem(item)">
                       <q-item-section>
@@ -131,7 +107,6 @@ import {
   toRaw,
   shallowRef,
 } from "vue";
-import { notifyWarn } from "src/util/common";
 export default {
   emits: ["cancel", "ok"],
   components: {
@@ -152,40 +127,59 @@ export default {
     const lng = ref("");
     const lat = ref("");
     const city = ref("");
+    const district = ref("");
+    const province = ref("");
+    const township = ref("");
     const address = ref("");
 
     const fnMarker = (location) => {
-      if (!marker) return;
+      if (!marker) {
+        marker = new AMap.Marker();
+      }
       marker.remove();
       marker.add(LOAD.mapObj);
       LOAD.mapObj.setZoomAndCenter(17, location);
       marker.setPosition(location);
     };
-    const fnAddress = (location, projectCity, projectAddress) => {
+    const fnAddress = (location, addressObj) => {
       if (!geocoder) return;
       const { lat: LAT, lng: LNG } = location;
       lng.value = LNG;
       lat.value = LAT;
-      if (projectCity && projectAddress) {
-        city.value = projectCity;
+      if (addressObj) {
+        const {
+          province: a,
+          city: b,
+          district: c,
+          township: d,
+          projectAddress,
+        } = addressObj;
+        province.value = a || "";
+        city.value = b || "";
+        district.value = c || "";
+        township.value = d || "";
         address.value = projectAddress;
       } else {
         geocoder.getAddress(location, (status, result) => {
           if (status === "complete" && result && result.regeocode) {
+            console.log(result.regeocode);
             const { addressComponent, formattedAddress } = result.regeocode;
             const {
-              province,
-              city: resultCity,
-              district,
-              township,
+              province: a,
+              city: b,
+              district: c,
+              township: d,
             } = addressComponent;
-            const cityStr = `${province}${resultCity}${district}${township}`;
-            const length = cityStr.length;
-            const addressStr = formattedAddress.slice(length);
-            city.value = cityStr;
-            address.value = addressStr;
+            province.value = a || "";
+            city.value = b || "";
+            district.value = c || "";
+            township.value = d || "";
+            address.value = formattedAddress;
           } else {
+            province.value = "";
             city.value = "";
+            district.value = "";
+            township.value = "";
             address.value = "";
           }
         });
@@ -206,7 +200,6 @@ export default {
       } else {
         polygon.setPath(path);
       }
-      // map.setFitView()
       if (!polygonEditor) {
         AMap.plugin("AMap.PolygonEditor", () => {
           polygonEditor = new window.AMap.PolygonEditor(LOAD.mapObj, polygon);
@@ -219,6 +212,7 @@ export default {
         polygonEditor.open();
       }
     };
+    // 初始化地图插件
     const initMap = () => {
       AMap.plugin(["AMap.AutoComplete"], function () {
         autoComplete = new AMap.AutoComplete({ city: "全国" });
@@ -229,8 +223,6 @@ export default {
           radius: 1000,
         });
       });
-
-      marker = new AMap.Marker();
       LOAD.mapObj.on("click", onMapClick);
     };
 
@@ -239,7 +231,10 @@ export default {
       if (!autoComplete) return;
       autoComplete.search(val, (status, result) => {
         if (status === "complete" && result && result.info === "OK") {
-          filterList.value = result.tips;
+          filterList.value = result.tips.filter((el) => {
+            const { location } = el;
+            return !!location;
+          });
         }
       });
     };
@@ -248,10 +243,6 @@ export default {
       listVisible.value = false;
       inputFilter.value = item.name;
       const { location } = item;
-      if (!location) {
-        notifyWarn("无法定位到当前选择目标，请重新选择!");
-        return;
-      }
       fnMarker(location);
       fnAddress(location);
       const path = [
@@ -260,7 +251,6 @@ export default {
         location.offset(0, -100),
         location.offset(-200, 0),
       ];
-
       fnPolygon(path);
     };
     // 地图点击事件
@@ -287,7 +277,10 @@ export default {
       }
       emit("ok", {
         mapStr,
+        province: province.value,
         city: city.value,
+        district: district.value,
+        township: township.value,
         address: address.value,
       });
     };
@@ -296,20 +289,27 @@ export default {
       initMap();
       if (props.row) {
         const obj = toRaw(props.row);
-        const { mapStr, projectCity, projectAddress } = obj;
-        if (mapStr && projectAddress && projectCity) {
+        const { mapStr, province, city, district, township, projectAddress } =
+          obj;
+        const addressObj = {
+          province,
+          city,
+          district,
+          township,
+          projectAddress,
+        };
+        if (mapStr && projectAddress) {
           const [gpsStr, fenceStr] = mapStr.split(";");
           if (!gpsStr || !fenceStr) return;
           const gpsArr = gpsStr.split(",");
           const position = new AMap.LngLat(gpsArr[0], gpsArr[1]);
           fnMarker(position);
-          fnAddress(position, projectCity, projectAddress);
+          fnAddress(position, addressObj);
           try {
             const path = JSON.parse(fenceStr).map((el) => {
               const { longitude, latitude } = el;
               return new AMap.LngLat(longitude, latitude);
             });
-            console.log("path", path);
             fnPolygon(path);
           } catch (e) {
             console.log("error", e);
@@ -350,6 +350,9 @@ export default {
       lng,
       lat,
       city,
+      district,
+      province,
+      township,
       address,
       inputFilter,
       listVisible,

@@ -31,10 +31,6 @@
               <div class="value">{{ row.describeStr }}</div>
             </div>
             <div class="item row">
-              <div class="label">项目区域:</div>
-              <div class="value">{{ row.projectCity }}</div>
-            </div>
-            <div class="item row">
               <div class="label">项目详细地址:</div>
               <div class="value">{{ row.projectAddress }}</div>
             </div>
@@ -53,7 +49,7 @@
             class="text-primary cursor-pointer"
             style="text-decoration: underline"
             @click="onFenceMap(row)"
-            >{{ row.projectCity + row.projectAddress }}</span
+            >{{ row.projectAddress || "-" }}</span
           >
         </template>
         <template #op="{ row }">

@@ -23,6 +23,7 @@
             <q-form class="row q-gutter-md items-center">
               <input-filter-company
                 style="width: 310px"
+                label-text="所属公司"
                 label-style="
                   min-width: 100px;
                   max-width: 100px;
@@ -163,7 +164,7 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const LOAD = inject("LOAD");
+    // const LOAD = inject("LOAD");
     let formData = reactive({
       companyId: "",
       companyName: "",
@@ -171,7 +172,10 @@ export default {
       concat: "",
       concatPhone: "",
       mapStr: "",
-      projectCity: "",
+      city: "",
+      district: "",
+      province: "",
+      township: "",
       projectAddress: "",
       describeStr: "",
     });

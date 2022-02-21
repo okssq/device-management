@@ -43,7 +43,7 @@
                 <q-item>
                   <q-item-section side lines="1">区域：</q-item-section>
                   <q-item-section lines="4">
-                    {{ row.projectCity + row.projectAddress }}
+                    {{ row.projectAddress || "-" }}
                   </q-item-section>
                 </q-item>
               </q-list>
@@ -101,8 +101,8 @@ export default {
     const initMap = () => {
       if (props.row) {
         const obj = toRaw(props.row);
-        const { mapStr, projectCity, projectAddress } = obj;
-        if (mapStr && projectAddress && projectCity) {
+        const { mapStr, projectAddress } = obj;
+        if (mapStr && projectAddress) {
           const [gpsStr, fenceStr] = mapStr.split(";");
           if (!gpsStr || !fenceStr) return;
           const gpsArr = gpsStr.split(",");

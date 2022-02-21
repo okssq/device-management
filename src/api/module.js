@@ -42,6 +42,16 @@ export const PROJECT = {
   del(param) {
     return post("/project/delete_project.json", param);
   },
+  options(param) {
+    return post("/project/project_level.json", param);
+  },
+};
+// 设备地图相关接口
+export const TERMINAL_MAP = {
+  // 项目列表
+  list(param) {
+    return post("/project/project_list.json", param);
+  },
 };
 // 设备相关接口
 export const TERMINAL = {

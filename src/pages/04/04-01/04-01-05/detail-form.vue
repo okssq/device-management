@@ -107,7 +107,7 @@
 <script>
 import chooseGpsDialog from "../04-01-04/choose-gps-dialog/index.vue";
 import { reactive, ref, shallowRef, toRaw, toRefs } from "vue";
-import { TERMINAL } from "src/api/module";
+import { TERMINAL, PROJECT } from "src/api/module";
 import InputFilterCompany from "components/company/input-filter-company.vue";
 export default {
   emits: ["cancel", "ok"],
@@ -145,9 +145,19 @@ export default {
     const projectList = shallowRef([]);
     const projectLoading = ref(false);
 
-    const getProjectList = () => {
+    const getProjectList = (val) => {
       projectLoading.value = true;
-      projectList.value = [{ label: "项目ID为1", value: "1" }];
+      PROJECT.options({ companyId: val })
+        .then((res) => {
+          projectList.value = res.map((el) => {
+            const { id, label } = el;
+            return { label, value: id };
+          });
+          console.log(res);
+        })
+        .finally(() => {
+          projectLoading.value = false;
+        });
       projectLoading.value = false;
     };
 
