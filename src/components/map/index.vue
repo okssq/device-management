@@ -1,6 +1,6 @@
 <template>
   <div class="relative-position fit" id="component-map">
-    <div class="absolute-center" v-if="!LOAD.map">
+    <div class="absolute-center" v-if="!mapLoad">
       <q-btn
         icon="sync"
         color="primary"
@@ -14,10 +14,12 @@
 </template>
 <script>
 import AMapLoader from "@amap/amap-jsapi-loader";
-import { inject, onMounted, onBeforeUnmount, ref } from "vue";
+import { inject, onMounted, onBeforeUnmount, ref, computed, watch } from "vue";
 export default {
-  setup() {
+  emits: ["load-success"],
+  setup(props, { emit }) {
     const LOAD = inject("LOAD");
+    const mapLoad = computed(() => LOAD.map);
     const loading = ref(false);
     const loadMap = async () => {
       if (LOAD.MAP) {
@@ -57,15 +59,38 @@ export default {
           loading.value = false;
         });
     };
+    watch(
+      mapLoad,
+      () => {
+        if (mapLoad.value) {
+          emit("load-success");
+        }
+      },
+      {
+        immediate: true,
+      }
+    );
     onMounted(() => {
       LOAD.mapTeleportTo = "#component-map";
     });
+
     onBeforeUnmount(() => {
       LOAD.mapTeleportTo = "#global-map-wrap";
+      if (LOAD.map) {
+        LOAD.mapObj.clearEvents("click");
+        const overlays = LOAD.mapObj.getAllOverlays();
+        overlays.forEach((el) => {
+          el.clearEvents("click");
+          el.clearEvents("mousemove");
+          el.clearEvents("mousemout");
+        });
+        LOAD.mapObj.clearMap();
+        LOAD.mapObj.clearInfoWindow();
+      }
     });
 
     return {
-      LOAD,
+      mapLoad,
       loading,
       loadMap,
     };

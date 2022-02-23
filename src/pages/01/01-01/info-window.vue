@@ -3,7 +3,7 @@
     <q-card style="width: 320px">
       <div class="row no-wrap items-center q-px-md q-py-sm">
         <span class="text-subtitle2 text-bold text-primary">
-          {{ info ? typeText[info.tmlType] + "-" + info.label : "" }}</span
+          {{ data ? typeText[data.type] + "-" + data.terminalId : "" }}</span
         >
         <q-space />
         <q-btn
@@ -20,78 +20,50 @@
       <q-separator />
       <q-list class="text-bold text-grey-10 q-pb-md" dense>
         <q-item>
+          <q-item-section side>项目：</q-item-section>
+          <q-item-section v-if="data">
+            {{ data.projectName }}
+          </q-item-section>
+        </q-item>
+        <q-item>
           <q-item-section side>状态：</q-item-section>
-          <q-item-section side v-if="info">
+          <q-item-section side v-if="data">
             <q-badge
-              :color="info == 0 ? 'grey' : 'green'"
-              :label="info == 0 ? '离线' : '在线'"
+              :color="data.onlineStatus == 0 ? 'grey' : 'green'"
+              :label="data.onlineStatus == 0 ? '离线' : '在线'"
             />
           </q-item-section>
         </q-item>
         <q-item>
           <q-item-section side>信息：</q-item-section>
-          <q-item-section v-if="info"> {{ info.info }}</q-item-section>
+          <q-item-section v-if="data"> </q-item-section>
         </q-item>
         <q-item>
           <q-item-section side>时间：</q-item-section>
-          <q-item-section> 2022/02/01 20:02:02</q-item-section>
+          <q-item-section v-if="data"> {{ data.onlineTime }}</q-item-section>
         </q-item>
         <q-item>
           <q-item-section side>地址：</q-item-section>
-          <q-item-section v-if="info"> {{ info.address }}</q-item-section>
+          <q-item-section v-if="data"> {{ data.address }}</q-item-section>
         </q-item>
       </q-list>
       <q-separator />
       <div class="q-pa-sm">
         <div class="text-grey-8">
-          <q-btn
-            flat
-            dense
-            icon="slideshow"
-            class="q-mr-xs"
-            title="视频查看"
-            @click="onVideo"
-          />
-          <q-btn
-            flat
-            dense
-            icon="photo_camera"
-            class="q-mr-xs"
-            title="照相"
-            @click="onPhoto"
-          />
+          <q-btn flat dense icon="slideshow" class="q-mr-xs" title="视频查看" />
+          <q-btn flat dense icon="photo_camera" class="q-mr-xs" title="照相" />
           <q-btn
             flat
             dense
             icon="keyboard_voice"
             class="q-mr-xs"
             title="文本下发"
-            @click="onTTS"
           />
-          <q-btn flat dense icon="volume_up" class="q-mr-xs" title="音量调节">
-            <q-popup-proxy>
-              <q-list dense padding class="rounded-borders">
-                <q-item
-                  clickable
-                  v-close-popup
-                  class="text-grey-7"
-                  v-for="item in [0, 20, 40, 60, 80, 100]"
-                  :key="item"
-                >
-                  <q-item-section>{{ item }}%</q-item-section>
-                </q-item>
-              </q-list>
-            </q-popup-proxy>
-          </q-btn>
-          <q-btn
-            flat
-            dense
-            icon="restart_alt"
-            title="重启"
-            @click="onReStart"
-          />
+
+          <q-btn flat dense icon="restart_alt" title="重启" />
         </div>
       </div>
+      <div class="tip-shadow relative-position"></div>
     </q-card>
 
     <!-- 照相 -->
@@ -185,17 +157,17 @@ import { ref } from "@vue/reactivity";
 export default {
   emits: ["close", "video"],
   props: {
-    info: {
+    data: {
       type: [null, Object],
       default: null,
     },
   },
   setup(props, { emit }) {
     const typeText = {
-      1: "大屏",
-      2: "打卡桩",
+      1: "座椅",
+      2: "瓶子回收",
       3: "储物柜",
-      4: "座椅",
+      4: "大屏",
     };
     const onVideo = () => {
       emit("video");

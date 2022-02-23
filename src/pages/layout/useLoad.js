@@ -14,15 +14,15 @@ const useLoad = () => {
         const mapObj = new AMap.Map("global-map", {
           zoom: 11, // 级别
           viewMode: "2D",
-          animateEnable: false,
-          isHotspot: false,
-          jogEnable: false,
-          indoorMap: false,
-          showIndoorMap: false,
-          doubleClickZoom: false,
-          keyboardEnable: false,
-          showBuildingBlock: false,
-          buildingAnimation: false,
+          // animateEnable: false,
+          // isHotspot: false,
+          // jogEnable: false,
+          // indoorMap: false,
+          // showIndoorMap: false,
+          // doubleClickZoom: false,
+          // keyboardEnable: false,
+          // showBuildingBlock: false,
+          // buildingAnimation: false,
         });
         mapObj.on("complete", () => {
           console.log("全局地图加载成功！");

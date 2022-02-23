@@ -48,9 +48,12 @@ export const PROJECT = {
 };
 // 设备地图相关接口
 export const TERMINAL_MAP = {
-  // 项目列表
-  list(param) {
-    return post("/project/project_list.json", param);
+  // 设备坐标列表
+  gpsList(param) {
+    return post("/terminal_map/terminal_gps_list.json", param, "json");
+  },
+  termninalBounds(param) {
+    return post("/terminal_map/project_gps_list.json", param, "json");
   },
 };
 // 设备相关接口
