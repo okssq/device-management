@@ -54,8 +54,8 @@ export default {
     const type = ref("");
     const options = [
       { label: "座椅", value: "1" },
-      { label: "储物柜", value: "2" },
-      { label: "打卡桩", value: "3" },
+      { label: "瓶子回收", value: "2" },
+      { label: "储物柜", value: "3" },
       { label: "大屏", value: "4" },
     ];
     const onSubmit = () => {

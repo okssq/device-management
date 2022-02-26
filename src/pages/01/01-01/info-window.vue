@@ -3,7 +3,11 @@
     <q-card style="width: 320px">
       <div class="row no-wrap items-center q-px-md q-py-sm">
         <span class="text-subtitle2 text-bold text-primary">
-          {{ data ? typeText[data.type] + "-" + data.terminalId : "" }}</span
+          {{
+            data
+              ? typeText[data.type] || "未知设备" + "-" + data.terminalId
+              : ""
+          }}</span
         >
         <q-space />
         <q-btn
@@ -34,10 +38,10 @@
             />
           </q-item-section>
         </q-item>
-        <q-item>
+        <!-- <q-item>
           <q-item-section side>信息：</q-item-section>
           <q-item-section v-if="data"> </q-item-section>
-        </q-item>
+        </q-item> -->
         <q-item>
           <q-item-section side>时间：</q-item-section>
           <q-item-section v-if="data"> {{ data.onlineTime }}</q-item-section>
@@ -48,19 +52,16 @@
         </q-item>
       </q-list>
       <q-separator />
-      <div class="q-pa-sm">
+      <div class="q-px-sm q-pt-sm">
         <div class="text-grey-8">
-          <q-btn flat dense icon="slideshow" class="q-mr-xs" title="视频查看" />
-          <q-btn flat dense icon="photo_camera" class="q-mr-xs" title="照相" />
           <q-btn
             flat
+            round
             dense
-            icon="keyboard_voice"
+            icon="toggle_on"
             class="q-mr-xs"
-            title="文本下发"
+            title="开关设置"
           />
-
-          <q-btn flat dense icon="restart_alt" title="重启" />
         </div>
       </div>
       <div class="tip-shadow relative-position"></div>

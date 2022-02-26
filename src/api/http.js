@@ -13,7 +13,7 @@ const requestArr = [];
 
 // axios实例
 const service = axios.create({
-  baseURL: "/", // 统一请求前缀
+  baseURL: "/web", // 统一请求前缀
   timeout: 60000, // 超时时间
   responseType: "json", // 返回结果类型
   withCredentials: true,

@@ -1,11 +1,11 @@
 <template>
   <div class="row no-wrap items-center shadow-2 my-header">
-    <div class="row no-wrap items-center" style="width: 220px">
+    <div class="row no-wrap items-center" style="width: 230px">
       <img
         src="~assets/images/logo.jpg"
         style="width: 40px; margin: 0 3px 0 9px"
       />
-      <img src="~assets/images/logo-text.jpg" class="gt-xs" />
+      <img src="~assets/images/logo-text.jpg" />
     </div>
     <div class="bd" />
     <crumbs />

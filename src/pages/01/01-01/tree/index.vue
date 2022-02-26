@@ -72,7 +72,7 @@ const nodeClass = (treeId, treeNode) => {
 };
 const termTypeText = {
   1: "座椅",
-  2: "瓶子回收",
+  2: "回收",
   3: "储物柜",
   4: "大屏",
 };

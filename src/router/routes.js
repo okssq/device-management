@@ -94,7 +94,7 @@ const routes = [
                 path: "/04-01-02",
                 component: () => import("pages/04/04-01/04-01-02"),
                 meta: {
-                  crumbs: ["信息管理", "设备信息", "打卡桩"],
+                  crumbs: ["信息管理", "设备信息", "瓶子回收"],
                 },
               },
               {
@@ -116,6 +116,13 @@ const routes = [
                 component: () => import("pages/04/04-01/04-01-05"),
                 meta: {
                   crumbs: ["信息管理", "设备信息", "未注册设备"],
+                },
+              },
+              {
+                path: "/04-01-06",
+                component: () => import("pages/04/04-01/04-01-06"),
+                meta: {
+                  crumbs: ["信息管理", "设备信息", "设备模板"],
                 },
               },
             ],

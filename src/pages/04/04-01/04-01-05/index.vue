@@ -39,11 +39,12 @@
         <template #op="{ row }">
           <div class="q-gutter-sm">
             <q-btn
-              dense
-              size="10px"
+              flat
+              round
+              size="12px"
               color="indigo"
-              icon="tune"
-              label="注册设备"
+              icon="phonelink_setup"
+              title="注册设备"
               @click.stop="onBind(row)"
             />
           </div>
@@ -95,8 +96,8 @@ export default {
     };
     const typeText = {
       1: "座椅",
-      2: "储物柜",
-      3: "打卡桩",
+      2: "瓶子回收",
+      3: "储物柜",
       4: "大屏",
     };
     const typeColor = {
@@ -130,7 +131,7 @@ export default {
       {
         name: "onlineTime",
         field: "onlineTime",
-        label: "在线时间",
+        label: "最后在线时间",
         align: "left",
       },
       {

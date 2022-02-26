@@ -252,6 +252,7 @@ export default {
       AMap.plugin(["AMap.MarkerCluster"], function () {
         cluster = new AMap.MarkerCluster(LOAD.mapObj, points, {
           gridSize: 80, // 聚合网格像素大小
+          maxZoom: 22,
           // renderClusterMarker, // 自定义聚合点样式
           renderMarker, // 自定义非聚合点样式
         });
@@ -309,7 +310,13 @@ export default {
     };
 
     onMounted(() => {});
-    onBeforeUnmount(() => {});
+    onBeforeUnmount(() => {
+      if (cluster) {
+        cluster.clearEvents("click");
+        cluster.setMap(null);
+        cluster = null;
+      }
+    });
 
     return {
       refInfoWindow,

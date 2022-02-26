@@ -75,9 +75,9 @@ module.exports = configure(function (ctx) {
         type: "http",
       },
       proxy: {
-        "/": {
+        "/web": {
           // target: 'http://192.168.2.100:8602',
-          target: "http://dcs.free.idcfengye.com",
+          target: "https://city.yitancc.com",
           changeOrigin: true,
         },
       },

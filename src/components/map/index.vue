@@ -79,13 +79,17 @@ export default {
       if (LOAD.map) {
         LOAD.mapObj.clearEvents("click");
         const overlays = LOAD.mapObj.getAllOverlays();
+        console.log("overlays,", overlays);
+
         overlays.forEach((el) => {
+          console.log("el1111,", el);
           el.clearEvents("click");
           el.clearEvents("mousemove");
           el.clearEvents("mousemout");
         });
         LOAD.mapObj.clearMap();
         LOAD.mapObj.clearInfoWindow();
+        console.log("执行清楚map组件完毕！");
       }
     });
 

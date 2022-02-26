@@ -1,10 +1,10 @@
 <template>
-  <div class="q-px-md q-py-sm row no-wrap">
+  <div class="q-pa-md row no-wrap">
     <q-input
       dense
       outlined
       debounce="350"
-      class="q-mr-sm flex1"
+      class="flex1"
       placeholder="请输入设备号"
       :model-value="filterText"
       @update:model-value="onFilter"

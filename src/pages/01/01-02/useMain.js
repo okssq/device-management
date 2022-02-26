@@ -6,7 +6,6 @@ const useMain = () => {
     cluster,
     projectPolygons = {},
     hasFnMarkerfecneIds = [],
-    projectMarkers = [],
     provincePolygons = [],
     cityPolygons = [],
     districtPolygons = [];
@@ -75,17 +74,27 @@ const useMain = () => {
         hasFnMarkerfecneIds.push(id);
         fnTerminalMarkers(res);
         polygon.clearEvents("click");
-        console.log(res);
       })
       .catch((err) => {});
   };
   // 渲染项目点
   const fnProjectGps = (arr) => {
+    const renderMarker = (context) => {
+      const { name } = context["data"][0];
+      var content = `
+          <div class="q-badge flex inline items-center no-wrap q-badge--single-line bg-blue" role="alert">项目：${name}</div>
+        `;
+
+      // var offset = new AMap.Pixel(-9, -9);
+      context.marker.setContent(content);
+      // context.marker.setOffset(offset);
+    };
     AMap.plugin(["AMap.MarkerCluster"], function () {
       cluster = new AMap.MarkerCluster(LOAD.mapObj, arr, {
         gridSize: 80, // 聚合网格像素大小
+        maxZoom: 22,
+        renderMarker,
       });
-      projectMarkers = arr;
     });
     console.log("renderProjectGps", arr);
   };
@@ -356,10 +365,11 @@ const useMain = () => {
     destroyFence("district");
     destroyFence("province");
     Object.values(projectPolygons).forEach((el) => {
+      console.log(el, "清楚围栏");
       el.clearEvents("click");
       el.destroy();
     });
-    projectPolygons = {};
+    projectPolygons = null;
     if (cluster) {
       cluster.setMap(null);
       cluster = null;

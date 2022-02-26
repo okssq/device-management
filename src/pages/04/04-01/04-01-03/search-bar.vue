@@ -1,19 +1,27 @@
 <template>
   <div class="bg-white q-pl-md q-pb-md q-mt-md">
     <q-form class="q-gutter-sm row items-center" @submit="onSubmit">
-      <q-input input-class="text-caption" outlined dense v-model="companyId">
-        <template #before>
-          <span class="text-caption text-bold">公司ID：</span>
-        </template>
-      </q-input>
-      <q-input input-class="text-caption" outlined dense v-model="projectId">
+      <input-filter-company :treeList="treeList" v-model="companyId" />
+      <q-input
+        input-class="text-caption"
+        placeholder="请输入项目ID"
+        outlined
+        dense
+        v-model="projectId"
+      >
         <template #before>
           <span class="text-caption text-bold">项目ID：</span>
         </template>
       </q-input>
-      <q-input input-class="text-caption" outlined dense v-model="terminalId">
+      <q-input
+        input-class="text-caption"
+        placeholder="请输入设备号"
+        outlined
+        dense
+        v-model="terminalId"
+      >
         <template #before>
-          <span class="text-caption text-bold">设备IMEI：</span>
+          <span class="text-caption text-bold">设备号：</span>
         </template>
       </q-input>
       <q-btn
@@ -28,9 +36,17 @@
 </template>
 <script>
 import { ref } from "vue";
+import InputFilterCompany from "components/company/input-filter-company.vue";
 export default {
   emits: ["search"],
+  components: {
+    InputFilterCompany,
+  },
   props: {
+    treeList: {
+      type: Array,
+      default: () => [],
+    },
     searching: {
       type: Boolean,
       default: false,
@@ -46,7 +62,7 @@ export default {
         companyId: companyId.value,
         projectId: projectId.value,
         terminalId: terminalId.value,
-        type: 10,
+        type: 3,
       });
     };
     onSubmit();

@@ -1,6 +1,10 @@
 <template>
   <div class="my-box column no-wrap">
-    <search-bar :searching="searching" @search="onSearch" @bind="onBind" />
+    <search-bar
+      :tree-list="treeList"
+      :searching="searching"
+      @search="onSearch"
+    />
     <q-separator />
     <div class="flex1 overflow-hidden">
       <result-table
@@ -47,31 +51,48 @@
             </div>
           </div>
         </template>
-        <template #custom-gpsInfo="{ val }">
+        <template #custom-gpsInfo="{ row, val }">
           <div
             class="text-primary cursor-pointer"
             style="text-decoration: underline"
+            @click="viewGps(row)"
           >
             <div>经度: {{ (val || "").split(",")[0] || "-" }}</div>
             <div>纬度: {{ (val || "").split(",")[1] || "-" }}</div>
           </div>
         </template>
-        <template #custom-checkType="{ val }">
-          <q-badge dense :label="val" :color="val === '1' ? 'green' : 'red'" />
-        </template>
-        <template #custom-nowStatus="{ val }">
-          <q-badge
-            dense
-            :label="val === '1' ? '启用' : '关闭'"
-            :color="val === '1' ? 'green' : 'grey'"
-          />
-        </template>
-        <template #custom-onlineStatus="{ val }">
-          <q-badge
-            dense
-            :label="onlineStatusText[val] || '未知'"
-            :color="onlineStatusColor[val] || 'brown'"
-          />
+
+        <template #custom-onlineStatus="{ row, val }">
+          <div class="row no-wrap justify-center">
+            <q-icon
+              v-if="val"
+              size="22px"
+              class="q-mr-sm"
+              :color="
+                row.checkType !== row.type
+                  ? 'red'
+                  : onlineStatusColor[val] || 'primary'
+              "
+              :name="
+                row.checkType !== row.type
+                  ? 'device_unknown'
+                  : onlineStatusIcon[val] || 'primary'
+              "
+            />
+            <q-badge
+              dense
+              :label="
+                row.checkType !== row.type
+                  ? '设备类型不匹配'
+                  : onlineStatusText[val] || '-'
+              "
+              :color="
+                row.checkType !== row.type
+                  ? 'red'
+                  : onlineStatusColor[val] || 'pramary'
+              "
+            />
+          </div>
         </template>
         <template #op="{ row }">
           <div class="q-gutter-sm">
@@ -100,41 +121,81 @@
       </result-table>
     </div>
   </div>
+  <gps-dialog
+    v-if="gpsDialogVisible"
+    :gps-data="gpsData"
+    @cancel="gpsDialogVisible = false"
+  ></gps-dialog>
+  <detail-dialog
+    v-if="detailDialogVisible"
+    :form-data="detailData"
+    @cancel="detailDialogVisible = false"
+    @ok="onConfirmEdit"
+  ></detail-dialog>
 </template>
 
 <script>
 import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
-import DetailForm from "./detail-form.vue";
+
+import GpsDialog from "./gps-dialog/index.vue";
+import useGps from "./useGps";
+import DetailDialog from "./detail-dialog/index.vue";
+import useDetail from "./useDetail";
+
 import { reactive, ref, shallowRef, toRefs } from "vue";
 import { TERMINAL } from "src/api/module.js";
 import { notifySuccess } from "src/util/common";
 import { useQuasar } from "quasar";
+import { useCompanyTree } from "components/company/useCompayTree";
 export default {
   components: {
     SearchBar,
     ResultTable,
+    GpsDialog,
+    DetailDialog,
   },
   setup() {
+    const { treeList } = useCompanyTree();
     const onlineStatusText = {
-      0: "状态零",
-      1: "状态一",
-      2: "状态二",
-      3: "状态三",
+      0: "离线",
+      1: "在线",
     };
     const onlineStatusColor = {
-      0: "grey",
-      1: "orange",
-      2: "green",
-      3: "blue",
+      0: "grey-8",
+      1: "green",
+    };
+    const onlineStatusIcon = {
+      0: "power_off",
+      1: "electrical_services",
     };
     const $q = useQuasar();
     const columns = [
       {
+        name: "onlineStatus",
+        field: "onlineStatus",
+        label: "状态",
+        align: "left",
+        type: "custom",
+      },
+      {
         name: "terminalId",
         field: "terminalId",
-        label: "设备IMEI",
+        label: "设备号",
+        align: "left",
+      },
+      {
+        name: "projectName",
+        field: "projectName",
+        label: "所属项目",
+        align: "left",
+      },
+
+      {
+        name: "companyName",
+        field: "companyName",
+        label: "所属公司",
         align: "left",
       },
       {
@@ -145,25 +206,16 @@ export default {
         type: "custom",
       },
       {
-        name: "checkType",
-        field: "checkType",
-        label: "checkType",
+        name: "address",
+        field: "address",
+        label: "设备所在位置",
         align: "left",
-        type: "custom",
       },
       {
-        name: "nowStatus",
-        field: "nowStatus",
-        label: "启用",
+        name: "onlineTime",
+        field: "onlineTime",
+        label: "最近在线时间",
         align: "left",
-        type: "custom",
-      },
-      {
-        name: "onlineStatus",
-        field: "onlineStatus",
-        label: "状态",
-        align: "left",
-        type: "custom",
       },
 
       {
@@ -218,38 +270,7 @@ export default {
       searchData && (searchData = { ...searchData, ...val });
       getList();
     };
-    // 未注册设备按钮回调
-    const onBind = () => {
-      $q.dialog({
-        component: DetailForm,
-      });
-    };
-    // 新增按钮回调
-    // const onInsert = () => {
-    //   $q.dialog({
-    //     component: DetailForm,
-    //     componentProps: {
-    //       type: "insert",
-    //     },
-    //   }).onOk(() => {
-    //     notifySuccess("增加成功");
-    //     onSearch({ page: 1 });
-    //   });
-    // };
-    // 编辑按钮回调
-    const onEdit = (row) => {
-      $q.dialog({
-        component: DetailForm,
-        componentProps: {
-          type: "edit",
-          formData: row,
-        },
-      }).onOk(() => {
-        notifySuccess("更新成功");
-        getList();
-      });
-    };
-
+    // 表格item删除回调
     const onDel = (row) => {
       $q.dialog({
         component: DelConfirm,
@@ -268,19 +289,32 @@ export default {
       });
     };
 
+    const { gpsData, gpsDialogVisible, viewGps } = useGps();
+    const { detailData, detailDialogVisible, onEdit, onConfirmEdit } =
+      useDetail(getList);
+
     return {
+      treeList,
       onlineStatusText,
       onlineStatusColor,
+      onlineStatusIcon,
       columns,
       rows,
       ...toRefs(pagination),
       searching,
       onPageChange,
       onSearch,
-      onBind,
       // onInsert,
-      onEdit,
       onDel,
+
+      gpsData,
+      gpsDialogVisible,
+      viewGps,
+
+      detailData,
+      detailDialogVisible,
+      onEdit,
+      onConfirmEdit,
     };
   },
 };

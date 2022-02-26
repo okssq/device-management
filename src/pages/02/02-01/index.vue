@@ -484,6 +484,7 @@ export default {
 
 <style scoped>
 .bg {
+  background-color: #fff;
   background-image: url("./page-bg.png");
   background-repeat: no-repeat;
   background-size: 100% 100%;
