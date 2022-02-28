@@ -52,8 +52,31 @@ export const TERMINAL_MAP = {
   gpsList(param) {
     return post("/terminal_map/terminal_gps_list.json", param, "json");
   },
-  termninalBounds(param) {
+  projectBounds(param) {
     return post("/terminal_map/project_gps_list.json", param, "json");
+  },
+};
+// 设备控制相关接口
+export const TERMINAL_CONTROL = {
+  // 设备的开关数量和状态
+  switchInfo(param) {
+    return post("/terminal_control/open_or_close.json", param);
+  },
+  // 单个开关控制
+  singleControl(param) {
+    return post("/terminal_control/singe_control.json", param);
+  },
+  // 批量开关控制
+  batchControl(param) {
+    return post("/terminal_control/batch_control.json", param);
+  },
+  // 重启系统
+  rebootSys(param) {
+    return post("/terminal_control/reboot_system.json", param);
+  },
+  // 重启应用
+  rebootApp(param) {
+    return post("/terminal_control/reboot_application.json", param);
   },
 };
 // 设备相关接口

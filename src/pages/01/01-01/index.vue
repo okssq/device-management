@@ -138,7 +138,7 @@ export default {
           }
         });
       } else {
-        TERMINAL_MAP.termninalBounds({
+        TERMINAL_MAP.projectBounds({
           list: [pId],
         }).then((res) => {
           console.log("bianjie", res);
@@ -261,7 +261,7 @@ export default {
           const { clusterData } = obj;
           if (clusterData.length !== 1) return;
           const row = clusterData[0];
-          fnInfowWindow({ id: `term_${clusterData[0]["terminalId"]}` });
+          fnInfowWindow({ id: `term_${row["terminalId"]}` });
         });
       });
     };

@@ -12,7 +12,7 @@
         <q-space />
         <q-btn
           round
-          size="12px"
+          size="10px"
           icon="clear"
           color="red-5"
           dense
@@ -52,7 +52,7 @@
         </q-item>
       </q-list>
       <q-separator />
-      <div class="q-px-sm q-pt-sm">
+      <div class="q-px-sm q-py-xs">
         <div class="text-grey-8">
           <q-btn
             flat
@@ -61,102 +61,22 @@
             icon="toggle_on"
             class="q-mr-xs"
             title="开关设置"
+            @click="onSwitch"
           />
         </div>
       </div>
       <div class="tip-shadow relative-position"></div>
     </q-card>
-
-    <!-- 照相 -->
-    <q-dialog v-model="dialogPhoto" persistent>
-      <q-card>
-        <div class="row q-px-md q-py-xs items-center justify-between">
-          <div class="text-subtitle2 text-bold">拍照</div>
-          <q-btn flat round size="12px" icon="clear" v-close-popup />
-        </div>
-        <q-separator />
-        <q-card-section style="width: 360px; height: 300px"> </q-card-section>
-        <q-separator />
-        <q-card-actions align="right">
-          <q-btn
-            dense
-            flat
-            label="取消"
-            color="primary"
-            @click="dialogPhoto = false"
-          />
-          <q-btn
-            dense
-            label="确定"
-            color="primary"
-            @click="dialogPhoto = false"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <!-- 文本下发 -->
-    <q-dialog v-model="dialogTTS" persistent>
-      <q-card>
-        <div class="row q-px-md q-py-xs items-center justify-between">
-          <div class="text-text-subtitle2 text-bold">文本下发</div>
-          <q-btn flat round size="12px" icon="clear" v-close-popup />
-        </div>
-        <q-separator />
-        <q-card-section style="width: 320px">
-          <q-input v-model="tts" type="textarea" outlined> </q-input>
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn
-            dense
-            flat
-            label="取消"
-            color="primary"
-            @click="dialogTTS = false"
-          />
-          <q-btn
-            dense
-            label="确定"
-            color="primary"
-            @click="dialogTTS = false"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-    <!-- 重启 -->
-    <q-dialog v-model="dialogReStart" persistent>
-      <q-card>
-        <q-card-section class="row items-center">
-          <q-avatar
-            size="40px"
-            icon="warning"
-            color="deep-orange"
-            text-color="white"
-          />
-          <span class="q-ml-sm text-bold">您确定要重启设备吗？</span>
-        </q-card-section>
-        <q-card-actions align="right">
-          <q-btn
-            dense
-            flat
-            label="取消"
-            color="primary"
-            @click="dialogReStart = false"
-          />
-          <q-btn
-            dense
-            label="确定"
-            color="primary"
-            @click="dialogReStart = false"
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 <script>
-import { ref } from "@vue/reactivity";
+import { ref, toRaw } from "@vue/reactivity";
+import { useQuasar } from "quasar";
+import DialogSwitch from "./dialog/switch/index.vue";
 export default {
   emits: ["close", "video"],
+  // eslint-disable-next-line vue/no-unused-components
+  components: { DialogSwitch },
   props: {
     data: {
       type: [null, Object],
@@ -170,39 +90,17 @@ export default {
       3: "储物柜",
       4: "大屏",
     };
-    const onVideo = () => {
-      emit("video");
-    };
-    const dialogPhoto = ref(false);
-    const onPhoto = () => {
-      dialogPhoto.value = true;
-    };
-
-    const dialogTTS = ref(false);
-    const tts = ref("");
-    const onTTS = () => {
-      tts.value = "";
-      dialogTTS.value = true;
-    };
-
-    const dialogReStart = ref(false);
-    const onReStart = () => {
-      dialogReStart.value = true;
+    const $q = useQuasar();
+    const onSwitch = () => {
+      const data = toRaw(props.data);
+      $q.dialog({
+        component: DialogSwitch,
+        componentProps: { data },
+      });
     };
     return {
       typeText,
-
-      onVideo,
-
-      dialogPhoto,
-      onPhoto,
-
-      dialogTTS,
-      tts,
-      onTTS,
-
-      dialogReStart,
-      onReStart,
+      onSwitch,
     };
   },
 };
