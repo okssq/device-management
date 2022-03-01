@@ -1,14 +1,7 @@
 <template>
   <div>
     <div class="row no-wrap justify-around q-px-md q-pt-md">
-      <div
-        v-mutation="handler1"
-        @dragenter="onDragEnter"
-        @dragleave="onDragLeave"
-        @dragover="onDragOver"
-        @drop="onDrop"
-        class="drop-target rounded-borders overflow-hidden"
-      >
+      <div class="drop-target rounded-borders overflow-hidden">
         <div
           v-for="n in 8"
           :key="n"
@@ -20,80 +13,19 @@
         >
           div{{ n }}
         </div>
-        <!-- <div
-          id="box1"
-          draggable="true"
-          @dragstart="onDragStart"
-          class="box navy"
-        >
-          box1
-        </div> -->
-        <!-- <div
-          id="box2"
-          draggable="true"
-          @dragstart="onDragStart"
-          class="box red"
-        >
-          box2
-        </div> -->
-        <!-- <div
-          id="box3"
-          draggable="true"
-          @dragstart="onDragStart"
-          class="box green"
-        >
-          box3
-        </div> -->
-        <!-- <div
-          id="box4"
-          draggable="true"
-          @dragstart="onDragStart"
-          class="box orange"
-        >
-          box4
-        </div> -->
-        <!-- <div
-          id="box5"
-          draggable="true"
-          @dragstart="onDragStart"
-          class="box navy"
-        >
-          box5
-        </div> -->
-        <!-- <div
-          id="box6"
-          draggable="true"
-          @dragstart="onDragStart"
-          class="box red"
-        >
-          box6
-        </div> -->
-        <!-- <div
-          id="box7"
-          draggable="true"
-          @dragstart="onDragStart"
-          class="box green"
-        >
-          box7
-        </div> -->
-        <!-- <div
-          id="box8"
-          draggable="true"
-          @dragstart="onDragStart"
-          class="box orange"
-        >
-          box8
-        </div> -->
       </div>
-
       <div
-        v-mutation="handler2"
-        @dragenter="onDragEnter"
-        @dragleave="onDragLeave"
-        @dragover="onDragOver"
-        @drop="onDrop"
-        class="drop-target rounded-borders overflow-hidden"
-      />
+        class="drop-target rounded-borders overflow-hidden relative-position"
+      >
+        <div class="fit">2423423423</div>
+        <div
+          @dragenter="onDragEnter"
+          @dragleave="onDragLeave"
+          @dragover="onDragOver"
+          @drop="onDrop"
+          class="drop-target absolute-top-left fit"
+        />
+      </div>
     </div>
 
     <div class="row justify-around items-start">
@@ -125,38 +57,10 @@ export default {
       status1,
       status2,
 
-      handler1(mutationRecords) {
-        console.log("handler1");
-        status1.value = [];
-        for (const index in mutationRecords) {
-          const record = mutationRecords[index];
-          const info = `type: ${record.type}, nodes added: ${
-            record.addedNodes.length > 0 ? "true" : "false"
-          }, nodes removed: ${
-            record.removedNodes.length > 0 ? "true" : "false"
-          }, oldValue: ${record.oldValue}`;
-          status1.value.push(info);
-        }
-      },
-
-      handler2(mutationRecords) {
-        console.log("handler2");
-        status2.value = [];
-        for (const index in mutationRecords) {
-          const record = mutationRecords[index];
-          const info = `type: ${record.type}, nodes added: ${
-            record.addedNodes.length > 0 ? "true" : "false"
-          }, nodes removed: ${
-            record.removedNodes.length > 0 ? "true" : "false"
-          }, oldValue: ${record.oldValue}`;
-          status2.value.push(info);
-        }
-      },
-
       // store the id of the draggable element
       onDragStart(e) {
         console.log("onDragStart", e);
-        e.dataTransfer.setData("text", e.target.id);
+        e.dataTransfer.setData("text", { a: 1, b: 2 });
         e.dataTransfer.dropEffect = "move";
       },
 
@@ -175,8 +79,6 @@ export default {
       },
 
       onDragOver(e) {
-        console.log("onDragOver", e);
-
         e.preventDefault();
       },
 
@@ -186,22 +88,25 @@ export default {
 
         // don't drop on other draggables
         if (e.target.draggable === true) {
+          console.log(111111);
           return;
         }
 
         const draggedId = e.dataTransfer.getData("text");
-        const draggedEl = document.getElementById(draggedId);
+        console.log("draggedId", draggedId);
+        // const draggedEl = document.getElementById(draggedId);
 
-        // check if original parent node
-        if (draggedEl.parentNode === e.target) {
-          e.target.classList.remove("drag-enter");
-          return;
-        }
+        // // check if original parent node
+        // if (draggedEl.parentNode === e.target) {
+        //   console.log(222222);
+        //   e.target.classList.remove("drag-enter");
+        //   return;
+        // }
 
-        // make the exchange
-        draggedEl.parentNode.removeChild(draggedEl);
-        e.target.appendChild(draggedEl);
-        e.target.classList.remove("drag-enter");
+        // // make the exchange
+        // draggedEl.parentNode.removeChild(draggedEl);
+        // e.target.appendChild(draggedEl);
+        // e.target.classList.remove("drag-enter");
       },
     };
   },
@@ -212,7 +117,7 @@ export default {
   height: 400px
   width: 200px
   min-width: 200px
-  background-color: gainsboro
+  // background-color: gainsboro
 
 .drag-enter
   outline-style: dashed

@@ -170,7 +170,21 @@ export const LOGS = {
     return post("/logs/operation_log_list.json", param);
   },
 };
-
+// 资源文件相关接口
+export const RESOURCE = {
+  // 查询所有的资源列表
+  list(param) {
+    return post("/resource/resource_list.json", param);
+  },
+  // 新增资源信息
+  add(param) {
+    return post("/resource/insert_resource.json", param);
+  },
+  // 删除资源信息
+  add(param) {
+    return post("/resource/delete_resource.json", param);
+  },
+};
 // 树
 export const LEVEL = {
   // 公司->项目->设备

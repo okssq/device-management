@@ -185,8 +185,10 @@ export default {
       const renderMarker = (context) => {
         const { name } = context["data"][0];
         var content = `
-          <div class="q-badge flex inline items-center no-wrap q-badge--single-line bg-blue" role="alert">项目：${name}</div>
+          <div class="q-badge q-badge--single-line bg-blue q-pa-sm shadow-1">项目：${name}</div>
+          
         `;
+        //
 
         // var offset = new AMap.Pixel(-9, -9);
         context.marker.setContent(content);
