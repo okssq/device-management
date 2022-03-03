@@ -1,7 +1,7 @@
 <template>
   <div
     class="full-height column no-wrap relative-position"
-    style="width: 300px; min-width: 300px"
+    style="width: 240px; min-width: 200px"
   >
     <div class="row no-wrap items-center justify-between">
       <q-item-label header>广告资源列表</q-item-label>
@@ -15,34 +15,35 @@
         @click="onAddResource"
       />
     </div>
+    <q-separator />
     <q-scroll-area class="full-width flex1">
       <template v-for="item in resourceList" :key="item.id">
-        <div class="row no-wrap items-center q-pa-sm item-resource">
+        <div class="relative-position">
           <div
-            style="width: 120px; height: 90px"
+            style="width: 240px; height: 120px"
             :id="`res${item.id}`"
             :draggable="true"
             @dragstart="onDragStart"
           >
             <img :draggable="false" class="fit" v-if="item.resource.includes('jpg')"
                  :src="'http://mms2.baidu.com/it/u=1895335407,2753497845&fm=253' || item.resource"/>
-            <video :draggable="false" class="fit" autoplay v-else
-                   :src="'https://www.w3school.com.cn/example/html5/mov_bbb.mp4' || item.resource"/>
+            <video  class="fit" autoplay loop v-else style="object-fit: fill"
+                    :src="'https://www.w3school.com.cn/example/html5/mov_bbb.mp4' || item.resource"/>
           </div>
-          <q-item-section class="q-ml-md q-mr-sm">
-            <q-item-label>{{ item.descMsg }}</q-item-label>
-            <q-item-label caption>{{ item.fileSize }}</q-item-label>
-          </q-item-section>
-          <q-btn
-            flat
-            dense
-            round
-            color="red-5"
-            icon="close"
-            @click="onRemove(item)"
-          ></q-btn>
+          <div :draggable="false"  class="absolute-bottom q-py-xs q-px-sm row items-center justify-between" style="background-color: rgba(0, 0, 0, 0.25);">
+            <div :draggable="false"  class="text-white text-caption">{{ item.descMsg }}</div>
+            <q-btn
+              :draggable="false"
+              push
+              dense
+              round
+              color="red-4"
+              icon="close"
+              size="xs"
+              @click="onRemove(item)"
+            />
+          </div>
         </div>
-        <q-separator></q-separator>
       </template>
     </q-scroll-area>
     <q-inner-loading :showing="loading" style="z-index: 100">

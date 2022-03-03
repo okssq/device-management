@@ -1,14 +1,14 @@
 <template>
   <div class="flex1 row no-wrap overflow-hidden ">
-    <div class="flex1 column justify-center items-center relative-position">
-      <div :style="{ width: height / 1.5 + 'px', height: height + 'px' }" class="sence">
-        <component :is="currentPanel"></component>
+    <div class="flex1 column justify-center items-center relative-position overflow-hidden">
+      <div :style="{ width: height / 1.4 + 'px', height: height + 'px' }" class="sence column no-wrap">
+        <component :is="currentPanel" />
       </div>
       <q-resize-observer @resize="onResize"/>
     </div>
     <q-separator vertical/>
     <q-tabs
-      class="full-height text-grey-8"
+      class="full-height text-grey-7"
       style="width: 200px;min-width: 200px;"
       v-model="currentTab"
       align="left"
@@ -17,8 +17,8 @@
       outside-arrows
       mobile-arrows
       inline-label
-      active-color="white"
-      active-bg-color="primary"
+      active-color="black"
+      active-bg-color="blue-1"
       indicator-color="transparent"
     >
       <q-tab

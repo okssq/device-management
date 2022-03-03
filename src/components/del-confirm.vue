@@ -8,9 +8,9 @@
         >
       </q-card-section>
 
-      <q-card-actions align="right">
+      <q-card-actions align="right" class="q-mb-sm">
         <q-btn dense flat label="取消" color="primary" @click="onDialogHide" />
-        <q-btn dense label="确定" color="primary" @click="onDialogOK" />
+        <q-btn class="q-mr-sm" dense unelevated label="确定" color="primary" @click="onDialogOK" />
       </q-card-actions>
     </q-card>
   </q-dialog>
