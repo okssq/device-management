@@ -1,15 +1,18 @@
 <template>
-  <div class="q-pa-md row no-wrap">
+<!--  <div class="q-pa-md row no-wrap">-->
     <q-input
       dense
-      outlined
+      borderless
       debounce="350"
-      class="flex1"
+      class="q-px-md q-py-sm"
       placeholder="请输入设备号"
       :model-value="filterText"
       @update:model-value="onFilter"
       @focus.prevent.stop="listVisible = true"
     >
+      <template #before>
+        <q-icon name="search"></q-icon>
+      </template>
       <q-menu
         fit
         no-parent-event
@@ -45,7 +48,7 @@
         </q-item>
       </q-menu>
     </q-input>
-  </div>
+<!--  </div>-->
 </template>
 
 <script>
