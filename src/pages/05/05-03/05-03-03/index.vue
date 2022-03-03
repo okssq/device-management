@@ -1,52 +1,11 @@
 <template>
-  <div>
-    <div class="row no-wrap justify-around q-px-md q-pt-md">
-      <div class="drop-target rounded-borders overflow-hidden">
-        <div
-          v-for="n in 8"
-          :key="n"
-          :id="`box${n}`"
-          draggable="true"
-          class="box"
-          :class="`bg-blue-${n}`"
-          @dragstart="onDragStart"
-        >
-          div{{ n }}
-        </div>
-      </div>
-      <div
-        class="drop-target rounded-borders overflow-hidden relative-position"
-      >
-        <div class="fit">2423423423</div>
-        <div
-          @dragenter="onDragEnter"
-          @dragleave="onDragLeave"
-          @dragover="onDragOver"
-          @drop="onDrop"
-          class="drop-target absolute-top-left fit"
-        />
-      </div>
-    </div>
+  <div class="text-grey-5 text-h6">
+    开发中！
 
-    <div class="row justify-around items-start">
-      <div class="col row justify-center q-pa-md">
-        <div class="text-subtitle1">Mutation Info</div>
-        <div v-for="status in status1" :key="status">
-          {{ status }}
-        </div>
-      </div>
-
-      <div class="col row justify-center q-pa-md">
-        <div class="text-subtitle1">Mutation Info</div>
-        <div v-for="status in status2" :key="status">
-          {{ status }}
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 <script>
-import { ref } from "vue";
+import {ref} from "vue";
 
 export default {
   setup() {
@@ -60,7 +19,7 @@ export default {
       // store the id of the draggable element
       onDragStart(e) {
         console.log("onDragStart", e);
-        e.dataTransfer.setData("text", { a: 1, b: 2 });
+        e.dataTransfer.setData("text", {a: 1, b: 2});
         e.dataTransfer.dropEffect = "move";
       },
 
@@ -117,7 +76,7 @@ export default {
   height: 400px
   width: 200px
   min-width: 200px
-  // background-color: gainsboro
+// background-color: gainsboro
 
 .drag-enter
   outline-style: dashed

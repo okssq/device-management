@@ -170,21 +170,36 @@ export const LOGS = {
     return post("/logs/operation_log_list.json", param);
   },
 };
-// 资源文件相关接口
+// 广告资源文件相关接口
 export const RESOURCE = {
   // 查询所有的资源列表
   list(param) {
     return post("/resource/resource_list.json", param);
   },
   // 新增资源信息
-  add(param) {
+  insert(param) {
     return post("/resource/insert_resource.json", param);
   },
   // 删除资源信息
-  add(param) {
+  del(param) {
     return post("/resource/delete_resource.json", param);
   },
 };
+// ui原型图页面相关接口
+export const UI = {
+  // 查询模板页面数据
+  templateInfo(param) {
+    return post("/ui/template_pages.json", param);
+  },
+  // 新增模板页面数据
+  insert(param) {
+    return post("/ui/insert_template_page.json", param);
+  },
+  // 新增模板页面数据
+  update(param) {
+    return post("/ui/update_template_page.json", param);
+  },
+}
 // 树
 export const LEVEL = {
   // 公司->项目->设备

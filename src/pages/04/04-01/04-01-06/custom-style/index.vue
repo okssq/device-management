@@ -1,20 +1,17 @@
 <template>
   <div class="absolute fit bg-white z-max overflow-hidden column no-wrap">
-    <div
-      class="row justify-between items-center no-wrap q-px-md q-py-sm bg-grey-1"
-    >
-      <q-btn flat icon="undo" color="primary" @click="$emit('cancel')"
-        >返回</q-btn
-      >
+    <div class="row justify-between items-center no-wrap q-px-md q-py-sm bg-grey-1">
+      <q-btn flat icon="undo" color="primary" @click="$emit('cancel')">返回</q-btn>
       <div class="text-subtitle1">
         {{ data ? data.label + data.version : "" }}样式配置
       </div>
     </div>
     <q-separator />
-    <div class="flex1 row no-wrap">
-      <component :is="templateComponent"></component>
-      <q-separator vertical></q-separator>
+    <div class="flex1 row no-wrap overflow-hidden">
       <resource />
+      <q-separator vertical />
+      <component :is="templateComponent" />
+
     </div>
   </div>
 </template>
@@ -43,6 +40,7 @@ export default {
       if (!props.data) return "";
       else return templateComponentById[props.data.id];
     });
+
 
     return {
       templateComponent,

@@ -1,37 +1,37 @@
 <template>
   <div
-    class="full-height column no-wrap"
+    class="full-height column no-wrap relative-position"
     style="width: 300px; min-width: 300px"
   >
+    <div class="row no-wrap items-center justify-between">
+      <q-item-label header>广告资源列表</q-item-label>
+      <q-btn
+        flat
+        dense
+        round
+        icon="add"
+        color="primary"
+        class="q-mr-sm"
+        @click="onAddResource"
+      />
+    </div>
     <q-scroll-area class="full-width flex1">
-      <div class="row no-wrap items-center justify-between">
-        <q-item-label header>广告资源列表</q-item-label>
-        <q-btn
-          flat
-          dense
-          round
-          icon="add"
-          color="primary"
-          class="q-mr-sm"
-          @click="onAddResource"
-        />
-      </div>
       <template v-for="item in resourceList" :key="item.id">
         <div class="row no-wrap items-center q-pa-sm item-resource">
           <div
             style="width: 120px; height: 90px"
-            :id="item.id"
+            :id="`res${item.id}`"
+            :draggable="true"
             @dragstart="onDragStart"
           >
-            <img class="fit" v-if="item.type == 1" :src="item.url" />
-            <video class="fit" autoplay v-else :src="item.url" />
+            <img :draggable="false" class="fit" v-if="item.resource.includes('jpg')"
+                 :src="'http://mms2.baidu.com/it/u=1895335407,2753497845&fm=253' || item.resource"/>
+            <video :draggable="false" class="fit" autoplay v-else
+                   :src="'https://www.w3school.com.cn/example/html5/mov_bbb.mp4' || item.resource"/>
           </div>
           <q-item-section class="q-ml-md q-mr-sm">
-            <q-item-label>Single line item</q-item-label>
-            <q-item-label caption
-              >Secondary line text. Lorem ipsum dolor sit amet, consectetur
-              adipiscit elit.</q-item-label
-            >
+            <q-item-label>{{ item.descMsg }}</q-item-label>
+            <q-item-label caption>{{ item.fileSize }}</q-item-label>
           </q-item-section>
           <q-btn
             flat
@@ -45,47 +45,36 @@
         <q-separator></q-separator>
       </template>
     </q-scroll-area>
+    <q-inner-loading :showing="loading" style="z-index: 100">
+      <q-spinner-tail color="primary" size="2em"/>
+    </q-inner-loading>
   </div>
 </template>
 
 <script>
+import DelConfirm from "components/del-confirm";
 import DialogAdd from "./dialog-add.vue";
-import { useQuasar } from "quasar";
-import { notifySuccess } from "src/util/common";
-import { RESOURCE } from "src/api/module";
-import { shallowRef } from "vue";
+import {useQuasar} from "quasar";
+import {notifySuccess} from "src/util/common";
+import {RESOURCE} from "src/api/module";
+import {ref, shallowRef, toRaw} from "vue";
+
 export default {
   setup() {
     const $q = useQuasar();
-    const resourceList = shallowRef([
-      {
-        id: 1,
-        type: 1,
-        url: "http://mms2.baidu.com/it/u=1895335407,2753497845&fm=253",
-      },
-      {
-        id: 2,
-        type: 1,
-        url: "https://mms1.baidu.com/it/u=1027959558,2472093700&fm=253",
-      },
-      {
-        id: 3,
-        type: 1,
-        url: "http://mms0.baidu.com/it/u=1135969073,3125375329&fm=253",
-      },
-      {
-        id: 4,
-        type: 2,
-        url: " https://www.w3school.com.cn/example/html5/mov_bbb.mp4",
-      },
-    ]);
+    const loading = ref(false)
+    const resourceList = shallowRef([]);
     // 获取资源列表事件
     const getResourceList = () => {
-      RESOURCE.list({ page: 1, pageSize: 999 })
+      loading.value = true
+      RESOURCE.list({page: 1, pageSize: 999})
         .then((res) => {
+          resourceList.value = res.results || [];
           console.log("getResourceList", res);
         })
-        .catch(() => {});
+        .finally(() => {
+          loading.value = false
+        });
     };
     // 新增资源按钮事件
     const onAddResource = () => {
@@ -93,24 +82,46 @@ export default {
         component: DialogAdd,
       }).onOk(() => {
         notifySuccess("增加成功");
-        // onSearch({ page: 1 });
+        getResourceList()
       });
     };
-    const onRemove = () => {};
+    // 删除资源项事件
+    const onRemove = (row) => {
+      $q.dialog({
+        component: DelConfirm,
+      }).onOk(() => {
+        loading.value = true;
+        RESOURCE.del({id: row.id})
+          .then(() => {
+            notifySuccess("删除成功");
+            getResourceList();
+          })
+          .catch(() => {
+          })
+          .finally(() => {
+            loading.value = false;
+          });
+      });
+    };
     // 资源项开始被拖动
     const onDragStart = (e) => {
-      console.log("onDragStart", e);
-      console.log(" e.target.id", e.target.id);
-      e.dataTransfer.setData("dragId", e.target.id);
+      if (!e.target.draggable) return
+      const id = e.target.id.slice(3)
+      const findItem = toRaw(resourceList.value).find(el => el.id == id)
+      const str = JSON.stringify(findItem)
+      e.dataTransfer.setData("dragStr", str);
       e.dataTransfer.dropEffect = "move";
     };
-    getResourceList();
 
+    getResourceList();
     return {
+      loading,
       resourceList,
-      onDragStart,
+
       onAddResource,
       onRemove,
+
+      onDragStart,
     };
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="flex1 q-pa-md bg-grey-1">
     <div class="q-gutter-md row">
       <q-card style="width: 260px" v-for="item in configList" :key="item.id">
         <q-img :src="imgObj[item.id]" style="width: 260px; height: 180px" />

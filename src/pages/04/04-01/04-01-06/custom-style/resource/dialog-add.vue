@@ -6,9 +6,9 @@
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-text-subtitle2 text-bold">新增资源</div>
-        <q-btn flat round size="12px" icon="clear" @click="onDialogHide" />
+        <q-btn flat round size="12px" icon="clear" @click="onDialogHide"/>
       </div>
-      <q-separator />
+      <q-separator/>
       <q-scroll-area style="height: 290px; max-height: 50vh; padding: 16px">
         <q-form class="row q-gutter-md items-center">
           <q-select
@@ -32,7 +32,7 @@
           >
             <template #before>
               <span class="text-caption text-bold my-form-label"
-                >文件类型：</span
+              >文件类型：</span
               >
             </template>
           </q-select>
@@ -45,6 +45,7 @@
             </div>
             <div class="flex1">
               <q-uploader
+                ref="refUploader"
                 style="width: 274px; box-shadow: none"
                 bordered
                 no-thumbnails
@@ -79,72 +80,91 @@
           </q-input>
         </q-form>
       </q-scroll-area>
-      <q-separator />
+      <q-separator/>
       <q-card-actions align="right">
-        <q-btn flat label="取消" color="primary" @click="onDialogHide" />
-        <q-btn label="确定" color="primary" @click="onSubmit" />
+        <q-btn flat label="取消" color="primary" @click="onDialogHide"/>
+        <q-btn label="确定" color="primary" @click="onSubmit"/>
       </q-card-actions>
       <q-inner-loading :showing="loading" style="z-index: 100">
-        <q-spinner-tail color="primary" size="2em" />
+        <q-spinner-tail color="primary" size="2em"/>
       </q-inner-loading>
     </q-card>
   </q-dialog>
 </template>
 <script>
-import { useDialogPluginComponent } from "quasar";
-import { reactive, ref, toRaw, toRefs } from "vue";
-import { ROLE } from "src/api/module";
+import {useDialogPluginComponent} from "quasar";
+import {reactive, ref, toRaw, toRefs} from "vue";
+import {RESOURCE} from "src/api/module";
+import {notifyWarn} from "src/util/common";
+
 export default {
   emits: [...useDialogPluginComponent.emits],
   components: {},
   props: {},
   setup(props) {
-    const { dialogRef, onDialogOK, onDialogHide } = useDialogPluginComponent();
+    const {dialogRef, onDialogOK, onDialogHide} = useDialogPluginComponent();
 
     let formData = reactive({
       type: "1",
-      fileSize: "",
+      fileSize: 0,
       resource: "",
       descMsg: "",
     });
     const loading = ref(false);
+    const refUploader = ref(null)
 
+    // 增加按钮事件
     const onAdded = (info) => {
-      formData.fileSize = "";
+      formData.fileSize = 0;
       formData.resource = "";
     };
+    // 删除按钮事件
     const onRemoved = (info) => {
-      formData.fileSize = "";
+      formData.fileSize = 0;
       formData.resource = "";
     };
+    // 上传文件完成事件
     const onUploaded = (info) => {
-      console.log("onUploaded", info);
+      const {xhr} = info;
+      const {status, statusText, responseText} = xhr;
+      if (status !== 200 && statusText !== 'ok') return
+      try {
+        const res = JSON.parse(responseText)
+        const {code, msg} = res
+        if (code === 2000) {
+          console.log('info',info)
+          const [file] = info.files
+          const { result} = res
+          formData.resource = result.resource
+          // formData.fileSize = file['__sizeLabel'];
+          formData.fileSize = 0;
+        } else {
+          notifyWarn(msg || '上传失败')
+          refUploader.value.reset()
+        }
+      } catch (e) {
+        console.error(e)
+      }
     };
+    // 提交表单按钮事件
     const onSubmit = () => {
       loading.value = true;
+      // const {type,...param} = toRaw(formData);
       const param = toRaw(formData);
-      if (props.type === "insert") {
-        ROLE.insert(param)
-          .then(() => {
-            onDialogOK();
-          })
-          .catch(() => {})
-          .finally(() => {
-            loading.value = false;
-          });
-      } else {
-        ROLE.update(param)
-          .then(() => {
-            onDialogOK();
-          })
-          .catch(() => {})
-          .finally(() => {
-            loading.value = false;
-          });
-      }
+      RESOURCE.insert(param)
+        .then(() => {
+          onDialogOK();
+        })
+        .catch(() => {
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+
     };
     return {
       dialogRef,
+      refUploader,
       ...toRefs(formData),
       loading,
 
@@ -162,6 +182,7 @@ export default {
 .my-form-item {
   width: 350px;
 }
+
 .my-form-label {
   min-width: 70px;
   max-width: 70px;

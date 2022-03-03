@@ -27,6 +27,7 @@
     >
       <q-list>
         <nav-item
+          :router-keys="routerKeys"
           v-for="item in nav.children"
           :key="item.id"
           :nav="item"
@@ -45,7 +46,7 @@ export default {
   props: {
     routerKeys: {
       type: Array,
-      default: () => ["02", "02-02"],
+      default: () => ["01", "01-01"],
     },
     nav: {
       type: Object,
