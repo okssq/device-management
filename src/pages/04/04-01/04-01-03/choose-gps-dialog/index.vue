@@ -132,7 +132,7 @@ export default {
       if (!marker) return;
       marker.remove();
       marker.add(LOAD.mapObj);
-      LOAD.mapObj.setCenter(location); // 加上这个人生倍儿爽，把当前定位设成中心点
+      LOAD.mapObj.setCenter(location,true,false); // 加上这个人生倍儿爽，把当前定位设成中心点
       marker.setPosition(location);
     };
     const fnAddress = (location, addressStr) => {

@@ -6,7 +6,7 @@
         style="margin-bottom: 20px; margin-top: 10px"
       > -->
       <div class="q-py-md text-center text-subtitle1 text-grey-7 text-bold">
-        您好，欢迎登录使用！
+        智慧设备管控平台
       </div>
       <!-- </div> -->
       <q-input

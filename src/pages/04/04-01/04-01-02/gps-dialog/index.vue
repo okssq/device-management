@@ -134,7 +134,7 @@ export default {
       }
       marker.off("click", openInfoWindow);
       marker.on("click", openInfoWindow);
-      LOAD.mapObj.setCenter(position);
+      LOAD.mapObj.setCenter(position,true,false);
     };
     // 渲染自定义卡片
     const fnInfoWindow = () => {

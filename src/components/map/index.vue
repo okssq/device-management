@@ -7,29 +7,32 @@
         :disable="loading"
         :loading="loading"
         @click="loadMap"
-        >地图资源加载失败，请重试！</q-btn
+      >地图资源加载失败，请重试！
+      </q-btn
       >
     </div>
   </div>
 </template>
 <script>
 import AMapLoader from "@amap/amap-jsapi-loader";
-import { inject, onMounted, onBeforeUnmount, ref, computed, watch } from "vue";
+import {inject, onMounted, onBeforeUnmount, ref, computed, watch} from "vue";
+
 export default {
   emits: ["load-success"],
-  setup(props, { emit }) {
-    const LOAD = inject("LOAD");
-    const mapLoad = computed(() => LOAD.map);
+  setup(props, {emit}) {
+    const map = inject('map')
+    const mapTeleportTo = inject('mapTeleportTo')
+    const mapLoad = computed(() => !!map.value);
     const loading = ref(false);
-    const loadMap = async () => {
-      if (LOAD.MAP) {
+    const loadMap = () => {
+      loading.value = true;
+      if (mapLoad.value) {
         loading.value = false;
         return true;
       }
-      loading.value = true;
+
       AMapLoader.load({
         key: "7c93197f8661b907705f9fe87c9ed782",
-        // version: "1.4.15",
         version: "2.0",
       })
         .then((AMap) => {
@@ -48,16 +51,15 @@ export default {
           });
           mapObj.on("complete", () => {
             console.log("全局地图加载完成");
-            LOAD.map = true;
-            LOAD.mapObj = mapObj;
-            loading.value = false;
+            map.value = mapObj;
           });
         })
         .catch((err) => {
-          console.error("全局地图加载失败", err);
-          LOAD.map = false;
-          loading.value = false;
-        });
+          console.log("全局地图加载失败", err);
+          map.value = null;
+        }).finally(() => {
+        loading.value = false;
+      });
     };
     watch(
       mapLoad,
@@ -71,26 +73,24 @@ export default {
       }
     );
     onMounted(() => {
-      LOAD.mapTeleportTo = "#component-map";
+      mapTeleportTo.value = "#component-map";
     });
 
     onBeforeUnmount(() => {
-      LOAD.mapTeleportTo = "#global-map-wrap";
-      if (LOAD.map) {
-        LOAD.mapObj.clearEvents("click");
-        const overlays = LOAD.mapObj.getAllOverlays();
-        console.log("overlays,", overlays);
+      mapTeleportTo.value = "#global-map-wrap";
+      if (!map.value) return
+      map.value.clearEvents();
+      const overlays = map.value.getAllOverlays();
+      console.log("overlays,", overlays);
 
-        overlays.forEach((el) => {
-          console.log("el1111,", el);
-          el.clearEvents("click");
-          el.clearEvents("mousemove");
-          el.clearEvents("mousemout");
-        });
-        LOAD.mapObj.clearMap();
-        LOAD.mapObj.clearInfoWindow();
-        console.log("执行清楚map组件完毕！");
-      }
+      overlays.forEach((el) => {
+        console.log("overlays[i],", el);
+        el.clearEvents();
+      });
+      map.value.remove(overlays)
+      map.value.clearMap();
+      map.value.clearInfoWindow();
+      console.log("执行清除地图内部组件完毕",map.value.getAllOverlays());
     });
 
     return {

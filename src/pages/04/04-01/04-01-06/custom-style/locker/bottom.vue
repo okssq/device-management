@@ -4,12 +4,12 @@
   </div>
   <q-separator/>
   <div class="overflow-hidden row q-px-md q-py-lg justify-between items-center no-wrap justify-center">
-    <div class="text-no-wrap">
+    <div class="text-no-wrap flex1">
       <div class="row no-wrap items-center">
         <q-badge transparent color="red-5" :label="rowId1"/>
         <span class="text-bold">{{ id1Value }}</span>
         <q-popup-edit v-model="id1Value" auto-save v-slot="scope" @save="onSave(rowId1,$event)">
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+          <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set"/>
         </q-popup-edit>
       </div>
       <div class="row no-wrap items-center">
@@ -17,7 +17,11 @@
         <span>服务电话：</span>
         <span>{{ id2Value }}</span>
         <q-popup-edit v-model="id2Value" auto-save v-slot="scope" @save="onSave(rowId2,$event)">
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+          <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set">
+            <template #before>
+              <span class="text-subtitle2">服务电话：</span>
+            </template>
+          </q-input>
         </q-popup-edit>
       </div>
       <div class="row no-wrap items-center">
@@ -25,7 +29,11 @@
         <span>服务时间：</span>
         <span>{{ id3Value }}</span>
         <q-popup-edit v-model="id3Value" auto-save fit v-slot="scope" @save="onSave(rowId3,$event)">
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+          <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set">
+            <template #before>
+              <span class="text-subtitle2">服务时间：</span>
+            </template>
+          </q-input>
         </q-popup-edit>
       </div>
       <div class="row no-wrap items-center">
@@ -33,7 +41,11 @@
         <span>服务地址：</span>
         <span>{{ id4Value }}</span>
         <q-popup-edit v-model="id4Value" auto-save fit v-slot="scope" @save="onSave(rowId4,$event)">
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+          <q-input v-model="scope.value" dense autofocus borderless  @keyup.enter="scope.set">
+            <template #before>
+              <span class="text-subtitle2">服务地址：</span>
+            </template>
+          </q-input>
         </q-popup-edit>
       </div>
     </div>
@@ -42,14 +54,14 @@
         <img class="full-width" src="./qrcode.png"/>
         <q-badge class="absolute-center" color="red-4" :label="rowId6"/>
         <q-popup-edit v-model="id6Value" auto-save fit v-slot="scope" @save="onSave(rowId6,$event)">
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+          <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set"/>
         </q-popup-edit>
       </div>
       <div class="row no-wrap items-center">
         <q-badge transparent color="red-5" :label="rowId5"/>
         <span class="text-bold">{{ id5Value }}</span>
         <q-popup-edit v-model="id5Value" auto-save fit v-slot="scope" @save="onSave(rowId5,$event)">
-          <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+          <q-input v-model="scope.value" dense autofocus  @keyup.enter="scope.set"/>
         </q-popup-edit>
       </div>
     </div>

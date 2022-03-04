@@ -1,8 +1,7 @@
 <template>
   <div class="login-page">
     <div class="full-width row items-center q-mt-lg q-pl-lg">
-      <img style="width: 70px" src="~assets/images/logo2.jpg" alt />
-      <div class="text-h4 text-white text-bold q-ml-md">智慧设备管控平台</div>
+      <img style="width: 140px" src="~assets/images/logo-white.jpg" alt="上海蚁探智能科技有限公司" />
     </div>
     <login-canvas />
     <login-form />
@@ -20,7 +19,7 @@ export default {
 .login-page {
   width: 100vw;
   height: 100vh;
-  background-image: url("assets/images/lg-bg.png");
+  background-image: url("src/assets/images/lg-bg.png");
   background-repeat: no-repeat;
   background-position: 50%;
   background-size: 100% 100%;

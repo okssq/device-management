@@ -64,7 +64,9 @@ export default {
       }
       // 8个开关以内
       if (number < 8) {
+        console.log(111)
         const str = parseInt(status).toString(2);
+        console.log('str',str)
         const length = str.length;
         if (length < number) {
           const zeroArr = Array.from({ length: number - length }, () => 0);
@@ -77,8 +79,17 @@ export default {
             };
           });
           console.log("switchArr", switchArr, options.value);
+        }else{
+          const startArr = str.split("").reverse();
+          options.value = startArr.map((el, index) => {
+            return {
+              label: `开关${index + 1}`,
+              value: el == 1,
+            };
+          });
         }
       } else {
+        console.log(222)
         // loading.value = false;
       }
     };
@@ -95,12 +106,15 @@ export default {
     const onSwitchChange = (val, index) => {
       loading.value = true;
       TERMINAL_CONTROL.singleControl({
-        index: index + 1,
+        index: index,
         phone: props.data.terminalId,
         status: val ? "1" : 0,
       })
         .then((res) => {
-          fnSwitch(res);
+          setTimeout(()=>{
+            getInfo()
+          },2000)
+
         })
         .finally(() => {
           loading.value = false;

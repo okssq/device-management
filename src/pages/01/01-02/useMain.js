@@ -188,17 +188,17 @@ const useMain = () => {
       provincePolygons.forEach((el) => {
         flag ? el.show() : el.hide();
       });
-      flag && LOAD.mapObj.setFitView(provincePolygons);
+      flag && LOAD.mapObj.setFitView(provincePolygons,true);
     } else if (type === "city") {
       cityPolygons.forEach((el) => {
         flag ? el.show() : el.hide();
       });
-      flag && LOAD.mapObj.setFitView(cityPolygons);
+      flag && LOAD.mapObj.setFitView(cityPolygons,true);
     } else if (type === "district") {
       districtPolygons.forEach((el) => {
         flag ? el.show() : el.hide();
       });
-      flag && LOAD.mapObj.setFitView(districtPolygons);
+      flag && LOAD.mapObj.setFitView(districtPolygons,true);
     }
   };
   // 渲染生成地区围栏
@@ -224,7 +224,7 @@ const useMain = () => {
           districtPolygons = arr;
         }
       }
-      LOAD.mapObj.setFitView(arr); //地图自适应
+      LOAD.mapObj.setFitView(arr,true); //地图自适应
     }
   };
   // 省级选择改变
@@ -239,7 +239,7 @@ const useMain = () => {
     destroyFence("district");
     destroyFence("province");
     if (!val) {
-      LOAD.mapObj.setZoomAndCenter(5, [105.882825, 36.289626]);
+      LOAD.mapObj.setZoomAndCenter(5, [105.882825, 36.289626],true,false);
     } else {
       districtSearch.setLevel("province");
       districtSearch.setSubdistrict(2);
@@ -331,7 +331,7 @@ const useMain = () => {
   // 地图加载成功事件,初始化地图插件
   const onMapLoadSuccess = () => {
     console.log("地图加载成功事件");
-    LOAD.mapObj.setZoomAndCenter(5, [105.882825, 36.289626]);
+    LOAD.mapObj.setZoomAndCenter(5, [105.882825, 36.289626],true,false);
     AMap.plugin(["AMap.DistrictSearch"], function () {
       districtSearch = new AMap.DistrictSearch({
         level: "country",

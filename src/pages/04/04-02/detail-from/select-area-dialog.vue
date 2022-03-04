@@ -138,7 +138,7 @@ export default {
       }
       marker.remove();
       marker.add(LOAD.mapObj);
-      LOAD.mapObj.setZoomAndCenter(17, location);
+      LOAD.mapObj.setZoomAndCenter(17, location,true,false);
       marker.setPosition(location);
     };
     const fnAddress = (location, addressObj) => {

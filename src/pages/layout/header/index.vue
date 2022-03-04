@@ -1,5 +1,5 @@
 <template>
-  <div class="row no-wrap items-center shadow-2 my-header">
+  <div class="row no-wrap items-center shadow-1 layout-header">
     <div class="row no-wrap items-center" style="width: 230px">
       <img
         src="~assets/images/logo.jpg"
@@ -10,7 +10,6 @@
     <div class="bd" />
     <crumbs />
     <q-space />
-    <qr-code />
     <q-btn-dropdown
       flat
       icon="account_circle"
@@ -33,12 +32,13 @@
 </template>
 <script>
 import Crumbs from "./crumbs.vue";
-import QrCode from "./qr-code.vue";
 import { useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
 export default {
-  components: { Crumbs, QrCode },
+  components: {
+    Crumbs
+  },
   setup() {
     const $q = useQuasar();
     const router = useRouter();
@@ -58,7 +58,7 @@ export default {
 };
 </script>
 <style scoped>
-.my-header {
+.layout-header {
   height: 56px;
   z-index: 11;
 }

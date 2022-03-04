@@ -1,41 +1,32 @@
 <template>
-  <div
-    class="full-height shadow-4 column no-wrap my-side"
-    :style="{ width: NAV_ISMINI ? '56PX' : '230PX' }"
-  >
+  <div class="full-height shadow-2 column no-wrap" :style="layoutSideStyle">
     <q-scroll-area class="flex1 q-py-sm">
-      <q-list class="q-mr-sm expand-nav" v-show="!NAV_ISMINI">
+      <q-list class="q-mr-sm expand-nav" v-show="!isMiniNav">
         <nav-expand-item
           :router-keys="routerKeys"
           v-for="item in navs"
           :key="item.id"
           :nav="item"
-          :level="0"
         />
       </q-list>
-      <q-list :separator="false" v-show="NAV_ISMINI" class="popup-nav">
+      <q-list :separator="false" class="popup-nav" v-show="isMiniNav">
         <nav-popup-item
           :router-keys="routerKeys"
           v-for="item in navs"
           :key="item.id"
           :nav="item"
-          :level="0"
         />
       </q-list>
     </q-scroll-area>
-    <q-separator />
+    <q-separator/>
     <q-btn
       flat
       color="primary"
       style="height: 48px"
-      :icon="
-        NAV_ISMINI
-          ? 'keyboard_double_arrow_right'
-          : 'keyboard_double_arrow_left'
-      "
-      @click="NAV_ISMINI = !NAV_ISMINI"
+      :icon="toggleBtnIcon"
+      @click="isMiniNav = !isMiniNav"
     />
-    <q-separator />
+    <q-separator/>
   </div>
 </template>
 
@@ -43,12 +34,23 @@
 import NavExpandItem from "./nav-expand-item.vue";
 import NavPopupItem from "./nav-popup-item.vue";
 
-import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
+import {ref, computed} from "vue";
+import {useRoute} from "vue-router";
+
 export default {
-  components: { NavExpandItem, NavPopupItem },
+  components: {
+    NavExpandItem,
+    NavPopupItem
+  },
   setup() {
-    const NAV_ISMINI = ref(false);
+    const isMiniNav = ref(false)
+    const layoutSideStyle = computed(() => {
+      return {width: isMiniNav.value ? '56px' : '230px'}
+    })
+    const toggleBtnIcon = computed(() => {
+      return isMiniNav.value ? 'keyboard_double_arrow_right' : 'keyboard_double_arrow_left'
+    })
+
     const route = useRoute();
     const routerKeys = computed(() => {
       const str = route.path.substring(1);
@@ -217,16 +219,13 @@ export default {
       },
     ];
     return {
-      NAV_ISMINI,
+      isMiniNav,
+      layoutSideStyle,
+      toggleBtnIcon,
+
       navs,
       routerKeys,
     };
   },
 };
 </script>
-<style scoped>
-.my-side {
-  transition: all 0.3s;
-  z-index: 12;
-}
-</style>

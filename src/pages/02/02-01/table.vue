@@ -1,8 +1,9 @@
 <template>
+
   <table>
     <tbody>
     <tr>
-      <th style="text-align: center;" v-for="item in columns" :key="item">
+      <th style="text-align: center;" v-for="(item,index) in columns" :key="index">
         {{ item }}
       </th>
     </tr>
@@ -11,6 +12,7 @@
     </tr>
     </tbody>
   </table>
+
 </template>
 
 <script>
@@ -25,7 +27,6 @@ export default {
       default: () => []
     },
   },
-  name: "table"
 }
 </script>
 
@@ -42,7 +43,7 @@ tr {
 }
 
 tr th {
-  flex:1;
+  flex: 1;
   color: #1DCEFF;
   font-size: 0.729vw;
   padding: 0 2px;

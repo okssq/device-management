@@ -1,73 +1,79 @@
 <template>
   <div class="absolute-full">
+    <global-map @load-success="onMapLoadSuccess"/>
     <info-window
       ref="refInfoWindow"
-      v-show="infoWindoVisible"
-      :data="infoWindoData"
-      @close="infoWindoVisible = false"
+      v-show="infoWindowVisible"
+      :loading="infoWindowLoading"
+      :data="infoWindowData"
+      @close="infoWindowVisible = false"
     />
-    <global-map @load-success="onMapLoadSuccess" />
-    <div
-      class="absolute-top-right shadow-2 bg-white"
-      style="max-height: 100%; top: 15px; right: 15px"
-    >
-      <tab-tree
-        v-if="treeNode.length"
-        v-model:tab="tab"
-        :tree-list="treeList"
-        :tree-node="treeNode"
-        @update:tab="onTabChange"
-        @com-select="onComSelect"
-        @prj-select="onPrjSelect"
-        @term-select="onTermSelect"
-      />
-    </div>
+    <tab-tree
+      v-if="treeNode.length"
+      v-model:tab="tab"
+      :tree-list="treeList"
+      :tree-node="treeNode"
+      @update:tab="onTabChange"
+      @com-select="onComSelect"
+      @prj-select="onPrjSelect"
+      @term-select="onTermSelect"
+    />
+    <q-resize-observer @resize="onResize"/>
+    <q-inner-loading :showing="loading" style="z-index: 100">
+      <q-spinner-tail color="primary" size="2em"/>
+    </q-inner-loading>
   </div>
 </template>
 
 <script>
-import TabTree from "./tree/index.vue";
+
 import GlobalMap from "components/map/index.vue";
+import TabTree from "./tree/index.vue";
 import InfoWindow from "./info-window.vue";
-import { LEVEL, TERMINAL_MAP } from "src/api/module";
+import {LEVEL, TERMINAL_MAP} from "src/api/module";
 import {
   ref,
+  shallowRef,
   inject,
   onBeforeUnmount,
-  onMounted,
-  shallowRef,
-  toRaw,
 } from "vue";
+
 export default {
   components: {
-    TabTree,
     GlobalMap,
-    InfoWindow,
+    TabTree,
+    InfoWindow
   },
   setup() {
-    let gpsArr = [];
-    let cluster,
-      fenceObj = {},
-      fencePolygon,
-      infoWindow;
+    let allPoints = []; // 存储所有GPS点 [{设备ID,lnglat,项目ID,...详细信息}]
+    let allFenceObj = {}; // 存储所有围栏对象 {围栏ID：地图围栏对象}
+    let cluster = null;  // 点聚合地图对象
+    let infoWindow = null; // 信息窗口地图对象
+    let width = 0;   // 地图宽度
+    let height = 0; // 地图高度
 
-    const LOAD = inject("LOAD");
-
-    const refInfoWindow = ref(null);
-    const infoWindoVisible = ref(false);
-    const infoWindoData = shallowRef(null);
+    const loading = ref(true)
+    const map = inject("map");
 
     const tab = ref(0);
     const treeList = shallowRef([]);
     const treeNode = shallowRef([]);
-    const FORMAT_VEHICLE_TREE = (oldArr, pIndex, vList = [], vObj = {}) => {
+
+    const refInfoWindow = ref(null);
+    const infoWindowLoading = ref(false);
+    const infoWindowVisible = ref(false);
+    const infoWindowData = shallowRef(null);
+
+
+    // 格式化树列表所需要的数据格式
+    const formatTreeData = (oldArr, pIndex, vList = [], vObj = {}) => {
       const tree = [];
       let count = 0;
       let offlineCount = 0;
       let noVehicleCompanyCount = 0;
       oldArr.forEach((el, index) => {
-        const { id, label, type, children, others } = el;
-        const treeItem = { label, type };
+        const {id, label, type, children, others} = el;
+        const treeItem = {label, type};
         if (type == 1 || type == 2) {
           const _index =
             pIndex === undefined ? `${index}` : `${pIndex}-${index}`;
@@ -82,7 +88,7 @@ export default {
               tree: subTree,
               count: subCount,
               offlineCount: subOfflineCount,
-            } = FORMAT_VEHICLE_TREE(children, _index, vList, vObj);
+            } = formatTreeData(children, _index, vList, vObj);
             if (subCount) {
               subTree.length && (treeItem.children = subTree);
               count += subCount;
@@ -108,7 +114,7 @@ export default {
             index: _index,
             termType,
           });
-          vObj[`term_${id}`] = { label, status, index: _index };
+          vObj[`term_${id}`] = {label, status, index: _index};
           tree.push({
             id: "term_" + id,
             label,
@@ -121,217 +127,220 @@ export default {
           if (status === 0) offlineCount += 1;
         }
       });
-      return { tree, count, offlineCount, vList, vObj };
+      return {tree, count, offlineCount, vList, vObj};
     };
-
-    // 渲染项目围栏
-    const fnProjectFence = (row) => {
-      const { id } = row;
-      const pId = id.slice(4);
-      if (fenceObj[pId]) {
-        Object.keys(fenceObj).forEach((key) => {
-          if (key === pId) {
-            fenceObj[key].show();
-            LOAD.mapObj.setFitView(fenceObj[key]);
-          } else {
-            fenceObj[key].hide();
-          }
-        });
-      } else {
-        TERMINAL_MAP.projectBounds({
-          list: [pId],
-        }).then((res) => {
-          console.log("bianjie", res);
-          const result = res[0];
-          if (!result) return;
-          const { mapStr } = result;
-          const [gps, fenceStr] = mapStr.split(";");
-          const path = JSON.parse(fenceStr).map((el) => {
-            const { longitude, latitude } = el;
-            return new AMap.LngLat(longitude, latitude);
-          });
-          const polygon = new AMap.Polygon({
-            map: LOAD.mapObj,
-            zIndex: 12,
-            strokeWeight: 1,
-            strokeColor: "#0091ea",
-            fillColor: "#80d8ff",
-            fillOpacity: 0.3,
-            path,
-          });
-          fenceObj[pId] = polygon;
-          LOAD.mapObj.setFitView(polygon);
-        });
+    // 渲染tab页面对应[全部/在线/离线]GPS点
+    const renderTabGps = (type) => {
+      map.value.setZoomAndCenter(5, [110.850831, 36.86837],true,false);
+      let data = []
+      if (type === 0) {
+        data = JSON.parse(JSON.stringify(allPoints))
+      } else if (type === 1) {
+        data = JSON.parse(JSON.stringify(allPoints.filter(el => {
+          return el['onlineStatus'] === '1'
+        })))
+      } else if (type === 2) {
+        data = JSON.parse(JSON.stringify(allPoints.filter(el => {
+          return el['onlineStatus'] === '0'
+        })))
       }
-    };
-    // 渲染infoWindow
-    const fnInfowWindow = (row) => {
+      cluster.setData(data)
+    }
+    // 渲染自定义卡片
+    const renderInfoWindow = (row) => {
+      infoWindowLoading.value = true
+      infoWindowVisible.value = true;
+      const {id} = row;
+      const tId = id.slice(5);
+      const findItem = allPoints.find(el => el.terminalId === tId)
+      const {lnglat} = findItem
+      const position = JSON.parse(JSON.stringify(lnglat));
       if (!infoWindow) {
         infoWindow = new window.AMap.InfoWindow({
           isCustom: true,
           autoMove: false,
           content: refInfoWindow.value.$el,
-          anchor: "bottom-center",
-          offset: new window.AMap.Pixel(3, -30),
+          offset: new window.AMap.Pixel(9, -40),
+          position
         });
       }
-      const { id } = row;
-      const tId = id.slice(5);
-      TERMINAL_MAP.gpsList({
-        terminalIds: [tId],
-      }).then((res) => {
-        const { gpsInfo, projectId } = res[0];
-        fnProjectFence({ id: `prj_${projectId}` });
-        // const arr = gpsInfo.split(",");
-        // const gps = new AMap.LngLat(arr[0], arr[1]);
-        // infoWindoData.value = res[0];
-        // infoWindoVisible.value = true;
-        // infoWindow.setPosition(gps);
-        // infoWindow.open(LOAD.mapObj, gps);
-        // LOAD.mapObj.panTo(gps);
+      infoWindow.close()
 
-        setTimeout(() => {
-          const arr = gpsInfo.split(",");
-          const gps = new AMap.LngLat(arr[0], arr[1]);
-          infoWindoData.value = res[0];
-          infoWindoVisible.value = true;
-          infoWindow.setPosition(gps);
-          infoWindow.open(LOAD.mapObj);
-        }, 500);
-        console.log("获取当前设备详情信息", res);
+      setTimeout(function () {
+        infoWindow.open(map.value, position, 20);
+      }, 400);
+
+      map.value.setZoomAndCenter(18, position, true, false)
+      // (树列表宽度340+树列表左右各15+卡片320+卡片左右各12 = 914)
+      // (卡片高度250+marker高度40 = 300)
+      // (height/2) - (( height - 300 ) / 2 )
+      const panLeft = width < 914 ? -(width / 4) : -((width / 2) - ((width - 340 - 30) / 2))
+      const panTop = (height / 2) - ((height - 300) / 2)
+      map.value.panBy(panLeft, panTop)
+
+
+      TERMINAL_MAP.gpsList({terminalIds: [tId],})
+        .then((res) => {
+          infoWindowData.value = res[0];
+          console.log("获取当前设备详情信息", res[0]);
+        }).finally(() => {
+        infoWindowLoading.value = false
       });
 
       //
     };
-
-    // 渲染点聚合
-    const fnMarkerCluster = (arr) => {
-      const points = arr.map((el) => {
-        const { gpsInfo } = el;
-        const lnglat = gpsInfo.split(",");
-        return {
-          ...el,
-          lnglat,
-        };
-      });
-      const count = points.length;
-      const renderClusterMarker = (context) => {
-        const factor = Math.pow(context.count / count, 1 / 18);
-        const div = document.createElement("div");
-        const Hue = 180 - factor * 180;
-        const bgColor = "hsla(" + Hue + ",100%,40%,0.7)";
-        const fontColor = "hsla(" + Hue + ",100%,90%,1)";
-        const borderColor = "hsla(" + Hue + ",100%,40%,1)";
-        const shadowColor = "hsla(" + Hue + ",100%,90%,1)";
-        div.style.backgroundColor = bgColor;
-        const size = Math.round(
-          30 + Math.pow(context.count / count, 1 / 5) * 20
-        );
-        div.style.width = div.style.height = size + "px";
-        div.style.border = "solid 1px " + borderColor;
-        div.style.borderRadius = size / 2 + "px";
-        div.style.boxShadow = "0 0 5px " + shadowColor;
-        div.innerHTML = context.count;
-        div.style.lineHeight = size + "px";
-        div.style.color = fontColor;
-        div.style.fontSize = "14px";
-        div.style.textAlign = "center";
-        context.marker.setOffset(new AMap.Pixel(-size / 2, -size / 2));
-        context.marker.setContent(div);
-      };
-      const renderMarker = (context) => {
-        const { type, onlineStatus } = context["data"][0];
-        var content = `
-          <img src="./images/type${type}-status${onlineStatus}.png">
-        `;
-
-        // var offset = new AMap.Pixel(-9, -9);
-        context.marker.setContent(content);
-        // context.marker.setOffset(offset);
-      };
-      AMap.plugin(["AMap.MarkerCluster"], function () {
-        cluster = new AMap.MarkerCluster(LOAD.mapObj, points, {
-          gridSize: 80, // 聚合网格像素大小
-          maxZoom: 22,
-          // renderClusterMarker, // 自定义聚合点样式
-          renderMarker, // 自定义非聚合点样式
-        });
-        cluster.on("click", function (obj) {
-          console.log("a", obj);
-          const { clusterData } = obj;
-          if (clusterData.length !== 1) return;
-          const row = clusterData[0];
-          fnInfowWindow({ id: `term_${row["terminalId"]}` });
-        });
-      });
-    };
-
-    // 获取树数据
-    const getTreeData = () => {
-      LEVEL.treeList().then((res) => {
-        const { tree, vList } = FORMAT_VEHICLE_TREE([res]);
+    // 渲染树
+    const renderTree = () => {
+      getTreeData().then(res => {
+        const {tree, vList} = formatTreeData([res]);
         treeList.value = vList;
         treeNode.value = tree;
+      }).catch(err => {
+        console.log('<<getTreeData err>>', err)
+      }).finally(() => {
+        loading.value = false
+      })
+    }
+    // 渲染所有gps点
+    const renderAllGps = (list) => {
+      allPoints = list.map((el) => {
+        const {gpsInfo} = el;
+        const gpsArr = gpsInfo.split(",");
+        return {
+          ...el,
+          lnglat: gpsArr,
+        };
       });
-    };
-    // 获取GPS点信息by-companyeId/projectId,terminaslId,
-    const getGpsData = (param) => {
-      TERMINAL_MAP.gpsList(param)
-        .then((res) => {
-          gpsArr = JSON.parse(JSON.stringify(res));
-          fnMarkerCluster(gpsArr);
-          console.log("gpsList", res);
-        })
-        .catch(() => {});
-    };
+      const renderMarker = (context) => {
+        const {type, onlineStatus} = context["data"][0];
+        const content = `
+          <img style="width: 36px" src="./images/type${type}-status${onlineStatus}.png">
+        `;
+        context.marker.setContent(content);
+      };
+      AMap.plugin(["AMap.MarkerCluster"], function () {
+        cluster = new AMap.MarkerCluster(
+          map.value,
+          JSON.parse(JSON.stringify(allPoints)),
+          {
+            gridSize: 40, // 聚合网格像素大小
+            maxZoom: 20,
+            renderMarker, // 自定义非聚合点样式
+          }
+        );
+        cluster.on("click", function (obj) {
+          const {clusterData} = obj;
+          if (clusterData.length !== 1) return;
+          const row = clusterData[0];
+          renderInfoWindow({id: `term_${row["terminalId"]}`});
+        });
+      });
+    }
+    // 渲染所有项目围栏
+    const renderAllFence = (list) => {
+      list.map(el => {
+        const {projectId, mapStr} = el
+        const [gps, fenceStr] = mapStr.split(";");
+        if (!fenceStr) return
+        const path = JSON.parse(fenceStr).map((el) => {
+          const {longitude, latitude} = el;
+          return new AMap.LngLat(longitude, latitude);
+        });
+        const polygon = new AMap.Polygon({
+          map: map.value,
+          zIndex: 12,
+          strokeWeight: 1,
+          strokeColor: "#0091ea",
+          fillColor: "#80d8ff",
+          fillOpacity: 0.3,
+          path,
+        });
+        allFenceObj[projectId] = polygon;
+      })
+    }
+    // 获取所有GPS点
+    const getAllGps = () => TERMINAL_MAP.gpsList()
+    // 获取所有项目边界
+    const getAllFence = () => TERMINAL_MAP.projectBounds()
+    // 获取树数据
+    const getTreeData = () => LEVEL.treeList()
 
     // 全部/在线/离线选项卡改变事件
-    const onTabChange = (val) => {};
+    const onTabChange = (val) => {
+      infoWindowVisible.value = false
+      renderTabGps(val)
+    };
     // 公司选择改变事件
     const onComSelect = (item) => {
-      console.log("item", item);
+      // console.log("item", item);
     };
     // 项目选择改变事件
     const onPrjSelect = (item) => {
-      console.log("item", item);
-      fnProjectFence(item);
+      infoWindowVisible.value = false;
+      const projectId = item.id.slice(4);
+      map.value.setFitView(allFenceObj[projectId], true, [60, 60, 60, 400], 20);
     };
     // 设备选择改变事件
     const onTermSelect = (item) => {
-      console.log("item", item);
-      fnInfowWindow(item);
+      console.log("设备选择改变事件", item);
+      renderInfoWindow(item)
     };
     // 地图加载完成事件
     const onMapLoadSuccess = () => {
-      LOAD.mapObj.setZoomAndCenter(5, [110.850831, 36.86837]);
-      // LOAD.mapObj.setFitView([], false, [60, 60, 60, 300], 5);
-      getGpsData();
-      getTreeData();
+      map.value.setZoomAndCenter(5, [110.850831, 36.86837],true,false);
+      Promise.all([getAllGps(), getAllFence()])
+        .then(([gpsData, fenceData]) => {
+          console.log('gpsData', gpsData)
+          console.log('fenceData', fenceData)
+          renderAllGps(gpsData)
+          renderAllFence(fenceData)
+          renderTree()
+        }).catch(err => {
+        loading.value = false
+        console.log('<<onMapLoadSuccess => Promise.all事件发生错误>> ', err)
+      })
     };
+    // 地图窗口大小改变事件
+    const onResize = (size) => {
+      width = size.width
+      height = size.height
+    }
 
-    onMounted(() => {});
     onBeforeUnmount(() => {
+      if (!map.value) return
+      console.log('清除设备分布页面生成的地图对象~~')
+      if (infoWindow) {
+        infoWindow.clearEvents()
+        map.value.remove(infoWindow)
+        infoWindow = null
+      }
       if (cluster) {
-        cluster.clearEvents("click");
-        cluster.setMap(null);
+        cluster.clearEvents();
+        map.value.remove(cluster)
         cluster = null;
       }
+      allPoints = null
+      allFenceObj = null
     });
 
     return {
-      refInfoWindow,
-      infoWindoVisible,
-      infoWindoData,
+      loading,
 
       tab,
       treeList,
       treeNode,
 
+      refInfoWindow,
+      infoWindowVisible,
+      infoWindowLoading,
+      infoWindowData,
+
+      onMapLoadSuccess,
+      onResize,
       onTabChange,
       onComSelect,
       onPrjSelect,
       onTermSelect,
-      onMapLoadSuccess,
     };
   },
 };

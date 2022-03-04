@@ -1,11 +1,11 @@
 <template>
   <teleport :to="mapTeleportTo">
-    <div id="global-map" class="fit"></div>
+    <div id="global-map" class="fit" />
   </teleport>
   <div class="fullscreen overflow-hidden column no-wrap">
     <layout-header />
     <div class="flex1 overflow-hidden row no-wrap">
-      <layout-side />
+      <layout-side class="layout-side " />
       <div class="flex1 column no-wrap overflow-hidden layout-main">
         <router-view />
       </div>
@@ -16,7 +16,7 @@
 <script>
 import LayoutHeader from "./header";
 import LayoutSide from "./side";
-import useLoad from "./useLoad";
+import useLayout from "./useLayout";
 import { onMounted } from "vue";
 export default {
   components: {
@@ -24,7 +24,7 @@ export default {
     LayoutSide,
   },
   setup() {
-    const { mapTeleportTo, loadMap } = useLoad();
+    const { mapTeleportTo, loadMap } = useLayout();
     onMounted(() => {
       loadMap();
     });
@@ -37,13 +37,13 @@ export default {
 </script>
 
 <style scoped>
+.layout-side {
+  transition: all 0.3s;
+  z-index: 12;
+}
 .layout-main {
   z-index: 8;
   position: relative;
   background-color: rgb(244, 245, 250);
-}
-
-.layout-content {
-  overflow: hidden;
 }
 </style>

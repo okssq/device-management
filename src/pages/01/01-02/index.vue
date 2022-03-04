@@ -1,81 +1,97 @@
 <template>
   <div class="absolute-full">
-    <global-map @load-success="onMapLoadSuccess" />
+    <global-map @load-success="onMapLoadSuccess"/>
     <q-select
       v-bind="baseSelectProps"
-      style="top: 20px"
+      style="top: 15px"
       v-model="province"
       :options="provinceOptions"
       @update:model-value="onProvinceChange"
     >
+      <template #no-option>
+        <div class="q-px-md q-py-sm">
+          暂无数据
+        </div>
+      </template>
       <template #prepend>
-        <div class="text-subtitle2 text-bold q-ml-md">省级：</div>
+        <div class="text-body2 q-ml-md">省级</div>
       </template>
       <template #after>
-        <div class="text-subtitle2 text-bold q-mr-sm"></div>
+        <div class="q-mr-sm"></div>
       </template>
     </q-select>
     <q-select
       v-bind="baseSelectProps"
       :clearable="!(city === '直辖市' || city === '特别行政区')"
-      style="top: 74px"
+      style="top: 69px"
       v-model="city"
       :options="cityOptions"
       @update:model-value="onCityChange"
     >
+      <template #no-option>
+        <div class="q-px-md q-py-sm">
+          暂无数据
+        </div>
+      </template>
       <template #prepend>
-        <div class="text-subtitle2 text-bold q-ml-md">地级：</div>
+        <div class="text-body2 q-ml-md">地级：</div>
       </template>
       <template #after>
-        <div class="text-subtitle2 text-bold q-mr-sm"></div>
+        <div class="q-mr-sm"></div>
       </template>
     </q-select>
     <q-select
       v-bind="baseSelectProps"
-      style="top: 128px"
+      style="top: 123px"
       v-model="district"
       :options="districtOptions"
       @update:model-value="onDistrictChange"
     >
+      <template #no-option>
+        <div class="q-px-md q-py-sm">
+          暂无数据
+        </div>
+      </template>
       <template #prepend>
-        <div class="text-subtitle2 text-bold q-ml-md">县级：</div>
+        <div class="text-body2  q-ml-md">县级：</div>
       </template>
       <template #after>
-        <div class="text-subtitle2 text-bold q-mr-sm"></div>
+        <div class="q-mr-sm"></div>
       </template>
     </q-select>
     <div
       class="absolute-top-right bg-white shadow-2"
-      style="width: 260px; top: 182px; right: 20px; border-radius: 2px"
+      style="width: 260px; top: 177px; right: 15px; border-radius: 2px"
     >
       <q-input
         dense
         borderless
         debounce="500"
         placeholder="请输入项目名称"
-        class="q-mx-md q-my-sm"
+        class="q-mx-md q-my-xs"
         v-model="filterText"
       >
-        <template #append>
+        <template #before>
           <q-icon name="search"></q-icon>
         </template>
       </q-input>
-      <q-separator />
-      <q-list>
+      <q-separator/>
+      <q-list class="overflow-auto" style="max-height: calc(100vh - 292px)">
         <template v-for="item in filterList" :key="item.id">
           <q-item
             clickable
             :active="selectProjectId === item.id"
-            @click="onSelectProjrctItem(item)"
+            @click="onSelectProjectItem(item)"
           >
             <q-item-section>
               <q-item-label lines="2">{{ item.projectName }}</q-item-label>
               <q-item-label caption lines="2">{{
-                item.projectAddress
-              }}</q-item-label>
+                  item.projectAddress
+                }}
+              </q-item-label>
             </q-item-section>
           </q-item>
-          <q-separator />
+          <q-separator/>
         </template>
         <q-item v-if="!filterList.length">
           <q-item-section>
@@ -83,35 +99,43 @@
           </q-item-section>
         </q-item>
       </q-list>
+      <q-inner-loading :showing="listLoading" style="z-index: 100">
+        <q-spinner-tail color="primary" size="2em"/>
+      </q-inner-loading>
     </div>
   </div>
 </template>
 <script>
-import { PROJECT, TERMINAL_MAP } from "src/api/module.js";
-import { computed, inject, ref, shallowRef, onBeforeUnmount } from "vue";
+import {PROJECT, TERMINAL_MAP} from "src/api/module.js";
+import {computed, inject, ref, shallowRef, onBeforeUnmount} from "vue";
 import GlobalMap from "components/map";
+import {notifyWarn} from "src/util/common";
+
 export default {
   components: {
     GlobalMap,
   },
   setup() {
+    let districtSearch = null; // 地图查找省市对象
+    let cluster = null; //地图点聚合对象
+    let projectFenceObj = {} //存储所有项目围栏对象 {围栏ID：地图围栏对象}
+    let hasRenderMarkerFenceIds = []; //存储已经加载过项目设备坐标集的项目ID
+    let provincePolygons = [], //存取省级围栏[Polygon,Polygon,..]
+        cityPolygons = [],     //存取市级围栏[Polygon,Polygon,..]
+        districtPolygons = []; //存取县级围栏[Polygon,Polygon,..]
+
+    const listLoading = ref(false)
+    const map = inject("map");
+    // select下拉框基本属性配置
     const baseSelectProps = {
       class: "aa absolute-top-right bg-white shadow-2",
       dense: true,
       clearable: true,
       borderless: true,
       optionsDense: true,
+      style: "right: 15px; width: 260px; border-radius: 2px",
       "popup-content-class": "text-grey-7 select__content",
-      style: "right: 20px; width: 260px; border-radius: 2px",
     };
-    const LOAD = inject("LOAD");
-    let districtSearch,
-      cluster,
-      projectPolygons = {},
-      hasFnMarkerfecneIds = [],
-      provincePolygons = [],
-      cityPolygons = [],
-      districtPolygons = [];
     const projectList = shallowRef([]);
     const provinceOptions = shallowRef([]);
     const cityOptions = shallowRef([]);
@@ -149,170 +173,58 @@ export default {
         );
       }
     });
-
     // 当前项目选择id
     const selectProjectId = ref("");
 
-    //
-    const fnTerminalMarkers = (arr) => {
-      arr.forEach((el) => {
-        const { type, onlineStatus, gpsInfo } = el;
-        const gpsArr = gpsInfo.split(",");
-        const position = new AMap.LngLat(gpsArr[0], gpsArr[1]);
-        new AMap.Marker({
-          map: LOAD.mapObj,
-          position,
-          offset: new AMap.Pixel(-10, 0),
-          icon: `images/type${type}-status${onlineStatus}.png`, // 添加 Icon 图标 URL
-        });
-      });
-    };
-    // 渲染项目围栏的设备
-    const fnTerminals = (id, polygon) => {
-      if (hasFnMarkerfecneIds.includes(id)) return;
-      console.log("渲染项目围栏的设备", id, polygon);
 
-      TERMINAL_MAP.gpsList({ projectId: id })
-        .then((res) => {
-          hasFnMarkerfecneIds.push(id);
-          fnTerminalMarkers(res);
-          polygon.clearEvents("click");
-        })
-        .catch((err) => {});
-    };
-    // 渲染项目点
-    const fnProjectGps = (arr) => {
-      const renderMarker = (context) => {
-        const { name } = context["data"][0];
-        var content = `
-          <div class="q-badge q-badge--single-line bg-blue q-pa-sm shadow-1">项目：${name}</div>
-          
-        `;
-        //
-
-        // var offset = new AMap.Pixel(-9, -9);
-        context.marker.setContent(content);
-        // context.marker.setOffset(offset);
-      };
-      AMap.plugin(["AMap.MarkerCluster"], function () {
-        cluster = new AMap.MarkerCluster(LOAD.mapObj, arr, {
-          gridSize: 80, // 聚合网格像素大小
-          maxZoom: 22,
-          renderMarker,
-        });
-      });
-      console.log("renderProjectGps", arr);
-    };
-    // 渲染项目围栏
-    const fnProjectFence = (arr) => {
-      arr.forEach((el) => {
-        const { id, fence } = el;
-        const polygon = new AMap.Polygon({
-          map: LOAD.mapObj,
-          zIndex: 12,
-          strokeOpacity: 0.8,
-          strokeWeight: 3,
-          strokeColor: "#0091ea",
-          fillColor: "#80d8ff",
-          fillOpacity: 0.4,
-          path: fence,
-          extData: {
-            id,
-          },
-        });
-        // polygon.on("mouseover", () => {
-        //   polygon.setOptions({
-        //     fillOpacity: 0.4,
-        //   });
-        // });
-        // polygon.on("mouseout", () => {
-        //   polygon.setOptions({
-        //     fillOpacity: 0.3,
-        //   });
-        // });
-        polygon.on("click", function () {
-          fnTerminals(id, polygon);
-          projectPolygons[id] = polygon;
-        });
-      });
-    };
-    // 渲染项目列表GPS点及围栏
-    const renderGpsAndFence = (results) => {
-      const gpsArr = [];
-      const fenceArr = [];
-      results.forEach((el) => {
-        const { id, mapStr, projectName } = el;
-        const [gpsStr, fenceStr] = mapStr.split(";");
-        if (!gpsStr || !fenceStr) return;
-        const locationGpsArr = gpsStr.split(",");
-        // const position = new AMap.LngLat(locationGpsArr[0], locationGpsArr[1]);
-        gpsArr.push({
-          id,
-          name: projectName,
-          lnglat: locationGpsArr,
-        });
-        fenceArr.push({
-          id,
-          fence: JSON.parse(fenceStr).map((el) => {
-            const { longitude, latitude } = el;
-            return new AMap.LngLat(longitude, latitude);
-          }),
-        });
-      });
-      fnProjectGps(gpsArr);
-      fnProjectFence(fenceArr);
-    };
-    // 获取项目列表
-    const getProjectList = () => {
-      PROJECT.list({ page: 1, pageSize: 999 }).then((res) => {
-        const { results } = res;
-        projectList.value = results;
-        renderGpsAndFence(results);
-        console.log("projectList", results);
-      });
-    };
-    // 销毁地区围栏
-    const destroyFence = (type) => {
-      if (type === "province") {
-        provincePolygons.forEach((el) => {
-          el.destroy();
-        });
-      } else if (type === "city") {
-        cityPolygons.forEach((el) => {
-          el.destroy();
-        });
-      } else if (type === "district") {
-        districtPolygons.forEach((el) => {
-          el.destroy();
-        });
-      }
-    };
     // 围栏的显示与隐藏
     const fnToggleAreas = (type, flag) => {
       if (type === "province") {
         provincePolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && LOAD.mapObj.setFitView(provincePolygons);
+        flag && map.value.setFitView(provincePolygons, true);
       } else if (type === "city") {
         cityPolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && LOAD.mapObj.setFitView(cityPolygons);
+        flag && map.value.setFitView(cityPolygons, true);
       } else if (type === "district") {
         districtPolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && LOAD.mapObj.setFitView(districtPolygons);
+        flag && map.value.setFitView(districtPolygons, true);
+      }
+    };
+    // 销毁地区围栏
+    const destroyFence = (type) => {
+      if (type === "province") {
+        provincePolygons.forEach((el) => {
+          map.value.remove(el)
+          el.destroy();
+        });
+        provincePolygons = []
+      } else if (type === "city") {
+        cityPolygons.forEach((el) => {
+          map.value.remove(el)
+          el.destroy();
+        });
+        cityPolygons = []
+      } else if (type === "district") {
+        districtPolygons.forEach((el) => {
+          map.value.remove(el)
+          el.destroy();
+        });
+        cityPolygons = []
       }
     };
     // 渲染生成地区围栏
-    const fnRenderFence = (type, bounds) => {
+    const renderAreaFence = (type, bounds) => {
       const arr = [];
       if (bounds) {
         for (let i = 0, l = bounds.length; i < l; i++) {
           const polygon = new AMap.Polygon({
-            map: LOAD.mapObj,
+            map: map.value,
             zIndex: 10,
             strokeWeight: 1,
             strokeColor: "#0091ea",
@@ -329,12 +241,11 @@ export default {
             districtPolygons = arr;
           }
         }
-        LOAD.mapObj.setFitView(arr); //地图自适应
+        map.value.setFitView(arr, true); //地图自适应
       }
     };
     // 省级选择改变
     const onProvinceChange = (val) => {
-      console.log("省级选择改变", val);
       filterText.value = "";
       city.value = "";
       district.value = "";
@@ -344,15 +255,14 @@ export default {
       destroyFence("district");
       destroyFence("province");
       if (!val) {
-        LOAD.mapObj.setZoomAndCenter(5, [105.882825, 36.289626]);
+        map.value.setZoomAndCenter(5, [110.850831, 36.86837, true, false]);
       } else {
         districtSearch.setLevel("province");
         districtSearch.setSubdistrict(2);
         districtSearch.search(val, function (status, result) {
           if (status == "complete") {
-            console.log("根据省级查找信息", result);
             const data = result.districtList[0];
-            const { districtList, boundaries, citycode } = data;
+            const {districtList, boundaries, citycode} = data;
             if (Array.isArray(citycode)) {
               cityOptions.value = districtList.map((el) => el.name);
             } else {
@@ -375,14 +285,14 @@ export default {
               city.value = length === 3 ? "直辖市" : "特别行政区";
               districtOptions.value = arr;
             }
-            fnRenderFence("province", boundaries);
+            renderAreaFence("province", boundaries);
           }
         });
       }
     };
     // 市级选择改变
     const onCityChange = (val) => {
-      console.log("市级选择改变", val);
+      // console.log("市级选择改变", val);
       filterText.value = "";
       district.value = "";
       districtOptions.value = [];
@@ -395,19 +305,19 @@ export default {
         districtSearch.setSubdistrict(1);
         districtSearch.search(val, function (status, result) {
           if (status == "complete") {
-            console.log("根据市级查找信息", result);
+            // console.log("根据市级查找信息", result);
             const data = result.districtList[0];
-            const { districtList, boundaries } = data;
+            const {districtList, boundaries} = data;
             districtOptions.value = districtList.map((el) => el.name);
             fnToggleAreas("province", false);
-            fnRenderFence("city", boundaries);
+            renderAreaFence("city", boundaries);
           }
         });
       }
     };
     // 县级选择改变
     const onDistrictChange = (val) => {
-      console.log("县级选择改变", val, typeof val);
+      // console.log("县级选择改变", val, typeof val);
       filterText.value = "";
       destroyFence("district");
       if (!val) {
@@ -423,20 +333,122 @@ export default {
         districtSearch.setSubdistrict(1);
         districtSearch.search(val, function (status, result) {
           if (status == "complete") {
-            console.log("根据区县查找信息", result);
+            // console.log("根据区县查找信息", result);
             const data = result.districtList[0];
-            const { boundaries } = data;
+            const {boundaries} = data;
             fnToggleAreas("province", false);
             fnToggleAreas("city", false);
-            fnRenderFence("district", boundaries);
+            renderAreaFence("district", boundaries);
           }
         });
       }
     };
-    // 地图加载成功事件,初始化地图插件
-    const onMapLoadSuccess = () => {
-      console.log("地图加载成功事件");
-      LOAD.mapObj.setZoomAndCenter(5, [105.882825, 36.289626]);
+
+    // 渲染所有设备定位图标通过项目
+    const renderTerminalsByProject = (projectId) => {
+      if (hasRenderMarkerFenceIds.includes(projectId)) {
+        console.log('不需要发送请求项目的所有设备了。')
+        projectFenceObj[projectId].clearEvents()
+        return;
+      }
+      TERMINAL_MAP.gpsList({projectId})
+        .then((res) => {
+          console.log('根据项目id查询到所有设备定位信息:', res)
+          hasRenderMarkerFenceIds.push(projectId);
+          projectFenceObj[projectId].clearEvents();
+          (res || []).forEach(el=> {
+            const {type,onlineStatus,terminalId,gpsInfo} = el
+            const gpsArr = gpsInfo.split(',');
+            const position = new AMap.LngLat(+gpsArr[0], +gpsArr[1])
+            // 新建自定义图标
+            const icon = new AMap.Icon({
+              size: new AMap.Size(36, 40),    // 图标尺寸
+              image: `./images/type${type}-status${onlineStatus}.png`,  // Icon的图像
+              // imageOffset: new AMap.Pixel(0, -60),  // 图像相对展示区域的偏移量，适于雪碧图等
+              imageSize: new AMap.Size(36, 40)   // 根据所设置的大小拉伸或压缩图片
+            });
+            // // 将 Icon 实例添加到 marker 上:
+            new AMap.Marker({
+              map: map.value,
+              position,
+              icon: icon, // 添加 Icon 实例
+              title: `设备号：${terminalId}`,
+            });
+          })
+        })
+        .catch((err) => {
+        });
+    }
+    // 渲染所有项目围栏
+    const renderAllProjectFence = (list) => {
+      list.map(el => {
+        const {id, path} = el
+        const polygon = new AMap.Polygon({
+          map: map.value,
+          zIndex: 12,
+          strokeWeight: 1,
+          strokeColor: "#0091ea",
+          fillColor: "#80d8ff",
+          fillOpacity: 0.3,
+          path,
+          id,
+        });
+
+        polygon.on("click", function () {
+          renderTerminalsByProject(id);
+        });
+        projectFenceObj[id] = polygon;
+      })
+    }
+    // 渲染所有项目点聚合
+    const renderAllProjectGps = (points) => {
+      const renderMarker = (context) => {
+        const {projectName} = context["data"][0];
+        const content = `
+          <div class="q-badge q-badge--single-line bg-blue q-pa-sm shadow-1">项目：${projectName}</div>
+        `;
+        context.marker.setContent(content);
+      };
+      AMap.plugin(["AMap.MarkerCluster"], function () {
+        cluster = new AMap.MarkerCluster(map.value, points, {
+          gridSize: 80, // 聚合网格像素大小
+          maxZoom: 20,
+          renderMarker,
+        });
+      });
+    }
+    // 获取所有项目信息
+    const getAllProjectInfo = () => {
+      listLoading.value = true;
+      PROJECT.list({page: 1, pageSize: 999}).then(res => {
+        const {results} = res;
+        const points = []
+        const fenceList = []
+        results.forEach((el) => {
+          const {id, mapStr, projectName} = el;
+          const [gpsStr, fenceStr] = mapStr.split(";");
+          if (!gpsStr || !fenceStr) return;
+          const locationGpsArr = gpsStr.split(",");
+          points.push({lnglat: locationGpsArr, id, projectName});
+          fenceList.push({
+            id,
+            path: JSON.parse(fenceStr).map((el) => {
+              const {longitude, latitude} = el;
+              return new AMap.LngLat(longitude, latitude);
+            })
+          })
+        });
+        renderAllProjectGps(points);
+        renderAllProjectFence(fenceList);
+        projectList.value = results;
+        // console.log('渲染所有项目围栏及项目点聚合', results)
+      }).finally(() => {
+        listLoading.value = false
+      })
+    }
+    // 加载省下拉框列表的所有选项值
+    const fnProvinceOption = () => {
+      map.value.setZoomAndCenter(5, [110.850831, 36.86837, true, false]);
       AMap.plugin(["AMap.DistrictSearch"], function () {
         districtSearch = new AMap.DistrictSearch({
           level: "country",
@@ -446,38 +458,45 @@ export default {
         districtSearch.search("中国", function (status, result) {
           if (status == "complete") {
             const data = result.districtList[0];
-            const { districtList } = data;
+            const {districtList} = data;
             provinceOptions.value = districtList.map((el) => el.name);
           }
         });
       });
-      getProjectList();
-    };
+    }
     // 当前选择项目改变事件
-    const onSelectProjrctItem = (row) => {
-      const { id } = row;
+    const onSelectProjectItem = (row) => {
+      const {id} = row;
       selectProjectId.value = id;
-      const polygons = LOAD.mapObj.getAllOverlays("polygon");
-      const findItem = polygons.find((el) => {
-        return id === el._opts.extData.id;
-      });
-      fnTerminals(id, projectPolygons[id]);
-
-      LOAD.mapObj.setFitView([findItem], true, [20, 20, 20, 240]);
-    };
-    const clearMap = () => {
-      projectPolygons = null;
-      if (cluster) {
-        cluster.setMap(null);
-        cluster = null;
+      const polygon = projectFenceObj[id]
+      if(!polygon) {
+        notifyWarn('地图资源加载中，请稍后重试！')
+        return
       }
+      renderTerminalsByProject(id)
+      map.value.setFitView([projectFenceObj[id]], true, [20, 20, 20, 300]);
     };
+    // 地图加载成功事件
+    const onMapLoadSuccess = () => {
+      fnProvinceOption();
+      getAllProjectInfo();
+    };
+
 
     onBeforeUnmount(() => {
-      clearMap();
+      if(!map.value) return
+      if (cluster) {
+        map.value.remove(cluster)
+        cluster = null;
+      }
+      destroyFence("city");
+      destroyFence("district");
+      destroyFence("province");
     });
 
     return {
+      listLoading,
+
       baseSelectProps,
       projectList,
       provinceOptions,
@@ -490,7 +509,7 @@ export default {
       filterList,
       selectProjectId,
 
-      onSelectProjrctItem,
+      onSelectProjectItem,
       onProvinceChange,
       onCityChange,
       onDistrictChange,

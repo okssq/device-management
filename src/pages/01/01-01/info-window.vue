@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="relative-position">
     <q-card style="width: 320px">
       <div class="row no-wrap items-center q-px-md q-py-sm">
         <span class="text-subtitle2 text-bold text-primary">
@@ -67,6 +67,9 @@
       </div>
       <div class="tip-shadow relative-position"></div>
     </q-card>
+    <q-inner-loading :showing="loading" style="z-index: 100">
+      <q-spinner-tail color="primary" size="2em"/>
+    </q-inner-loading>
   </div>
 </template>
 <script>
@@ -78,6 +81,10 @@ export default {
   // eslint-disable-next-line vue/no-unused-components
   components: { DialogSwitch },
   props: {
+    loading: {
+      type: Boolean,
+      default: false
+    },
     data: {
       type: [null, Object],
       default: null,
