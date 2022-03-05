@@ -108,6 +108,23 @@ export const TEMPLATE = {
   list(param) {
     return post("/template/template_list.json", param);
   },
+
+  // 查询座椅开关列表
+  switchList(param) {
+    return post("/template/switch_list.json", param);
+  },
+  // 增加座椅开关列表
+  insertSwitch(param) {
+    return post("/template/insert_switch.json", param);
+  },
+  // 查询座椅开关列表
+  delSwitch(param) {
+    return post("/template/delete_switch.json", param);
+  },
+  // 查询座椅开关列表
+  updateSwitch(param) {
+    return post("/template/update_switch.json", param);
+  },
 };
 // 登录相关接口
 export const login = {

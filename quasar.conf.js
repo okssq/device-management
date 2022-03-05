@@ -78,6 +78,7 @@ module.exports = configure(function (ctx) {
         "/web": {
           // target: 'http://192.168.2.100:8602',
           target: "https://city.yitancc.com",
+          // target: "http://dcs.free.idcfengye.com",
           changeOrigin: true,
         },
       },

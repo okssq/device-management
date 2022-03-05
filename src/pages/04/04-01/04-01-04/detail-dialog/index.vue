@@ -3,7 +3,7 @@
     <div class="fullscreen dimmed">
       <div class="absolute-center bg-white column no-wrap z-top">
         <q-card
-          class="relative-positon overflow-hidden"
+          class="relative-position overflow-hidden"
           style="width: 292px; max-width: 98vw"
         >
           <div class="row q-px-md q-py-xs items-center justify-between">

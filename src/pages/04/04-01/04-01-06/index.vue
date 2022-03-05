@@ -1,5 +1,5 @@
 <template>
-  <div class="flex1 q-pa-md bg-grey-1 relative-position">
+  <div class="flex1 q-pa-md bg-grey-1 relative-position overflow-auto">
     <div class="q-gutter-md row">
       <q-card style="width: 240px" v-for="item in templateList" :key="item.id">
         <q-img :src="imgObj[item.id]" style="width: 240px; height: 140px"/>
@@ -44,8 +44,11 @@
 import {ref, shallowRef} from "vue";
 import {TEMPLATE} from 'src/api/module'
 import { useRouter } from 'vue-router'
+import SeatSwitchConfig from "./seat-switch-config";
+import {useQuasar} from "quasar";
 export default {
   setup() {
+    const $q = useQuasar()
     const router = useRouter()
     const imgObj = {
       1: "/images/yizi-shiwu.png",
@@ -70,7 +73,9 @@ export default {
     }
     // 智能座椅配置开关按钮事件
     const onSetSeatSwitch = () => {
-
+      $q.dialog({
+        component: SeatSwitchConfig
+      })
     }
 
     renderTemplateList()
