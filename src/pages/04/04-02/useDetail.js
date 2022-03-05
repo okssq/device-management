@@ -1,5 +1,6 @@
 import { ref, shallowRef, inject } from "vue";
-import { notifySuccess } from "src/util/common";
+import { notifySuccess, notifyWarn } from "src/util/common";
+
 const useDetail = (onSearch, getList, treeList) => {
   const LOAD = inject("LOAD");
   const loginCompanyId = LOAD.loginInfo.companyId + "";

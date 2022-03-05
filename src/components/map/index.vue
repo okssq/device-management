@@ -81,10 +81,7 @@ export default {
       if (!map.value) return
       map.value.clearEvents();
       const overlays = map.value.getAllOverlays();
-      console.log("overlays,", overlays);
-
       overlays.forEach((el) => {
-        console.log("overlays[i],", el);
         el.clearEvents();
       });
       map.value.remove(overlays)

@@ -65,7 +65,7 @@
         <template #custom-onlineStatus="{ row, val }">
           <div class="row no-wrap justify-center">
             <q-icon
-              v-if="val"
+              v-if="!!val"
               size="22px"
               class="q-mr-sm"
               :color="
@@ -138,12 +138,11 @@
 import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
-
-import GpsDialog from "./gps-dialog/index.vue";
-import useGps from "./useGps";
+import GpsDialog from "components/view-gps-dialog";
 import DetailDialog from "./detail-dialog/index.vue";
-import useDetail from "./useDetail";
 
+import useGps from "./useGps";
+import useDetail from "./useDetail";
 import { reactive, ref, shallowRef, toRefs } from "vue";
 import { TERMINAL } from "src/api/module.js";
 import { notifySuccess } from "src/util/common";
@@ -183,6 +182,12 @@ export default {
         name: "terminalId",
         field: "terminalId",
         label: "设备号",
+        align: "left",
+      },
+      {
+        name: "terminalName",
+        field: "terminalName",
+        label: "设备别名",
         align: "left",
       },
       {

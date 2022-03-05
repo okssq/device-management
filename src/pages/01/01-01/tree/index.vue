@@ -46,7 +46,7 @@ import "@ztree/ztree_v3/js/jquery.ztree.core.min";
 import "@ztree/ztree_v3/js/jquery.ztree.exhide.min";
 import InputFilter from "./input-filter.vue";
 import {onBeforeUnmount, onMounted, ref} from "vue";
-
+import {termTypeText, termStatusText} from 'src/util/common'
 const nodeClass = (treeId, treeNode) => {
   const {type, status} = treeNode;
   if (type != 3) {
@@ -68,16 +68,7 @@ const nodeClass = (treeId, treeNode) => {
     }
   }
 };
-const termTypeText = {
-  1: "座椅",
-  2: "回收",
-  3: "储物柜",
-  4: "大屏",
-};
-const statusText = {
-  0: "离线",
-  1: "在线",
-};
+
 export default {
   components: {InputFilter},
   emits: ["update:tab", "com-select", "prj-select", "term-select"],
@@ -158,7 +149,7 @@ export default {
                  `;
               } else {
                 return `[${termTypeText[termType] || "未知设备"}]-${name}(${
-                  statusText[status] || "未知状态"
+                  termStatusText[status] || "未知状态"
                 })`;
               }
             },
@@ -211,7 +202,7 @@ export default {
                  `;
               } else {
                 return `[${termTypeText[termType] || "未知设备"}]-${name}(${
-                  statusText[status] || "未知状态"
+                  termStatusText[status] || "未知状态"
                 })`;
               }
             },
@@ -264,7 +255,7 @@ export default {
                  `;
               } else {
                 return `[${termTypeText[termType] || "未知设备"}]-${name}(${
-                  statusText[status] || "未知状态"
+                  termStatusText[status] || "未知状态"
                 })`;
               }
             },

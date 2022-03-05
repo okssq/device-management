@@ -18,7 +18,7 @@
           </div>
           <q-separator />
           <div style="height: 500px">
-            <global-map></global-map>
+            <global-map @load-success="onMapLoadSuccess" />
           </div>
           <q-separator />
           <div class="q-pa-md">
@@ -46,19 +46,23 @@
               <q-btn label="确定" color="primary" @click="onSubmit" />
             </q-form>
           </div>
-          <div
-            class="absolute-top-left bg-white q-pa-sm shadow-5"
+          <section
+            class="absolute-top-left bg-white rounded-borders shadow-2 q-py-xs"
             style="top: 60px; left: 15px"
           >
             <q-input
               dense
-              outlined
+              borderless
+              rounded
               placeholder="搜索地址"
               v-model="inputFilter"
               style="width: 240px"
               @focus="listVisible = true"
               @update:model-value="onInputChange"
             >
+              <template #prepend>
+                <q-icon name="search" class="q-ml-sm"/>
+              </template>
               <q-menu
                 v-model="listVisible"
                 fit
@@ -84,14 +88,15 @@
                 </q-list>
               </q-menu>
             </q-input>
-          </div>
-          <div
-            class="absolute-top-right bg-white q-pa-sm shadow-5"
+          </section>
+          <section
+            class="absolute-top-right bg-white q-pa-sm rounded-borders shadow-2 text-bold text-capitalize"
             style="top: 60px; right: 15px"
+            v-if="lng && lat"
           >
             <div>经度：{{ lng || "-" }}</div>
             <div>纬度：{{ lat || "-" }}</div>
-          </div>
+          </section>
         </q-card>
       </div>
     </div>
@@ -102,7 +107,6 @@ import GlobalMap from "components/map/index.vue";
 import {
   ref,
   inject,
-  onMounted,
   onBeforeUnmount,
   toRaw,
   shallowRef,
@@ -120,7 +124,7 @@ export default {
   },
   setup(props, { emit }) {
     let autoComplete, geocoder, marker, district;
-    const LOAD = inject("LOAD");
+    const map = inject("map");
     const inputFilter = ref("");
     const listVisible = ref(false);
     const filterList = shallowRef([]);
@@ -131,8 +135,8 @@ export default {
     const fnMarker = (location) => {
       if (!marker) return;
       marker.remove();
-      marker.add(LOAD.mapObj);
-      LOAD.mapObj.setCenter(location,true,false); // 加上这个人生倍儿爽，把当前定位设成中心点
+      marker.add(map.value);
+      map.value.setCenter(location,true,false); // 加上这个人生倍儿爽，把当前定位设成中心点
       marker.setPosition(location);
     };
     const fnAddress = (location, addressStr) => {
@@ -152,7 +156,8 @@ export default {
         });
       }
     };
-    const initMap = () => {
+
+    const onMapLoadSuccess = () => {
       AMap.plugin(["AMap.AutoComplete"], function () {
         autoComplete = new AMap.AutoComplete({ city: "全国" });
       });
@@ -172,7 +177,16 @@ export default {
         });
       });
       marker = new AMap.Marker();
-      LOAD.mapObj.on("click", onMapClick);
+      map.value.on("click", onMapClick);
+      if (props.row) {
+        const obj = toRaw(props.row);
+        const { gpsInfo } = obj;
+        const arr = gpsInfo.split(",");
+        if(!arr || (arr && (!arr[0] || !arr[1]) )) return
+        const position = new AMap.LngLat(arr[0], arr[1]);
+        fnMarker(position);
+        fnAddress(position, obj.address);
+      }
     };
 
     const onInputChange = (val) => {
@@ -205,28 +219,19 @@ export default {
       fnAddress(location);
       console.log("filterSelectItem", item);
     };
-    onMounted(() => {
-      initMap();
-      if (props.row) {
-        const obj = toRaw(props.row);
-        const { gpsInfo } = obj;
-        const arr = gpsInfo.split(",");
-        const position = new AMap.LngLat(arr[0], arr[1]);
-        fnMarker(position);
-        fnAddress(position, obj.address);
-      }
-    });
+
+
 
     onBeforeUnmount(() => {
-      if (LOAD.mapObj) {
-        LOAD.mapObj.off("click", onMapClick);
+      if (map.value) {
+        map.value.off("click", onMapClick);
       }
       if (marker) marker.remove();
       autoComplete = null;
       district = null;
       geocoder = null;
       marker = null;
-      LOAD.mapObj.clearMap();
+      map.value.clearMap();
     });
 
     return {
@@ -237,32 +242,11 @@ export default {
       listVisible,
       filterList,
 
+      onMapLoadSuccess,
       onInputChange,
       filterSelectItem,
       onSubmit,
     };
   },
 };
-// district.search(item.adcode, function (status, result) {
-//   // 获取朝阳区的边界信息
-//   console.log("status", status, "result", result);
-//   if (status !== "complete") return;
-//   const bounds = result.districtList[0].boundaries;
-//   if (bounds) {
-//     for (var i = 0, l = bounds.length; i < l; i++) {
-//       //生成行政区划polygon
-//       const polygon = new AMap.Polygon({
-//         map: LOAD.mapObj,
-//         strokeWeight: 1,
-//         path: bounds[i],
-//         fillOpacity: 0.5,
-//         fillColor: "#CCF3FF",
-//         strokeColor: "#CC66CC",
-//       });
-//       polygons.push(polygon);
-//     }
-//     // 地图自适应
-//     LOAD.mapObj.setFitView();
-//   }
-// });
 </script>

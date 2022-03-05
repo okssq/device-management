@@ -42,6 +42,7 @@
         class="q-ma-md"
         label="视频通道"
         dropdown-icon="mdi-chevron-down"
+        v-model="channel"
         :options="['通道1', '通道2', '通道3', '通道4']"
       >
       </q-select>
@@ -129,6 +130,7 @@ export default {
       { name: "211", speed: "46" },
       { name: "314", speed: "99" },
     ]);
+    const channel = ref('')
     const columns = [
       {
         name: "sTime",
@@ -260,6 +262,7 @@ export default {
     return {
       selected,
       videoList,
+      channel,
       columns,
       rows,
     };

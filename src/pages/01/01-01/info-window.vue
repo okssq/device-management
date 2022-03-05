@@ -5,7 +5,7 @@
         <span class="text-subtitle2 text-bold text-primary">
           {{
             data
-              ? typeText[data.type] || "未知设备" + "-" + data.terminalId
+              ? termTypeText[data.type] || "未知设备" + "-" + data.terminalId
               : ""
           }}</span
         >
@@ -73,13 +73,12 @@
   </div>
 </template>
 <script>
-import { ref, toRaw } from "@vue/reactivity";
+import { toRaw } from "vue";
 import { useQuasar } from "quasar";
 import DialogSwitch from "./dialog/switch/index.vue";
+import { termTypeText } from 'src/util/common'
 export default {
   emits: ["close", "video"],
-  // eslint-disable-next-line vue/no-unused-components
-  components: { DialogSwitch },
   props: {
     loading: {
       type: Boolean,
@@ -91,12 +90,6 @@ export default {
     },
   },
   setup(props, { emit }) {
-    const typeText = {
-      1: "座椅",
-      2: "瓶子回收",
-      3: "储物柜",
-      4: "大屏",
-    };
     const $q = useQuasar();
     const onSwitch = () => {
       const data = toRaw(props.data);
@@ -106,7 +99,7 @@ export default {
       });
     };
     return {
-      typeText,
+      termTypeText,
       onSwitch,
     };
   },

@@ -183,17 +183,17 @@ export default {
         provincePolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && map.value.setFitView(provincePolygons, true);
+        flag && map.value.setFitView(provincePolygons, true, [20, 20, 20, 300],22);
       } else if (type === "city") {
         cityPolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && map.value.setFitView(cityPolygons, true);
+        flag && map.value.setFitView(cityPolygons, true, [20, 20, 20, 300],22);
       } else if (type === "district") {
         districtPolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && map.value.setFitView(districtPolygons, true);
+        flag && map.value.setFitView(districtPolygons, true, [20, 20, 20, 300],22);
       }
     };
     // 销毁地区围栏
@@ -241,7 +241,7 @@ export default {
             districtPolygons = arr;
           }
         }
-        map.value.setFitView(arr, true); //地图自适应
+        map.value.setFitView(arr, true, [20, 20, 20, 300],22); //地图自适应
       }
     };
     // 省级选择改变
@@ -474,7 +474,7 @@ export default {
         return
       }
       renderTerminalsByProject(id)
-      map.value.setFitView([projectFenceObj[id]], true, [20, 20, 20, 300]);
+      map.value.setFitView([projectFenceObj[id]], true, [20, 20, 20, 300],22);
     };
     // 地图加载成功事件
     const onMapLoadSuccess = () => {

@@ -3,7 +3,7 @@
     <div class="fullscreen dimmed">
       <div class="absolute-center bg-white column no-wrap z-top">
         <q-card
-          class="relative-positon overflow-hidden"
+          class="relative-position overflow-hidden"
           style="width: 350px; max-width: 98vw"
         >
           <div class="row q-px-md q-py-xs items-center justify-between">
@@ -16,9 +16,9 @@
               @click="$emit('cancel')"
             />
           </div>
-          <q-separator />
+          <q-separator/>
 
-          <q-scroll-area style="max-height: 50vh; padding: 16px; height: 220px">
+          <q-scroll-area style="max-height: 50vh; padding: 16px; height: 310px">
             <q-form class="row q-gutter-md items-center">
               <input-filter-company
                 style="width: 310px"
@@ -36,16 +36,18 @@
                 dense
                 outlined
                 lazy-rules
-                class="my-form-item"
+                class="my-form-item "
                 v-model="projectId"
                 emit-value
                 map-options
+                :clearable="!!projectId"
                 :options="projectList"
                 :loading="projectLoading"
+                @clear="projectId=''"
               >
                 <template #before>
                   <span class="text-caption text-bold my-form-label"
-                    >所属项目：</span
+                  >所属项目：</span
                   >
                 </template>
               </q-select>
@@ -59,7 +61,7 @@
               >
                 <template #before>
                   <span class="text-caption text-bold my-form-label"
-                    >设备别名：</span
+                  >设备别名：</span
                   >
                 </template>
               </q-input>
@@ -72,7 +74,7 @@
               >
                 <template #before>
                   <span class="text-caption text-bold my-form-label"
-                    >设备地址：</span
+                  >设备地址：</span
                   >
                 </template>
                 <q-btn
@@ -84,15 +86,33 @@
                   @click="onChooseGps"
                 />
               </q-field>
+              <q-select
+                dense
+                outlined
+                lazy-rules
+                class="my-form-item ellipsis"
+                v-model="templateId"
+                emit-value
+                map-options
+                :clearable="!!templateId"
+                :options="templateOptions"
+                @clear="templateId=''"
+              >
+                <template #before>
+                  <span class="text-caption text-bold my-form-label"
+                  >设备模板：</span
+                  >
+                </template>
+              </q-select>
             </q-form>
           </q-scroll-area>
-          <q-separator />
+          <q-separator/>
           <q-card-actions align="right">
-            <q-btn flat label="取消" color="primary" @click="$emit('cancel')" />
-            <q-btn label="确定" color="primary" @click="onSubmit" />
+            <q-btn flat label="取消" color="primary" @click="$emit('cancel')"/>
+            <q-btn label="确定" color="primary" @click="onSubmit"/>
           </q-card-actions>
           <q-inner-loading :showing="loading" style="z-index: 100">
-            <q-spinner-tail color="primary" size="2em" />
+            <q-spinner-tail color="primary" size="2em"/>
           </q-inner-loading>
         </q-card>
       </div>
@@ -105,10 +125,11 @@
   ></choose-gps-dialog>
 </template>
 <script>
-import chooseGpsDialog from "../04-01-04/choose-gps-dialog/index.vue";
-import { reactive, ref, shallowRef, toRaw, toRefs } from "vue";
-import { TERMINAL, PROJECT } from "src/api/module";
+import chooseGpsDialog from "components/choose-gps-dialog";
+import {reactive, ref, shallowRef, toRaw, toRefs} from "vue";
+import {TERMINAL, PROJECT,TEMPLATE} from "src/api/module";
 import InputFilterCompany from "components/company/input-filter-company.vue";
+
 export default {
   emits: ["cancel", "ok"],
   components: {
@@ -133,32 +154,33 @@ export default {
       default: () => ({}),
     },
   },
-  setup(props, { emit }) {
+  setup(props, {emit}) {
     const loading = ref(false);
     let formData = reactive({
       terminalName: "",
       companyId: "",
       projectId: "",
       address: "",
+      templateId: ''
     });
     formData.companyId = props.selectCompanyId + "";
     const projectList = shallowRef([]);
     const projectLoading = ref(false);
-
+    const templateOptions =shallowRef([])
     const getProjectList = (val) => {
       projectLoading.value = true;
-      PROJECT.options({ companyId: val })
+      PROJECT.options({companyId: val})
         .then((res) => {
-          projectList.value = res.map((el) => {
-            const { id, label } = el;
-            return { label, value: id };
+          const arr = res.map((el) => {
+            const {id, label} = el;
+            return {label, value: id};
           });
-          console.log(res);
+          arr.unshift({label: '请选择', value: ''})
+          projectList.value = arr
         })
         .finally(() => {
           projectLoading.value = false;
         });
-      projectLoading.value = false;
     };
 
     // 选择公司改变时
@@ -176,7 +198,7 @@ export default {
     const onChooseGps = () => {
       chooseGpsDialogVisible.value = true;
     };
-    const onConfirmChooseGps = ({ lat, lng, address }) => {
+    const onConfirmChooseGps = ({lat, lng, address}) => {
       formData.address = address;
       formData.gpsInfo = `${lng},${lat}`;
       chooseGpsDialogVisible.value = false;
@@ -191,7 +213,8 @@ export default {
         .then(() => {
           emit("ok", param);
         })
-        .catch(() => {})
+        .catch(() => {
+        })
         .finally(() => {
           loading.value = false;
         });
@@ -200,10 +223,27 @@ export default {
     if (props.selectCompanyId) {
       onChangeCompanyId(props.selectCompanyId);
     }
+    if (props.formData.type){
+      TEMPLATE.list({
+        pageSize:999,
+        page:1,
+        terminalType:props.formData.type
+      }).then(res=> {
+        console.log('res',res)
+        const {results} = res
+        const arr = results.map((el) => {
+          const {id, templateName} = el;
+          return {label:templateName, value: id};
+        });
+        arr.unshift({label: '请选择', value: ''})
+        templateOptions.value = arr
+      })
+    }
     return {
       ...toRefs(formData),
       projectList,
       projectLoading,
+      templateOptions,
       loading,
       onChangeCompanyId,
       onSubmit,
@@ -219,6 +259,7 @@ export default {
 .my-form-item {
   width: 310px;
 }
+
 .my-form-label {
   min-width: 70px;
   max-width: 70px;

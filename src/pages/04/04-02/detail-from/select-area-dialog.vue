@@ -18,7 +18,7 @@
           </div>
           <q-separator />
           <div style="height: 400px">
-            <global-map></global-map>
+            <global-map @load-success="onMapLoadSuccess" />
           </div>
           <q-separator />
           <div class="q-pa-md">
@@ -46,18 +46,25 @@
             </q-form>
           </div>
           <section
-            class="absolute-top-left bg-white q-pa-sm shadow-5"
+            class="absolute-top-left bg-white rounded-borders shadow-2 q-py-xs"
             style="top: 60px; left: 15px"
           >
             <q-input
               dense
-              outlined
+              borderless
+              rounded
               placeholder="搜索地址"
               v-model="inputFilter"
               style="width: 240px"
               @focus="listVisible = true"
               @update:model-value="onInputChange"
             >
+              <template #prepend>
+                <q-icon name="search" class="q-ml-sm"/>
+              </template>
+              <template #append>
+                <div class="q-mr-sm"/>
+              </template>
               <q-menu
                 v-model="listVisible"
                 fit
@@ -85,7 +92,7 @@
             </q-input>
           </section>
           <section
-            class="absolute-top-right bg-white q-pa-sm shadow-5"
+            class="absolute-top-right bg-white q-pa-sm rounded-borders shadow-2 text-bold text-capitalize"
             style="top: 60px; right: 15px"
             v-if="lng && lat"
           >
@@ -98,7 +105,7 @@
   </teleport>
 </template>
 <script>
-import GlobalMap from "components/map/index.vue";
+import GlobalMap from "components/map";
 import {
   ref,
   inject,
@@ -120,7 +127,7 @@ export default {
   },
   setup(props, { emit }) {
     let autoComplete, geocoder, marker, polygon, polygonEditor;
-    const LOAD = inject("LOAD");
+    const map = inject("map");
     const inputFilter = ref("");
     const listVisible = ref(false);
     const filterList = shallowRef([]);
@@ -137,8 +144,7 @@ export default {
         marker = new AMap.Marker();
       }
       marker.remove();
-      marker.add(LOAD.mapObj);
-      LOAD.mapObj.setZoomAndCenter(17, location,true,false);
+      marker.add(map.value);
       marker.setPosition(location);
     };
     const fnAddress = (location, addressObj) => {
@@ -189,7 +195,7 @@ export default {
       if (!polygon) {
         polygon = new window.AMap.Polygon({
           path,
-          map: LOAD.mapObj,
+          map: map.value,
           draggable: false,
           strokeColor: "#FF0000",
           strokeOpacity: 0.8,
@@ -200,9 +206,12 @@ export default {
       } else {
         polygon.setPath(path);
       }
+      setTimeout(() => {
+        map.value.setFitView([polygon],true,[10,10,280,160])
+      },130)
       if (!polygonEditor) {
         AMap.plugin("AMap.PolygonEditor", () => {
-          polygonEditor = new window.AMap.PolygonEditor(LOAD.mapObj, polygon);
+          polygonEditor = new window.AMap.PolygonEditor(map.value, polygon);
           polygonEditor.open();
         });
       } else {
@@ -223,7 +232,7 @@ export default {
           radius: 1000,
         });
       });
-      LOAD.mapObj.on("click", onMapClick);
+      map.value.on("click", onMapClick);
     };
 
     // 搜索文字改变事件
@@ -267,25 +276,7 @@ export default {
       fnPolygon(path);
     };
 
-    const onSubmit = () => {
-      let mapStr = `${lng.value},${lat.value};`;
-      if (polygon) {
-        const path = (polygon.getPath() || []).map((el) => {
-          return { longitude: el["lng"], latitude: el["lat"] };
-        });
-        mapStr += JSON.stringify(path);
-      }
-      emit("ok", {
-        mapStr,
-        province: province.value,
-        city: city.value,
-        district: district.value,
-        township: township.value,
-        address: address.value,
-      });
-    };
-
-    onMounted(() => {
+    const onMapLoadSuccess = () => {
       initMap();
       if (props.row) {
         const obj = toRaw(props.row);
@@ -323,11 +314,30 @@ export default {
           }
         }
       }
-    });
+    }
+    const onSubmit = () => {
+      let mapStr = `${lng.value},${lat.value};`;
+      if (polygon) {
+        const path = (polygon.getPath() || []).map((el) => {
+          return { longitude: el["lng"], latitude: el["lat"] };
+        });
+        mapStr += JSON.stringify(path);
+      }
+      emit("ok", {
+        mapStr,
+        province: province.value,
+        city: city.value,
+        district: district.value,
+        township: township.value,
+        address: address.value,
+      });
+    };
+
+
 
     onBeforeUnmount(() => {
-      if (LOAD.mapObj) {
-        LOAD.mapObj.off("click", onMapClick);
+      if (map.value) {
+        map.value.off("click", onMapClick);
       }
       if (marker) marker.remove();
       if (polygon) {
@@ -343,7 +353,7 @@ export default {
       geocoder = null;
       marker = null;
       polygon = null;
-      LOAD.mapObj.clearMap();
+      map.value.clearMap();
     });
 
     return {
@@ -358,9 +368,11 @@ export default {
       listVisible,
       filterList,
 
+
       onInputChange,
       filterSelectItem,
       onSubmit,
+      onMapLoadSuccess,
     };
   },
 };

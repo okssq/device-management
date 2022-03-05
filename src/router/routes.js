@@ -1,3 +1,7 @@
+import { h, resolveComponent } from "vue";
+
+const renderRouterView = () => h(resolveComponent("router-view"));
+
 const routes = [
   {
     path: "/login",
@@ -6,22 +10,22 @@ const routes = [
   },
   {
     path: "/",
-    component: () => import("pages/layout/index.vue"),
+    component: () => import("pages/layout"),
     children: [
       {
         path: "",
-        component: () => import("pages/01/index.vue"),
+        component: { render: renderRouterView },
         children: [
           {
             path: "/01-01",
-            component: () => import("pages/01/01-01/index.vue"),
+            component: () => import("pages/01/01-01"),
             meta: {
               crumbs: ["智慧地图", "设备分布"],
             },
           },
           {
             path: "/01-02",
-            component: () => import("pages/01/01-02/index.vue"),
+            component: () => import("pages/01/01-02"),
             meta: {
               crumbs: ["智慧地图", "项目分布"],
             },
@@ -30,7 +34,7 @@ const routes = [
       },
       {
         path: "",
-        component: () => import("pages/02/index.vue"),
+        component: { render: renderRouterView },
         children: [
           {
             path: "/02-01",
@@ -57,7 +61,7 @@ const routes = [
       },
       {
         path: "",
-        component: () => import("pages/03/index.vue"),
+        component: { render: renderRouterView },
         children: [
           {
             path: "/03-01",
@@ -77,11 +81,11 @@ const routes = [
       },
       {
         path: "",
-        component: () => import("pages/04/index.vue"),
+        component: { render: renderRouterView },
         children: [
           {
             path: "/04-01",
-            component: () => import("pages/04/04-01/index.vue"),
+            component: { render: renderRouterView },
             children: [
               {
                 path: "/04-01-01",
@@ -125,6 +129,21 @@ const routes = [
                   crumbs: ["信息管理", "设备信息", "广告资源配置"],
                 },
               },
+              {
+                name: "template-locker",
+                path: "/04-01-06/locker",
+                component: () =>
+                  import("pages/04/04-01/04-01-06/template/locker"),
+                meta: {
+                  routerKeys: ["04", "04-01", "04-01-06"],
+                  crumbs: [
+                    "信息管理",
+                    "设备信息",
+                    "广告资源配置",
+                    "智能桌椅自定义样式配置",
+                  ],
+                },
+              },
             ],
           },
           {
@@ -145,7 +164,7 @@ const routes = [
       },
       {
         path: "",
-        component: () => import("pages/05/index.vue"),
+        component: { render: renderRouterView },
         children: [
           {
             path: "/05-01",

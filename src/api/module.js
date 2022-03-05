@@ -60,7 +60,7 @@ export const TERMINAL_MAP = {
 export const TERMINAL_CONTROL = {
   // 设备的开关数量和状态
   switchInfo(param) {
-    return post("/terminal_control/open_or_close.json", param);
+    return post("/terminal_control/terminal_locker.json", param);
   },
   // 单个开关控制
   singleControl(param) {
@@ -100,6 +100,13 @@ export const TERMINAL = {
   // 绑定设备
   bind(param) {
     return post("/terminal/bind_terminal.json", param);
+  },
+};
+// 设备模板相关接口
+export const TEMPLATE = {
+  // 设备列表
+  list(param) {
+    return post("/template/template_list.json", param);
   },
 };
 // 登录相关接口
@@ -199,7 +206,7 @@ export const UI = {
   update(param) {
     return post("/ui/update_template_page.json", param);
   },
-}
+};
 // 树
 export const LEVEL = {
   // 公司->项目->设备

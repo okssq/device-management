@@ -17,36 +17,28 @@
             />
           </div>
           <q-separator />
-          <div style="height: 400px">
-            <global-map></global-map>
+          <div style="width:100%;height: 400px">
+            <global-map  @load-success="onMapLoadSuccess" />
           </div>
           <q-separator />
 
           <section
-            class="absolute-top-left bg-white shadow-5"
+            class="absolute-top-left bg-white rounded-borders shadow-2"
             style="top: 50px; left: 10px; width: 240px"
           >
-            <div v-if="row">
-              <q-list dense padding>
-                <q-item>
-                  <q-item-section side lines="1">纬度：</q-item-section>
-                  <q-item-section>
-                    {{ lng }}
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section side lines="1">经度：</q-item-section>
-                  <q-item-section>
-                    {{ lat }}
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section side lines="1">区域：</q-item-section>
-                  <q-item-section lines="4">
-                    {{ row.projectAddress || "-" }}
-                  </q-item-section>
-                </q-item>
-              </q-list>
+            <div v-if="row" class="text-capitalize text-bold q-pa-md">
+             <div class="row items-center no-wrap">
+               <div>经度：</div>
+               <div>{{ lng }}</div>
+             </div>
+              <div class="row items-center no-wrap">
+                <div>纬度：</div>
+                <div>{{ lat }}</div>
+              </div>
+              <div class="row items-center no-wrap">
+                <div class="text-no-wrap">区域：</div>
+                <div>{{ row.projectAddress || "-" }}</div>
+              </div>
             </div>
           </section>
         </q-card>
@@ -55,8 +47,8 @@
   </teleport>
 </template>
 <script>
-import GlobalMap from "components/map/index.vue";
-import { ref, inject, onMounted, onBeforeUnmount, toRaw } from "vue";
+import GlobalMap from "components/map";
+import { ref, inject, onBeforeUnmount, toRaw } from "vue";
 export default {
   emits: ["cancel"],
   components: {
@@ -70,7 +62,7 @@ export default {
   },
   setup(props, { emit }) {
     let marker, polygon;
-    const LOAD = inject("LOAD");
+    const map = inject("map");
     const lng = ref("");
     const lat = ref("");
     const fnMarker = (location) => {
@@ -78,15 +70,14 @@ export default {
         marker = new AMap.Marker();
       }
       marker.remove();
-      marker.add(LOAD.mapObj);
-      LOAD.mapObj.setZoomAndCenter(17, location,true,false);
+      marker.add(map.value);
       marker.setPosition(location);
     };
     const fnPolygon = (path) => {
       if (!polygon) {
         polygon = new window.AMap.Polygon({
           path,
-          map: LOAD.mapObj,
+          map: map.value,
           draggable: false,
           strokeColor: "#FF0000",
           strokeOpacity: 0.8,
@@ -97,8 +88,14 @@ export default {
       } else {
         polygon.setPath(path);
       }
+
+      setTimeout(() => {
+        map.value.setFitView([polygon],true,[60,60,280,60])
+      },130)
+
     };
-    const initMap = () => {
+    const onMapLoadSuccess = () => {
+      map.value.setZoom(20, true, false)
       if (props.row) {
         const obj = toRaw(props.row);
         const { mapStr, projectAddress } = obj;
@@ -126,13 +123,13 @@ export default {
             ];
             fnPolygon(path);
           }
+
         }
+      }else{
+
       }
     };
 
-    onMounted(() => {
-      initMap();
-    });
 
     onBeforeUnmount(() => {
       if (marker) marker.remove();
@@ -142,12 +139,13 @@ export default {
       }
       marker = null;
       polygon = null;
-      LOAD.mapObj.clearMap();
+      map.value.clearMap();
     });
 
     return {
       lng,
       lat,
+      onMapLoadSuccess,
     };
   },
 };

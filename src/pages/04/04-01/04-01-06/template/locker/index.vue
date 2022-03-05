@@ -1,30 +1,27 @@
 <template>
   <div class="absolute fit bg-white z-max overflow-hidden column no-wrap">
     <div class="row justify-between items-center no-wrap q-px-md q-py-sm bg-grey-1">
-      <q-btn flat icon="undo" color="primary" @click="$emit('cancel')">返回</q-btn>
+      <q-btn flat icon="undo" color="primary" @click="onBack">返回</q-btn>
       <div class="text-subtitle1">
-        {{ data ? data.label + data.version : "" }}样式配置
+        智能座椅v1.1.0自定义样式配置
       </div>
     </div>
     <q-separator />
     <div class="flex1 row no-wrap overflow-hidden">
       <resource />
       <q-separator vertical />
-      <component :is="templateComponent" />
-
+<!--      <component :is="templateComponent" />-->
     </div>
   </div>
 </template>
 
 <script>
-import Resource from "../template/resource/index.vue";
-import Template1 from "./locker";
+import Resource from "../resource";
+import { useRouter } from 'vue-router'
 import { computed } from "vue";
 export default {
-  emits: ["cancel"],
   components: {
     Resource,
-    Template1,
   },
   props: {
     data: {
@@ -33,17 +30,19 @@ export default {
     },
   },
   setup(props) {
-    const templateComponentById = {
-      1: Template1,
-    };
-    const templateComponent = computed(() => {
-      if (!props.data) return "";
-      else return templateComponentById[props.data.id];
-    });
+    const router = useRouter()
+    // 返回按钮
+    const onBack = () => {
+      router.push('/04-01-06')
+    }
+    // const templateComponent = computed(() => {
+    //   if (!props.data) return "";
+    //   else return templateComponentById[props.data.id];
+    // });
 
 
     return {
-      templateComponent,
+      onBack,
     };
   },
 };

@@ -132,7 +132,7 @@ export default {
         Object.keys(fenceObj).forEach((key) => {
           if (key === pId) {
             fenceObj[key].show();
-            map.value.setFitView(fenceObj[key],true);
+            map.value.setFitView(fenceObj[key],true, [20, 20, 20, 300],22);
           } else {
             fenceObj[key].hide();
           }
@@ -304,7 +304,6 @@ export default {
     // 地图加载完成事件
     const onMapLoadSuccess = () => {
       map.value.setZoomAndCenter(5, [110.850831, 36.86837],true,false);
-      // map.value.setFitView([], false, [60, 60, 60, 300], 5);
       getGpsData();
       getTreeData();
     };

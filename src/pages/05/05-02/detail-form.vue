@@ -12,7 +12,7 @@
       </div>
       <q-separator />
 
-      <q-scroll-area style="height: 260px; max-height: 50vh; padding: 16px">
+      <q-scroll-area style="height: 280px; max-height: 50vh; padding: 16px">
         <q-form class="row q-gutter-md items-center">
           <input-filter-company
             v-if="type == 'insert'"

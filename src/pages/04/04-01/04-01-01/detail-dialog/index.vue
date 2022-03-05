@@ -76,7 +76,7 @@
   ></choose-gps-dialog>
 </template>
 <script>
-import chooseGpsDialog from "../choose-gps-dialog/index.vue";
+import chooseGpsDialog from "components/choose-gps-dialog";
 import { reactive, ref, toRaw, toRefs } from "vue";
 import { TERMINAL } from "src/api/module";
 export default {

@@ -144,31 +144,6 @@
   box-shadow: 0 0 1px 0 rgb(0 0 0 / 10%);
   max-height: 100%;
 }
-.q-field--auto-height.q-field--dense .q-field__control,
-.q-field--auto-height.q-field--dense .q-field__native,
-.q-field--dense .q-field__control,
-.q-field--dense .q-field__marginal {
-  height: 36px;
-}
-.q-field--auto-height.q-field--dense .q-field__control,
-.q-field--auto-height.q-field--dense .q-field__native {
-  min-height: 36px;
-}
-.aa.q-field--auto-height.q-field--dense .q-field__control,
-.aa.q-field--auto-height.q-field--dense .q-field__native,
-.aa.q-field--dense .q-field__control,
-.aa.q-field--dense .q-field__marginal {
-  height: 44px !important;
-}
-.aa.q-field--auto-height.q-field--dense .q-field__control,
-.aa.q-field--auto-height.q-field--dense .q-field__native {
-  min-height: 44px !important;
-}
-
-.q-textarea .q-field__control {
-  min-height: 52px !important;
-  height: auto !important;
-}
 
 .tip-shadow {
   height: 0;

@@ -24,3 +24,15 @@ export const notifyInfo = (message) => {
     position: "top",
   });
 };
+
+export const termTypeText = {
+  1: "座椅",
+  2: "回收",
+  3: "储物柜",
+  4: "大屏",
+}
+
+export const termStatusText = {
+  0: "离线",
+  1: "在线",
+}

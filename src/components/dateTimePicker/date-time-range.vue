@@ -21,7 +21,10 @@
         @click.prevent.stop="onClear"
       />
     </template>
-    <q-menu @hide="onHide">
+    <q-menu @hide="onHide" style="    width: 290px;
+    height: 380px;
+    min-width: 290px;
+    min-height: 380px;" >
       <div class="q-pa-none">
         <!-- <div
           class="bg-primary text-grey-2 text-subtitle1 q-px-sm q-py-md column no-wrap items-center"

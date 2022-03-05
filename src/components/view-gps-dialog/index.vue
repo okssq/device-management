@@ -4,7 +4,7 @@
       <div class="absolute-center bg-white column no-wrap z-top">
         <q-card
           class="relative-positon overflow-hidden"
-          style="width: 500px; max-width: 98vw"
+          style="width: 600px; max-width: 98vw"
         >
           <div class="row q-px-md q-py-xs items-center justify-between">
             <div class="text-subtitle2 text-bold">查看设备定位信息</div>
@@ -17,8 +17,8 @@
             />
           </div>
           <q-separator />
-          <div style="height: 320px">
-            <global-map></global-map>
+          <div style="height: 400px">
+            <global-map @load-success="onMapLoadSuccess" />
           </div>
         </q-card>
       </div>
@@ -26,8 +26,8 @@
   </teleport>
 </template>
 <script>
-import GlobalMap from "components/map/index.vue";
-import { inject, onMounted, onBeforeUnmount, toRaw } from "@vue/runtime-core";
+import GlobalMap from "components/map";
+import { inject, onBeforeUnmount, toRaw } from "@vue/runtime-core";
 export default {
   emits: ["cancel"],
   components: {
@@ -40,7 +40,7 @@ export default {
     },
   },
   setup(props) {
-    const LOAD = inject("LOAD");
+    const map = inject("map");
     let icon = null;
     let marker = null;
     let infoWindow = null;
@@ -59,62 +59,50 @@ export default {
           if (status === "complete" && result.info === "OK") {
             const row = toRaw(props.gpsData);
             let content = `
-              <div class="flex q-pb-sm">
-                <div class="text-no-wrap text-bold">设备类型：</div>
-                <div class="text-primary ellipsis-3-lines">${
-                  typeText[row.type] || "未知类型"
-                }</div>
+              <div class="row items-center no-wrap q-my-xs">
+                <div style="min-width:75px" class="text-right">设备ID：</div>
+                <div>${row.terminalId}</div>
               </div>
-              <div class="flex q-pb-sm">
-                <div class="text-no-wrap text-bold">设备ID：</div>
-                <div class="text-primary ellipsis-3-lines">${
-                  row.terminalId
-                }</div>
+              <div class="row items-center no-wrap  q-mb-xs">
+                <div style="min-width:75px" class="text-right">设备类型：</div>
+                <div>${typeText[row.type] || "未知类型"}</div>
               </div>
-              <div class="flex q-pb-sm">
-                <div class="text-no-wrap text-bold">所属项目：</div>
-                <div class="text-primary ellipsis-3-lines">${
-                  row.projectName
-                }</div>
+              <div class="row items-center no-wrap q-mb-xs">
+                <div style="min-width:75px" class="text-right">所属项目：</div>
+                <div>${row.projectName}</div>
               </div>
-              <div class="flex q-pb-sm">
-                <div class="text-no-wrap text-bold">所属公司：</div>
-                <div class="text-primary ellipsis-3-lines">${
-                  row.companyName
-                }</div>
+              <div class="row items-center no-wrap q-mb-xs">
+                <div style="min-width:75px" class="text-right">所属公司：</div>
+                <div>${row.companyName}</div>
               </div>
-              <div class="flex q-pb-sm">
-                <div class="text-no-wrap text-bold">上传时间：</div>
-                <div class="text-primary ellipsis-3-lines">${
-                  row.onlineTime
-                }</div>
+              <div class="row items-center no-wrap q-mb-xs">
+                <div style="min-width:75px" class="text-right">上传时间：</div>
+                <div>${row.onlineTime}</div>
               </div>
-              <div class="flex q-pb-sm">
-                <div class="text-no-wrap text-bold">上传位置：</div>
-                <div class="text-primary ellipsis-3-lines">${
-                  result.regeocode.formattedAddress
-                }</div>
+              <div class="row items-start no-wrap">
+                <div style="min-width:75px" class="text-right">上传位置：</div>
+                <div>${result.regeocode.formattedAddress}</div>
               </div>
             `;
-
             infoWindow.setContent(
-              `<div class="q-pl-sm q-py-sm text-subtitle2"">${content}</div>`
+              `<div style="max-width: 280px" class="text-capitalize text-grey-9 text-bold">${content}</div>`
             );
           }
           geocoder = null;
-          LOAD.mapObj.panBy(0, 50);
+          map.value.panBy(0, 50);
         });
       });
     };
     const openInfoWindow = () => {
-      infoWindow && infoWindow.open(LOAD.mapObj);
+      infoWindow && infoWindow.open(map.value);
     };
     // 渲染自定义小车
     const fnMaker = () => {
+      const {type,onlineStatus} = toRaw(props.gpsData)
       icon = new AMap.Icon({
-        size: new AMap.Size(32, 32),
-        image: require("./point.png"),
-        imageSize: new AMap.Size(32, 32),
+        size: new AMap.Size(36, 40),
+        image:`./images/type${type}-status${onlineStatus}.png`,
+        imageSize: new AMap.Size(36,40),
       });
       const row = toRaw(props.gpsData);
       const { gpsInfo } = row;
@@ -125,7 +113,7 @@ export default {
       if (!marker) {
         marker = new AMap.Marker({
           position,
-          map: LOAD.mapObj,
+          map: map.value,
           icon,
           offset: new AMap.Pixel(-18, 0),
         });
@@ -134,7 +122,7 @@ export default {
       }
       marker.off("click", openInfoWindow);
       marker.on("click", openInfoWindow);
-      LOAD.mapObj.setCenter(position,true,false);
+      map.value.setCenter(position,true,false);
     };
     // 渲染自定义卡片
     const fnInfoWindow = () => {
@@ -152,14 +140,16 @@ export default {
       } else {
         infoWindow.setPosition(position);
       }
-      infoWindow.open(LOAD.mapObj);
+      infoWindow.open(map.value);
       getFormatContent();
     };
 
-    onMounted(() => {
+    const onMapLoadSuccess =() => {
       fnMaker();
       fnInfoWindow();
-    });
+    };
+
+
 
     onBeforeUnmount(() => {
       icon && (icon = null);
@@ -170,12 +160,16 @@ export default {
       }
       if (infoWindow) {
         infoWindow.close();
-        LOAD.mapObj.clearInfoWindow();
+        map.value.clearInfoWindow();
         infoWindow = null;
       }
       position = null;
-      LOAD.mapObj.clearMap();
+      map.value.clearMap();
     });
+
+    return {
+      onMapLoadSuccess
+    }
   },
 };
 </script>

@@ -37,14 +37,13 @@
           :items="filterList"
           :style="$attrs.style"
           :class="$attrs.class"
-          :virtual-scroll-slice-size="20"
-          :virtual-scroll-item-size="32"
+
         >
           <template #default="{ item, index }">
             <slot :item="item" :index="index">
-              <q-item dense clickable @click="onSelectItem(item)">
+              <q-item  clickable @click="onSelectItem(item)" class="q-px-md q-py-none" style="min-height: 36px">
                 <q-item-section
-                  class="text-caption text-bold"
+                  class="text-no-wrap q-pa-none"
                   :class="
                     item.id === modelValue ? 'text-primary' : 'text-grey-7'
                   "

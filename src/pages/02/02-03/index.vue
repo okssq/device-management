@@ -2,38 +2,6 @@
   <div class="my-box column no-wrap">
     <div class="bg-white q-pl-md q-pb-md q-mt-md">
       <q-form class="q-gutter-sm row items-center">
-        <q-input outlined dense placeholder="时间">
-          <template v-slot:prepend>
-            <q-icon name="event" class="cursor-pointer">
-              <q-popup-proxy
-                cover
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-date>
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-          <template v-slot:append>
-            <q-icon name="access_time" class="cursor-pointer">
-              <q-popup-proxy
-                cover
-                transition-show="scale"
-                transition-hide="scale"
-              >
-                <q-time mask="YYYY-MM-DD HH:mm" format24h>
-                  <div class="row items-center justify-end">
-                    <q-btn v-close-popup label="Close" color="primary" flat />
-                  </div>
-                </q-time>
-              </q-popup-proxy>
-            </q-icon>
-          </template>
-        </q-input>
         <q-input outlined dense placeholder="设备IMEI号"> </q-input>
         <q-select
           dense
@@ -42,6 +10,7 @@
           placeholder="设备类型"
           style="width: 180px"
           dropdown-icon="mdi-chevron-down"
+          v-model="select"
           :options="['手环', '打卡点', '摄像头', '其他设备']"
         >
         </q-select>
@@ -93,7 +62,7 @@
 <script>
 import MyEcharts from "components/echarts";
 import MyTable from "components/table";
-import { shallowReactive } from "vue";
+import {ref, shallowReactive} from "vue";
 
 export default {
   components: {
@@ -214,6 +183,7 @@ export default {
         content: "****************",
       },
     ];
+    const select = ref('')
     const options = shallowReactive({
       tooltip: {
         trigger: "axis",
@@ -358,6 +328,7 @@ export default {
     return {
       columns,
       rows,
+      select,
       options,
       typeColorObj,
       typeTextObj,

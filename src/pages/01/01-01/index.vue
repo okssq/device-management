@@ -89,8 +89,8 @@ export default {
               count: subCount,
               offlineCount: subOfflineCount,
             } = formatTreeData(children, _index, vList, vObj);
+            subTree.length && (treeItem.children = subTree);
             if (subCount) {
-              subTree.length && (treeItem.children = subTree);
               count += subCount;
               offlineCount += subOfflineCount;
               treeItem.count = subCount;
@@ -282,7 +282,7 @@ export default {
     };
     // 设备选择改变事件
     const onTermSelect = (item) => {
-      console.log("设备选择改变事件", item);
+      // console.log("设备选择改变事件", item);
       renderInfoWindow(item)
     };
     // 地图加载完成事件
@@ -290,8 +290,8 @@ export default {
       map.value.setZoomAndCenter(5, [110.850831, 36.86837],true,false);
       Promise.all([getAllGps(), getAllFence()])
         .then(([gpsData, fenceData]) => {
-          console.log('gpsData', gpsData)
-          console.log('fenceData', fenceData)
+          // console.log('gpsData', gpsData)
+          // console.log('fenceData', fenceData)
           renderAllGps(gpsData)
           renderAllFence(fenceData)
           renderTree()

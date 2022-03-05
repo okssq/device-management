@@ -15,15 +15,14 @@
       >
         <template #custom-type="{ val }">
           <q-badge
-            dense
-            :label="typeText[val] || '未知类型'"
+            outline
+            :label="termTypeText[val] || `未知类型type${val}`"
             :color="typeColor[val] || 'blue-grey'"
           />
         </template>
         <template #custom-onlineStatus="{ val }">
           <div class="row no-wrap justify-center">
             <q-icon
-              v-if="val"
               size="22px"
               class="q-mr-sm"
               :color="onlineStatusColor[val] || 'primary'"
@@ -31,7 +30,7 @@
             />
             <q-badge
               dense
-              :label="onlineStatusText[val] || '-'"
+              :label="termStatusText[val] || '-'"
               :color="onlineStatusColor[val] || 'primary'"
             />
           </div>
@@ -65,11 +64,12 @@
 <script>
 import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
+import DetailForm from "./detail-form.vue";
 import { reactive, ref, shallowRef, toRefs } from "vue";
 import { TERMINAL } from "src/api/module";
-import DetailForm from "./detail-form.vue";
 import useBind from "./useBind";
 import { useCompanyTree } from "components/company/useCompayTree";
+import { termTypeText,termStatusText } from 'src/util/common'
 export default {
   emits: ["cancel"],
   components: {
@@ -82,10 +82,6 @@ export default {
     const selectCompanyId = ref("");
     const selectCompanyName = ref("");
 
-    const onlineStatusText = {
-      0: "离线",
-      1: "在线",
-    };
     const onlineStatusColor = {
       0: "grey-8",
       1: "green",
@@ -94,12 +90,7 @@ export default {
       0: "power_off",
       1: "electrical_services",
     };
-    const typeText = {
-      1: "座椅",
-      2: "瓶子回收",
-      3: "储物柜",
-      4: "大屏",
-    };
+
     const typeColor = {
       1: "pink",
       2: "purple",
@@ -191,10 +182,10 @@ export default {
       getList
     );
     return {
-      onlineStatusText,
+      termStatusText,
       onlineStatusColor,
       onlineStatusIcon,
-      typeText,
+      termTypeText,
       typeColor,
       loading,
       columns,

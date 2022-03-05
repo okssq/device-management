@@ -1,7 +1,7 @@
 <template>
   <q-dialog persistent ref="dialogRef">
     <q-card
-      class="relative-positon overflow-hidden"
+      class="relative-position overflow-hidden"
       style="max-width: 98vw; width: 300px"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
@@ -13,17 +13,19 @@
         <q-item
           tag="label"
           v-ripple
-          v-for="(item, index) in options"
-          :key="index"
+          v-for="item in options"
+          :key="item.id"
         >
           <q-item-section>
-            <q-item-label>{{ item.label }}</q-item-label>
+            <q-item-label>{{ item.indexName }}</q-item-label>
           </q-item-section>
           <q-item-section side>
             <q-toggle
               color="blue"
-              :model-value="item.value"
-              @update:model-value="onSwitchChange($event, index)"
+              :true-value="1"
+              :false-value="0"
+              :model-value="item.useStatus"
+              @update:model-value="onSwitchChange(item)"
             />
           </q-item-section>
         </q-item>
@@ -38,7 +40,7 @@
 import { useDialogPluginComponent } from "quasar";
 import { ref } from "vue";
 import { TERMINAL_CONTROL } from "src/api/module.js";
-import { load } from "@amap/amap-jsapi-loader";
+import {notifySuccess} from "src/util/common";
 export default {
   emits: [...useDialogPluginComponent.emits],
   props: {
@@ -52,69 +54,30 @@ export default {
     const loading = ref(false);
     const options = ref([]);
     const fnSwitch = (res) => {
-      console.log("getInfo", res);
-      if (!res) {
-        // loading.value = false;
-        return;
-      }
-      const { number, status } = res;
-      if (!status) {
-        // loading.value = false;
-        return;
-      }
-      // 8个开关以内
-      if (number < 8) {
-        console.log(111)
-        const str = parseInt(status).toString(2);
-        console.log('str',str)
-        const length = str.length;
-        if (length < number) {
-          const zeroArr = Array.from({ length: number - length }, () => 0);
-          const startArr = str.split("").reverse();
-          const switchArr = [...startArr, ...zeroArr];
-          options.value = switchArr.map((el, index) => {
-            return {
-              label: `开关${index + 1}`,
-              value: el == 1,
-            };
-          });
-          console.log("switchArr", switchArr, options.value);
-        }else{
-          const startArr = str.split("").reverse();
-          options.value = startArr.map((el, index) => {
-            return {
-              label: `开关${index + 1}`,
-              value: el == 1,
-            };
-          });
-        }
-      } else {
-        console.log(222)
-        // loading.value = false;
-      }
+      console.log('res',res)
+      options.value = res || []
     };
     const getInfo = () => {
       loading.value = true;
       TERMINAL_CONTROL.switchInfo({ terminalId: props.data.terminalId })
         .then((res) => {
-          fnSwitch(res);
+          fnSwitch(res)
         })
         .finally(() => {
           loading.value = false;
         });
     };
-    const onSwitchChange = (val, index) => {
+    const onSwitchChange = (item) => {
       loading.value = true;
       TERMINAL_CONTROL.singleControl({
-        index: index,
-        phone: props.data.terminalId,
-        status: val ? "1" : 0,
+        index: item.index,
+        phone: item.terminalId,
+        status: item.useStatus ? 0 : 1,
       })
         .then((res) => {
-          setTimeout(()=>{
-            getInfo()
-          },2000)
-
+          console.log('resss1111',res)
+          item.useStatus = item.useStatus ? 0 : 1
+          notifySuccess('设置成功')
         })
         .finally(() => {
           loading.value = false;

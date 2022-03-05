@@ -53,6 +53,9 @@ export default {
 
     const route = useRoute();
     const routerKeys = computed(() => {
+      if(route.meta['routerKeys']) {
+        return route.meta['routerKeys']
+      }
       const str = route.path.substring(1);
       const length = str.split("-").length;
       const arr = [];

@@ -19,7 +19,7 @@
             />
           </div>
           <q-separator />
-          <q-scroll-area style="max-height: 50vh; padding: 16px; height: 260px">
+          <q-scroll-area style="max-height: 50vh; padding: 16px; height: 280px">
             <q-form class="row q-gutter-md items-center">
               <input-filter-company
                 style="width: 310px"

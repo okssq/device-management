@@ -3,16 +3,19 @@
     class="bg-white column no-wrap overflow-hidden relative-position"
     style="z-index: 200; max-height: 100%; width: 280px"
   >
-    <div class="q-px-md q-py-sm row no-wrap">
+    <div class="q-px-md q-py-xs row no-wrap">
       <q-input
         dense
-        outlined
+        borderless
         debounce="350"
         class="q-mr-sm flex1"
         placeholder="请输入设备号"
         v-model="inputFilter"
         @focus.prevent.stop="listVisible = true"
       >
+        <template #before>
+          <q-icon name="search" />
+        </template>
         <q-menu
           fit
           no-parent-event

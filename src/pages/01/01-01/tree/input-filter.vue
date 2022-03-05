@@ -4,7 +4,7 @@
       dense
       borderless
       debounce="350"
-      class="q-px-md q-py-sm"
+      class="q-px-md q-py-xs"
       placeholder="请输入设备号"
       :model-value="filterText"
       @update:model-value="onFilter"

@@ -69,7 +69,7 @@
             outlined
             lazy-rules
             class="my-form-item"
-            v-model="realName"
+            v-model="roleName"
             disable
           >
             <template #before>
