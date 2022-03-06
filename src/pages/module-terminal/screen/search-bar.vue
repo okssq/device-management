@@ -62,7 +62,7 @@ export default {
         companyId: companyId.value,
         projectId: projectId.value,
         terminalId: terminalId.value,
-        type: 1,
+        type: 4,
       });
     };
     onSubmit();

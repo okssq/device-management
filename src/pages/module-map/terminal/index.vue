@@ -31,12 +31,14 @@ import GlobalMap from "components/map/index.vue";
 import TabTree from "./tree/index.vue";
 import InfoWindow from "./info-window.vue";
 import {LEVEL, TERMINAL_MAP} from "src/api/module";
+import {notifyWarn} from "src/util/common";
 import {
   ref,
   shallowRef,
   inject,
   onBeforeUnmount,
 } from "vue";
+
 
 export default {
   components: {
@@ -148,11 +150,15 @@ export default {
     }
     // 渲染自定义卡片
     const renderInfoWindow = (row) => {
-      infoWindowLoading.value = true
-      infoWindowVisible.value = true;
       const {id} = row;
       const tId = id.slice(5);
       const findItem = allPoints.find(el => el.terminalId === tId)
+      if(!findItem) {
+        notifyWarn('没有查询到设备坐标')
+        return false
+      }
+      infoWindowLoading.value = true
+      infoWindowVisible.value = true;
       const {lnglat} = findItem
       const position = JSON.parse(JSON.stringify(lnglat));
       if (!infoWindow) {
@@ -203,13 +209,17 @@ export default {
     }
     // 渲染所有gps点
     const renderAllGps = (list) => {
-      allPoints = list.map((el) => {
+       list.forEach((el) => {
         const {gpsInfo} = el;
-        const gpsArr = gpsInfo.split(",");
-        return {
-          ...el,
-          lnglat: gpsArr,
-        };
+         if(gpsInfo){
+           const gpsArr = gpsInfo.split(",");
+           if(gpsArr.length === 2){
+             allPoints.push({
+               ...el,
+               lnglat: gpsArr
+             })
+           }
+         }
       });
       const renderMarker = (context) => {
         const {type, onlineStatus} = context["data"][0];

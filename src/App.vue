@@ -17,9 +17,6 @@ export default {
     const LOAD = shallowReactive({
       user: false,
       loginInfo: null,
-      map: false,
-      mapObj: null,
-      mapTeleportTo: "#global-map-wrap",
     });
     provide("LOAD", LOAD);
 
@@ -27,7 +24,9 @@ export default {
     const routerPath = $q.localStorage.getItem("router-path");
     LOAD.user = !!loginInfo;
     LOAD.loginInfo = loginInfo;
-    router.push(LOAD.user ? routerPath || "/01-01" : "/login");
+
+    console.log('11111',$q.localStorage.getItem("info"))
+    router.push(LOAD.user ? routerPath || "/map/terminal" : "/login");
   },
 };
 </script>

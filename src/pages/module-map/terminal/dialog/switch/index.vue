@@ -9,7 +9,7 @@
         <q-btn flat round size="12px" icon="clear" @click="onDialogHide" />
       </div>
       <q-separator />
-      <q-list dense>
+      <q-list dense v-if="options.length">
         <q-item
           tag="label"
           v-ripple
@@ -30,6 +30,9 @@
           </q-item-section>
         </q-item>
       </q-list>
+      <div v-else class="q-px-md q-py-lg text-grey-6">
+        暂无开关配置信息
+      </div>
       <q-inner-loading :showing="loading" style="z-index: 100">
         <q-spinner-tail color="primary" size="2em" />
       </q-inner-loading>

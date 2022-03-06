@@ -37,7 +37,8 @@ module.exports = configure(function (ctx) {
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       "roboto-font", // optional, you are not bound to it
-      "material-icons", // optional, you are not bound to it
+      "material-icons",
+      "Material-icons-outlined", // optional, you are not bound to it
     ],
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
@@ -89,24 +90,12 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
       config: {},
-
-      // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
-
-      // For special cases outside of where the auto-import strategy can have an impact
-      // (like functional components as one of the examples),
-      // you can manually specify Quasar components/directives to be available everywhere:
-      //
-      // components: [],
-      // directives: [],
-
-      // Quasar plugins
+      iconSet: "material-icons", // Quasar icon set
       plugins: [],
       lang: "zh-CN", // Quasar language pack
       plugins: ["LocalStorage", "AppFullscreen", "Notify", "Dialog"],
     },
 
-    // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
     animations: [],
 
@@ -149,9 +138,9 @@ module.exports = configure(function (ctx) {
       },
 
       manifest: {
-        name: `deviece-management-app`,
-        short_name: `deviece-management-app`,
-        description: `deviece-management-app-in-fuzhu`,
+        name: `device-management-app`,
+        short_name: `device-management-app`,
+        description: `device-management-app`,
         display: "standalone",
         orientation: "portrait",
         background_color: "#ffffff",

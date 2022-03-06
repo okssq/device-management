@@ -1,14 +1,9 @@
 <template>
   <div class="login-form-wrap">
     <q-form @submit="onSubmit" class="q-gutter-xs login-form">
-      <!-- <div
-        class="full-width row justify-center items-center"
-        style="margin-bottom: 20px; margin-top: 10px"
-      > -->
-      <div class="q-py-md text-center text-subtitle1 text-grey-7 text-bold">
+      <div class="q-ma-none q-pb-md q-pt-xs text-center text-subtitle1 text-grey-9 text-bold">
         智慧设备管控平台
       </div>
-      <!-- </div> -->
       <q-input
         dense
         outlined
@@ -18,10 +13,8 @@
         :rules="[(val) => (val && val.length > 0) || '用户名不能为空']"
       >
         <template #prepend>
-          <div class="text-subtitle2 text-grey-8 text-bold">用户名:</div>
-        </template>
-        <template #append>
-          <q-icon name="person_outline" />
+          <q-icon name="person_outline" size="16px" />
+          <div class="text-caption text-grey-7 text-bold">用户名:</div>
         </template>
       </q-input>
       <q-input
@@ -33,10 +26,8 @@
         :rules="[(val) => (val && val.length > 0) || '密码不能为空']"
       >
         <template #prepend>
-          <div class="text-subtitle2 text-grey-8 text-bold">密码:</div>
-        </template>
-        <template #append>
-          <q-icon name="lock_outline" />
+          <q-icon name="o_lock" size="14px" />
+          <div class="text-caption text-grey-7 text-bold">密码:</div>
         </template>
       </q-input>
       <div class="row no-wrap">
@@ -73,10 +64,9 @@ export default {
     const fnLogin = (res) => {
       $q.localStorage.set("loginInfo", res);
       const routerPath = $q.localStorage.getItem("router-path");
-
       LOAD.loginInfo = res;
       LOAD.user = true;
-      router.push(routerPath || "/01-01");
+      router.push(routerPath || "/map/terminal");
       notifySuccess("登录成功！");
     };
     const onSubmit = () => {
@@ -107,13 +97,13 @@ export default {
 .login-form-wrap {
   position: absolute;
   left: 50%;
-  top: 56%;
+  top: 54%;
   transform: translate(-50%, -70%);
   padding: 8px;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 6px;
   box-sizing: content-box;
-  width: 290px;
+  width: 300px;
 }
 .login-form {
   background: #fff;

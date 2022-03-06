@@ -12,7 +12,6 @@ import LoginCanvas from "./canvas.vue";
 import LoginForm from "./form.vue";
 export default {
   components: { LoginCanvas, LoginForm },
-  setup() {},
 };
 </script>
 <style scoped>

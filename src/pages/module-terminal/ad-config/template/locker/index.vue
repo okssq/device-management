@@ -33,7 +33,7 @@ export default {
     const router = useRouter()
     // 返回按钮
     const onBack = () => {
-      router.push('/04-01-06')
+      router.push('/terminal/adconfig')
     }
     // const templateComponent = computed(() => {
     //   if (!props.data) return "";
