@@ -8,7 +8,7 @@ const routes = [
     component: () => import("pages/login"),
   },
   {
-    path: "/",
+    path: "",
     component: () => import("pages/layout"),
     children: [
       {
@@ -225,6 +225,11 @@ const routes = [
         ],
       },
     ],
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "404",
+    component: () => import("pages/error/404.vue"),
   },
 ];
 

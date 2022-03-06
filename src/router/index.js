@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import routes from "./routes";
 import { LocalStorage } from "quasar";
-import { delAllRequest } from 'src/api/http'
+import { delAllRequest } from "src/api/http";
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -19,12 +19,13 @@ const router = createRouter({
   history: createWebHashHistory(),
 });
 router.beforeEach((to, from, next) => {
-  delAllRequest()
+  delAllRequest();
   next();
 });
 router.afterEach((to, from, failure) => {
   if (!failure) {
     if (to.path === "/login") return;
+    console.log("failure", failure);
     LocalStorage.set("router-path", to.path);
   }
 });

@@ -24,6 +24,7 @@ export default {
     LayoutSide,
   },
   setup() {
+    // const loginInfo
     const { mapTeleportTo, loadMap } = useLayout();
     onMounted(() => {
       loadMap();
