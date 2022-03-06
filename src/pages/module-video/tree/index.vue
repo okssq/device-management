@@ -1,6 +1,7 @@
 <template>
-  <div class="absolute-top-right shadow-2 bg-white" style="z-index: 200;width: 340px;top: 15px; right: 15px">
+  <div class="fit relative-position">
     <input-filter
+      v-if="treeNode.length"
       v-model:filter-text="filterText"
       :tree-list="treeList"
       @select="onInputSelect"
@@ -11,7 +12,7 @@
       inline-label
       active-color="primary"
       class="text-grey-8"
-      :model-value="tab"
+      v-model="tab"
       @update:model-value="onTabChange"
     >
       <q-tab :name="0" label="全部"/>
@@ -21,22 +22,25 @@
     <q-separator/>
     <ul
       v-show="tab === 0"
-      id="all-status-tree"
+      id="all-status-tree1"
       class="ztree overflow-auto"
-      style="max-height: calc(100vh - 172px)"
+      style="max-height: calc(100% - 84px)"
     />
     <ul
       v-show="tab === 1"
-      id="online-status-tree"
+      id="online-status-tree1"
       class="ztree overflow-auto"
-      style="max-height: calc(100vh - 172px)"
+      style="max-height: calc(100% - 84px)"
     />
     <ul
       v-show="tab === 2"
-      id="offline-status-tree"
+      id="offline-status-tree1"
       class="ztree overflow-auto"
-      style="max-height: calc(100vh - 172px)"
+      style="max-height: calc(100% - 84px)"
     />
+    <q-inner-loading :showing="loading" style="z-index: 100">
+      <q-spinner-tail color="primary" size="2em"/>
+    </q-inner-loading>
   </div>
 </template>
 
@@ -45,7 +49,7 @@ import "@ztree/ztree_v3/js/jquery-1.4.4.min";
 import "@ztree/ztree_v3/js/jquery.ztree.core.min";
 import "@ztree/ztree_v3/js/jquery.ztree.exhide.min";
 import InputFilter from "./input-filter.vue";
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {termTypeText, termStatusText} from 'src/util/common'
 const nodeClass = (treeId, treeNode) => {
   const {type, status} = treeNode;
@@ -71,13 +75,8 @@ const nodeClass = (treeId, treeNode) => {
 
 export default {
   components: {InputFilter},
-  emits: ["update:tab", "com-select", "prj-select", "term-select"],
+  emits: ["term-select"],
   props: {
-    // 当前tab值
-    tab: {
-      type: Number,
-      default: 0,
-    },
     treeList: {
       type: Array,
       default: () => [],
@@ -88,6 +87,7 @@ export default {
     },
   },
   setup(props, {emit}) {
+
     let zTreeObj,
       zTreeOnlineObj,
       zTreeOfflineObj,
@@ -95,18 +95,19 @@ export default {
       zTeeOnlineNodes,
       zTeeOfflineNodes;
 
+    const loading = computed(() => !props.treeNode.length)
     const filterText = ref("");
+    const tab = ref(0)
 
     // tab页面更改事件
-    const onTabChange = (value) => {
-      emit("update:tab", value);
+    const onTabChange = () => {
       zTreeObj && zTreeObj.cancelSelectedNode();
       zTreeOnlineObj && zTreeOnlineObj.cancelSelectedNode();
       zTreeOfflineObj && zTreeOfflineObj.cancelSelectedNode();
     };
     // 搜索过滤框列表选中事件
     const onInputSelect = (item) => {
-      if (props.tab != "0") {
+      if (tab.value !== 0) {
         zTreeObj.expandAll(false);
       }
       onTabChange(0);
@@ -117,19 +118,14 @@ export default {
         zTreeObj.selectNode(node);
       }, 350);
     };
-
     // 设备节点点击事件
     const onTermSelect = (event, treeId, node) => {
       emit("term-select", node);
     };
     // 树节点点击之前事件
     const beforeClick = (treeId, treeNode) => {
-      const {type, id, label} = treeNode;
-      if (type == 1) {
-        emit("com-select", {id, label});
-        return false;
-      } else if (type == 2) {
-        emit("prj-select", {id, label});
+      const {type} = treeNode;
+      if (type !== 3) {
         return false;
       } else {
         return true;
@@ -296,14 +292,14 @@ export default {
           onClick: onTermSelect,
         },
       };
-      zTreeObj = $.fn.zTree.init($("#all-status-tree"), allSetting, tree);
+      zTreeObj = $.fn.zTree.init($("#all-status-tree1"), allSetting, tree);
       zTreeOnlineObj = $.fn.zTree.init(
-        $("#online-status-tree"),
+        $("#online-status-tree1"),
         onLineSetting,
         tree
       );
       zTreeOfflineObj = $.fn.zTree.init(
-        $("#offline-status-tree"),
+        $("#offline-status-tree1"),
         offLineSetting,
         tree
       );
@@ -329,9 +325,15 @@ export default {
       }
     };
 
-    onMounted(() => {
-      fnTree(props.treeNode);
-    });
+    watch(() => props.treeNode.length, (val) => {
+      if(val){
+        console.log('渲染树！')
+        fnTree(props.treeNode);
+      }
+    })
+    // onMounted(() => {
+    //   fnTree(props.treeNode);
+    // });
     onBeforeUnmount(() => {
       zTreeObj && zTreeObj.destroy();
       zTreeOnlineObj && zTreeOnlineObj.destroy();
@@ -342,7 +344,9 @@ export default {
     });
 
     return {
+      loading,
       filterText,
+      tab,
 
       onTabChange,
       onInputSelect,

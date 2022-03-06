@@ -1,11 +1,6 @@
 <template>
   <div class="bg-white q-pl-md q-pb-md q-mt-md">
     <q-form class="q-gutter-sm row items-center" @submit="onSubmit">
-      <!-- <q-input outlined dense v-model="companyId">
-        <template #prepend>
-          <span class="text-caption text-bold">公司ID</span>
-        </template>
-      </q-input> -->
       <q-input
         outlined
         dense
@@ -24,12 +19,13 @@
         type="submit"
         :disable="searching"
       />
-      <q-btn icon="add" color="primary" dense @click="$emit('insert')" />
+      <q-btn v-if="hasInsert" dense icon="add" color="primary" @click="$emit('insert')"/>
     </q-form>
   </div>
 </template>
 <script>
-import { ref, inject, computed } from "vue";
+import {ref, inject, computed} from "vue";
+
 export default {
   emits: ["search", "insert"],
   props: {
@@ -38,11 +34,9 @@ export default {
       default: false,
     },
   },
-  setup(props, { emit }) {
-    const LOAD = inject("LOAD");
-    const isAdmin = computed(() => {
-      return !!(LOAD.loginInfo && LOAD.loginInfo.companyId == 1);
-    });
+  setup(props, {emit}) {
+    const loginInfo = inject("loginInfo");
+    const hasInsert = computed(() => !!(loginInfo.value && loginInfo.value.companyId == 1));
     const companyName = ref("");
     const onSubmit = () => {
       emit("search", {
@@ -52,7 +46,7 @@ export default {
     onSubmit();
 
     return {
-      isAdmin,
+      hasInsert,
       companyName,
       onSubmit,
     };

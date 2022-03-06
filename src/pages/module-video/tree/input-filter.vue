@@ -9,8 +9,8 @@
     @update:model-value="onFilter"
     @focus.prevent.stop="listVisible = true"
   >
-    <template #before>
-      <q-icon name="search"></q-icon>
+    <template #prepend>
+      <q-icon name="search" />
     </template>
     <q-menu
       fit

@@ -68,7 +68,9 @@
             dense
             outlined
             lazy-rules
-            type="textarea"
+            autogrow
+            maxlength="50"
+            hint="最多输入50个字符"
             class="my-form-item"
             v-model="companyAddress"
           >

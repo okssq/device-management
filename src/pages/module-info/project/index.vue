@@ -205,7 +205,7 @@ export default {
     const onDel = (row) => {
       $q.dialog({
         component: DelConfirm,
-        componentProps: { row },
+
       }).onOk(() => {
         searching.value = true;
         PROJECT.del({ id: row.id })

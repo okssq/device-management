@@ -1,4 +1,5 @@
-import { Notify } from "quasar";
+import { LocalStorage, Notify } from "quasar";
+import router from "src/router";
 
 export const notifyWarn = (message) => {
   Notify.create({
@@ -17,12 +18,10 @@ export const notifySuccess = (message) => {
   });
 };
 
-export const notifyInfo = (message) => {
-  Notify.create({
-    message,
-    color: "primary",
-    position: "top",
-  });
+export const fn3001 = () => {
+  notifyWarn("登录会话已过期！");
+  LocalStorage.remove("loginInfo");
+  router.push("/login");
 };
 
 export const termTypeText = {
@@ -30,9 +29,9 @@ export const termTypeText = {
   2: "回收",
   3: "储物柜",
   4: "大屏",
-}
+};
 
 export const termStatusText = {
   0: "离线",
   1: "在线",
-}
+};

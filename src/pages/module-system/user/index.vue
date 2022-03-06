@@ -6,7 +6,7 @@
       @search="onSearch"
       @insert="onInsert"
     />
-    <q-separator />
+    <q-separator/>
     <div class="flex1 overflow-hidden">
       <result-table
         row-key="id"
@@ -65,19 +65,20 @@ import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
 import UpdatePasswordForm from "./update-password-form.vue";
 
-import { inject, reactive, ref, shallowRef, toRefs } from "vue";
-import { USER } from "src/api/module.js";
-import { notifySuccess, notifyWarn } from "src/util/common";
-import { useQuasar } from "quasar";
-import { useCompanyTree } from "components/company/useCompayTree";
+import {USER} from "src/api/module.js";
+import {inject, reactive, ref, shallowRef, toRefs} from "vue";
+import {fn3001, notifySuccess, notifyWarn} from "src/util/common";
+import {useQuasar} from "quasar";
+import {useCompanyTree} from "components/company/useCompayTree";
+
 export default {
   components: {
     SearchBar,
     ResultTable,
   },
   setup() {
-    const { treeList } = useCompanyTree();
-    const LOAD = inject("LOAD");
+    const {treeList} = useCompanyTree();
+    const loginInfo = inject("loginInfo");
     const $q = useQuasar();
     const columns = [
       {
@@ -149,12 +150,13 @@ export default {
       searching.value = true;
       USER.list(searchData)
         .then((res) => {
-          const { results, totalCount, totalPage } = res;
+          const {results, totalCount, totalPage} = res;
           rows.value = results;
           pagination.totalCount = totalCount;
           pagination.totalPage = totalPage;
         })
-        .catch(() => {})
+        .catch(() => {
+        })
         .finally(() => {
           searching.value = false;
         });
@@ -171,10 +173,10 @@ export default {
     };
     // 表格pagination改变回调
     const onPageChange = (val) => {
-      const { pageSize, page } = val;
+      const {pageSize, page} = val;
       page && (pagination.page = page);
       pageSize && (pagination.pageSize = pageSize);
-      searchData && (searchData = { ...searchData, ...val });
+      searchData && (searchData = {...searchData, ...val});
       getList();
     };
     // 新增按钮回调
@@ -183,10 +185,12 @@ export default {
         notifyWarn("数据加载中，请稍后重试！");
         return;
       }
-      const item = treeList.value.find((el) => {
-        return el.id == LOAD.loginInfo.companyId;
-      });
-      const { id, label } = item || { id: "", label: "" };
+      const item = treeList.value.find((el) => el.id == loginInfo.value.companyId);
+      if (!item) {
+        fn3001()
+        return
+      }
+      const {id, label} = item;
       $q.dialog({
         component: DetailForm,
         componentProps: {
@@ -197,7 +201,7 @@ export default {
         },
       }).onOk(() => {
         notifySuccess("增加成功");
-        onSearch({ page: 1 });
+        onSearch({page: 1});
       });
     };
     // 编辑按钮回调
@@ -222,22 +226,21 @@ export default {
         },
       }).onOk(() => {
         notifySuccess("更新成功");
-        // getList();
       });
     };
     // 删除按钮回调
     const onDel = (row) => {
       $q.dialog({
         component: DelConfirm,
-        componentProps: { row },
       }).onOk(() => {
         searching.value = true;
-        USER.del({ id: row.id })
-          .then((res) => {
+        USER.del({id: row.id})
+          .then(() => {
             notifySuccess("删除成功");
             getList();
           })
-          .catch(() => {})
+          .catch(() => {
+          })
           .finally(() => {
             searching.value = false;
           });

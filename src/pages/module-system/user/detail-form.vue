@@ -2,7 +2,7 @@
   <q-dialog persistent ref="dialogRef">
     <q-card
       class="relative-position overflow-hidden"
-      style="max-width: 98vw; width: 680px"
+      style="max-width: 98vw; width: 714px"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-subtitle2 text-bold">
@@ -19,10 +19,10 @@
         <q-form class="row q-gutter-md items-center">
           <input-filter-company
             v-if="type == 'insert'"
-            style="width: 310px"
+            style="width: 320px"
             label-style="
-              min-width: 100px;
-              max-width: 100px;
+              min-width: 80px;
+              max-width: 80px;
               text-align: right;
               word-wrap: break-word;"
             :filter-text="selectCompanyName"
@@ -284,11 +284,11 @@ export default {
 </script>
 <style scoped>
 .my-form-item {
-  width: 310px;
+  width: 320px;
 }
 .my-form-label {
-  min-width: 100px;
-  max-width: 100px;
+  min-width: 80px;
+  max-width: 80px;
   text-align: right;
   word-wrap: break-word;
 }

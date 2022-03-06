@@ -79,8 +79,10 @@
                 dense
                 outlined
                 lazy-rules
+                autogrow
+                maxlength="50"
+                hint="最多输入50个字符"
                 class="my-form-item"
-                type="textarea"
                 v-model="describeStr"
               >
                 <template #before>
@@ -164,7 +166,6 @@ export default {
     },
   },
   setup(props, { emit }) {
-    // const LOAD = inject("LOAD");
     let formData = reactive({
       companyId: "",
       companyName: "",

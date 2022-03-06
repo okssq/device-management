@@ -41,16 +41,6 @@
               icon="clear"
               @click.stop="onDel(row)"
             />
-            <q-btn
-              title="菜单授权"
-              color="green"
-              flat
-              dense
-              size="11px"
-              round
-              icon="tune"
-              @click.stop="onAssign(row)"
-            />
           </div>
         </template>
       </result-table>
@@ -63,7 +53,7 @@ import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
 import { reactive, ref, shallowRef, toRefs, inject } from "vue";
-import { notifySuccess, notifyWarn } from "src/util/common";
+import { notifySuccess, notifyWarn, fn3001 } from "src/util/common";
 import { ROLE } from "src/api/module.js";
 import { useQuasar } from "quasar";
 import { useCompanyTree } from "components/company/useCompayTree";
@@ -73,7 +63,7 @@ export default {
     ResultTable,
   },
   setup() {
-    const LOAD = inject("LOAD");
+    const loginInfo = inject("loginInfo");
     const { treeList } = useCompanyTree();
     const $q = useQuasar();
     const columns = [
@@ -164,11 +154,13 @@ export default {
         notifyWarn("数据加载中，请稍后重试！");
         return;
       }
-      const item = treeList.value.find((el) => {
-        return el.id == LOAD.loginInfo.companyId;
-      });
+      const item = treeList.value.find((el) =>  el.id == loginInfo.value.companyId);
+      if(!item){
+        fn3001()
+        return
+      }
 
-      const { id, label } = item || { id: "", label: "" };
+      const { id, label } = item;
       $q.dialog({
         component: DetailForm,
         componentProps: {
@@ -200,11 +192,11 @@ export default {
     const onDel = (row) => {
       $q.dialog({
         component: DelConfirm,
-        componentProps: { row },
+
       }).onOk(() => {
         searching.value = true;
         ROLE.del({ id: row.id })
-          .then((res) => {
+          .then(() => {
             notifySuccess("删除成功");
             getList();
           })
@@ -215,9 +207,6 @@ export default {
       });
     };
 
-    const onAssign = () => {
-      notifyWarn("此功能暂未开放！");
-    };
     return {
       treeList,
       columns,
@@ -229,7 +218,6 @@ export default {
       onInsert,
       onEdit,
       onDel,
-      onAssign,
     };
   },
 };

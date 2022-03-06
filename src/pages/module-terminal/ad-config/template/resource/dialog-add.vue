@@ -73,7 +73,6 @@
             class="my-form-item"
             v-model="descMsg"
           >
-            <!-- type="textarea" -->
             <template #before>
               <span class="text-caption text-bold my-form-label">备注：</span>
             </template>

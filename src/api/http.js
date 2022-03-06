@@ -1,13 +1,7 @@
 import axios from "axios";
 import qs from "qs";
-import { notifyWarn } from "src/util/common";
-import { LocalStorage } from "quasar";
-import router from "src/router";
-const fn3001 = () => {
-  notifyWarn("登录会话已过期！");
-  LocalStorage.remove("loginInfo");
-  router.push("/login");
-};
+import { notifyWarn, fn3001 } from "src/util/common";
+
 // 当前正在请求的数组集合
 const requestArr = [];
 

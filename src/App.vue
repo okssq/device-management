@@ -12,21 +12,16 @@ export default {
     const router = useRouter();
     const map = shallowRef(null)
     const mapTeleportTo = ref('#global-map-wrap')
+    const loginInfo = shallowRef(null)
     provide('map',map)
     provide('mapTeleportTo',mapTeleportTo)
-    const LOAD = shallowReactive({
-      user: false,
-      loginInfo: null,
-    });
-    provide("LOAD", LOAD);
+    provide('loginInfo',loginInfo)
 
-    const loginInfo = $q.localStorage.getItem("loginInfo");
+    
+    const localLoginInfo = $q.localStorage.getItem("loginInfo");
     const routerPath = $q.localStorage.getItem("router-path");
-    LOAD.user = !!loginInfo;
-    LOAD.loginInfo = loginInfo;
-
-    console.log('11111',$q.localStorage.getItem("info"))
-    router.push(LOAD.user ? routerPath || "/map/terminal" : "/login");
+    loginInfo.value = localLoginInfo
+    router.push(!!localLoginInfo ? routerPath || "/map/terminal" : "/login");
   },
 };
 </script>

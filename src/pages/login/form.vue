@@ -54,19 +54,18 @@ export default {
   setup() {
     const $q = useQuasar();
     const router = useRouter();
-    const LOAD = inject("LOAD");
+    const loginInfo = inject('loginInfo')
     const name = ref("");
     const pass = ref("");
     const loading = ref(false);
 
-    LOAD.user = false;
-    LOAD.loginInfo = null;
+    loginInfo.value = null
+
     const fnLogin = (res) => {
       $q.localStorage.set("loginInfo", res);
+      loginInfo.value = res
       const routerPath = $q.localStorage.getItem("router-path");
-      LOAD.loginInfo = res;
-      LOAD.user = true;
-      router.push(routerPath || "/map/terminal");
+      router.push( routerPath ? (routerPath+'') : '/map/terminal');
       notifySuccess("登录成功！");
     };
     const onSubmit = () => {
@@ -79,7 +78,6 @@ export default {
         .then((res) => {
           fnLogin(res);
         })
-        .catch((err) => {})
         .finally(() => {
           loading.value = false;
         });

@@ -8,7 +8,7 @@
         <div class="absolute-center text-bold text-h6 text-center title">
           智慧设备管控平台数据监控
         </div>
-        <q-btn to="/02-02" dense flat round color="white" icon="logout"></q-btn>
+        <q-btn to="/data/dashboard" dense flat round color="white" icon="logout"></q-btn>
       </div>
       <div class="flex1 q-py-sm overflow-hidden row justify-between no-wrap">
         <div class="p25">

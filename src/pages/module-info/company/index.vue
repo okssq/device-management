@@ -1,7 +1,7 @@
 <template>
   <div class="my-box column no-wrap">
-    <search-bar :searching="searching" @search="onSearch" @insert="onInsert" />
-    <q-separator />
+    <search-bar :searching="searching" @search="onSearch" @insert="onInsert"/>
+    <q-separator/>
     <div class="flex1 overflow-hidden">
       <result-table
         row-key="id"
@@ -35,6 +35,7 @@
               color="red-5"
               icon="clear"
               @click.stop="onDel(row)"
+              v-if="hasDelete"
             />
           </div>
         </template>
@@ -48,24 +49,22 @@ import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-form.vue";
-import { reactive, ref, shallowRef, toRefs } from "vue";
-import { COMPANY } from "src/api/module.js";
-import { notifySuccess } from "src/util/common";
-import { useQuasar } from "quasar";
+
+import {COMPANY} from "src/api/module.js";
+import {computed, reactive, ref, shallowRef, toRefs, inject} from "vue";
+import {notifySuccess} from "src/util/common";
+import {useQuasar} from "quasar";
+
 export default {
   components: {
     SearchBar,
     ResultTable,
   },
   setup() {
+    const loginInfo = inject("loginInfo");
+    const hasDelete = computed(() => !!(loginInfo.value && loginInfo.value.companyId == 1));
     const $q = useQuasar();
     const columns = [
-      // {
-      //   name: "id",
-      //   field: "id",
-      //   label: "公司ID",
-      //   align: "left",
-      // },
       {
         name: "companyName",
         field: "companyName",
@@ -96,19 +95,12 @@ export default {
         label: "公司地址",
         align: "left",
       },
-
       {
         name: "createTime",
         field: "createTime",
         label: "创建时间",
         align: "left",
       },
-      // {
-      //   name: "updateTime",
-      //   field: "updateTime",
-      //   label: "最后更新时间",
-      //   align: "left",
-      // },
       {
         name: "op",
         label: "操作",
@@ -130,12 +122,13 @@ export default {
       searching.value = true;
       COMPANY.list(searchData)
         .then((res) => {
-          const { results, totalCount, totalPage } = res;
+          const {results, totalCount, totalPage} = res;
           rows.value = results;
           pagination.totalCount = totalCount;
           pagination.totalPage = totalPage;
         })
-        .catch(() => {})
+        .catch(() => {
+        })
         .finally(() => {
           searching.value = false;
         });
@@ -152,10 +145,10 @@ export default {
     };
     // 表格pagination改变回调
     const onPageChange = (val) => {
-      const { pageSize, page } = val;
+      const {pageSize, page} = val;
       page && (pagination.page = page);
       pageSize && (pagination.pageSize = pageSize);
-      searchData && (searchData = { ...searchData, ...val });
+      searchData && (searchData = {...searchData, ...val});
       getList();
     };
     // 新增按钮回调
@@ -167,7 +160,7 @@ export default {
         },
       }).onOk(() => {
         notifySuccess("增加成功");
-        onSearch({ page: 1 });
+        onSearch({page: 1});
       });
     };
     // 编辑按钮回调
@@ -187,15 +180,13 @@ export default {
     const onDel = (row) => {
       $q.dialog({
         component: DelConfirm,
-        componentProps: { row },
       }).onOk(() => {
         searching.value = true;
-        COMPANY.del({ id: row.id })
-          .then((res) => {
+        COMPANY.del({id: row.id})
+          .then(() => {
             notifySuccess("删除成功");
             getList();
           })
-          .catch(() => {})
           .finally(() => {
             searching.value = false;
           });
@@ -203,6 +194,7 @@ export default {
     };
 
     return {
+      hasDelete,
       columns,
       rows,
       ...toRefs(pagination),

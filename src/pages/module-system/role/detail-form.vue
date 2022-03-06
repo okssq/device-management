@@ -2,7 +2,7 @@
   <q-dialog persistent ref="dialogRef">
     <q-card
       class="relative-position overflow-hidden"
-      style="width: 342px; max-width: 98vw"
+      style="width: 380px; max-width: 98vw"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-text-subtitle2 text-bold">
@@ -12,14 +12,14 @@
       </div>
       <q-separator />
 
-      <q-scroll-area style="height: 280px; max-height: 50vh; padding: 16px">
+      <q-scroll-area style="height: 260px; max-height: 50vh; padding: 16px">
         <q-form class="row q-gutter-md items-center">
           <input-filter-company
             v-if="type == 'insert'"
-            style="width: 310px"
+            style="width: 320px"
             label-style="
-              min-width: 70px;
-              max-width: 70px;
+              min-width: 80px;
+              max-width: 80px;
               text-align: right;
               word-wrap: break-word;"
             :filter-text="selectCompanyName"
@@ -32,7 +32,7 @@
             dense
             outlined
             lazy-rules
-            disable
+            readonly
             class="my-form-item"
             v-model="companyName"
           >
@@ -59,9 +59,12 @@
             dense
             outlined
             lazy-rules
-            type="textarea"
+            autogrow
+            maxlength="50"
+            hint="最多输入50个字符"
             class="my-form-item"
             v-model="remark"
+
           >
             <template #before>
               <span class="text-caption text-bold my-form-label">备注：</span>
@@ -174,11 +177,11 @@ export default {
 </script>
 <style scoped>
 .my-form-item {
-  width: 310px;
+  width: 320px;
 }
 .my-form-label {
-  min-width: 70px;
-  max-width: 70px;
+  min-width: 80px;
+  max-width: 80px;
   text-align: right;
   word-wrap: break-word;
 }

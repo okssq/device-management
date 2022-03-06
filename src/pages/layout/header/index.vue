@@ -14,7 +14,7 @@
       flat
       icon="account_circle"
       color="grey-7"
-      :label="LOAD.user ? LOAD.loginInfo.realName : ''"
+      :label="loginInfo ? loginInfo.realName : ''"
     >
       <div class="q-pa-sm text-right">
         <q-btn
@@ -42,16 +42,14 @@ export default {
   setup() {
     const $q = useQuasar();
     const router = useRouter();
-    const LOAD = inject("LOAD");
+    const loginInfo = inject("loginInfo");
     const onLoginOut = () => {
       $q.localStorage.remove("loginInfo");
-      $q.localStorage.remove("router-path");
-      LOAD.loginInfo = null;
-      LOAD.user = false;
+      loginInfo.value = null
       router.push("/login");
     };
     return {
-      LOAD,
+      loginInfo,
       onLoginOut,
     };
   },
