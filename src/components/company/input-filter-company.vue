@@ -8,10 +8,11 @@
       :style="$attrs.style"
       input-class="text-caption"
       placeholder="请输入关键字选择公司"
-      v-model="inputFilter"
+      :model-value="filterResultVisible ? inputFilter : selectLabel"
       @update:model-value="filter"
       @clear="onClear"
-      @focus="onFocus"
+
+      @focusin="onFocus"
     >
       <template #before>
         <span :style="labelStyle" class="text-caption text-bold"
@@ -33,7 +34,7 @@
       >
         <q-virtual-scroll
           separator
-          style="max-width: 240px; max-height: 240px"
+          style="max-width:234px;max-height: 240px"
           :items="filterList"
           :style="$attrs.style"
           :class="$attrs.class"
@@ -43,7 +44,7 @@
             <slot :item="item" :index="index">
               <q-item  clickable @click="onSelectItem(item)" class="q-px-md q-py-none" style="min-height: 36px">
                 <q-item-section
-                  class="text-no-wrap q-pa-none"
+                  class="ellipsis q-pa-none"
                   :class="
                     item.id === modelValue ? 'text-primary' : 'text-grey-7'
                   "
@@ -89,7 +90,7 @@ export default {
   },
   setup(props, { emit }) {
     const selectLabel = ref(props.filterText || "");
-    const inputFilter = ref(props.filterText || "");
+    const inputFilter = ref("");
     const filterResultVisible = shallowRef(false);
     const filterList = ref([]);
     const noResult = computed(() => {
@@ -97,6 +98,7 @@ export default {
     });
 
     const filter = (val) => {
+      inputFilter.value = val
       // filterResultVisible.value = true;
       const currentValue = (val || "").trim();
       if (!currentValue) {
@@ -110,24 +112,25 @@ export default {
     };
     const onFocus = () => {
       filterResultVisible.value = true;
-      filter(inputFilter.value);
+      inputFilter.value = ''
+      filterList.value = props.treeList;
     };
     const onClear = () => {
+      inputFilter.value = ''
       selectLabel.value = "";
       emit("update:modelValue", "");
     };
     const onHide = () => {
-      inputFilter.value = "";
-      if (props.modelValue) {
-        inputFilter.value = selectLabel.value;
-      }
+      // inputFilter.value = "";
+      // if (props.modelValue) {
+      //   inputFilter.value = selectLabel.value;
+      // }
     };
     const onSelectItem = (item) => {
       filterResultVisible.value = false;
-      inputFilter.value = item.label;
+      inputFilter.value = '';
       selectLabel.value = item.label;
       emit("update:modelValue", item.id);
-      // emit("select", item);
     };
     watch(
       () => props.treeList,

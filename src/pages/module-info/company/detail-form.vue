@@ -2,7 +2,7 @@
   <q-dialog persistent ref="dialogRef">
     <q-card
       class="relative-position overflow-hidden"
-      style="width: 570px; max-width: 98vw"
+      style="width: 710px; max-width: 98vw"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-text-subtitle2 text-bold">
@@ -12,7 +12,7 @@
       </div>
       <q-separator />
 
-      <q-scroll-area style="height: 290px; max-height: 50vh; padding: 16px">
+      <q-scroll-area style="height: 256px; max-height: 50vh; padding: 16px">
         <q-form class="row q-gutter-md items-center">
           <q-input
             dense
@@ -162,11 +162,11 @@ export default {
 </script>
 <style scoped>
 .my-form-item {
-  width: 260px;
+  width: 320px;
 }
 .my-form-label {
-  min-width: 70px;
-  max-width: 70px;
+  min-width: 80px;
+  max-width: 80px;
   text-align: right;
   word-wrap: break-word;
 }

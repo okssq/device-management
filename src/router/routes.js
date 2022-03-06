@@ -72,7 +72,7 @@ const routes = [
             component: () => import("pages/module-video/live"),
             meta: {
               routerKeys: ["03", "03-01"],
-              crumbs: ["监管监控", "实时视频"],
+              crumbs: ["监管监控", "实时监控"],
             },
           },
           {

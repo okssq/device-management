@@ -14,11 +14,10 @@
         @page="onPageChange"
       >
         <template #custom-type="{ val }">
-          <q-badge
-            outline
-            :label="termTypeText[val] || `未知类型type${val}`"
-            :color="typeColor[val] || 'blue-grey'"
-          />
+          <q-badge :color="typeColor[val] || 'blue-grey'">
+            <q-icon size="16px" :name="termTypeIcon[val] || 'help_outline'" color="white"  />
+            <span class="q-mx-xs">{{termTypeText[val] || `未知类型type${val}`}}</span>
+          </q-badge>
         </template>
         <template #custom-onlineStatus="{ val }">
           <div class="row no-wrap justify-center">
@@ -90,6 +89,12 @@ export default {
       0: "power_off",
       1: "electrical_services",
     };
+    const termTypeIcon = {
+      1: 'drag_handle',
+      2: 'recycling',
+      3: 'calendar_view_month',
+      4: 'dvr'
+    }
 
     const typeColor = {
       1: "pink",
@@ -185,6 +190,7 @@ export default {
       termStatusText,
       onlineStatusColor,
       onlineStatusIcon,
+      termTypeIcon,
       termTypeText,
       typeColor,
       loading,

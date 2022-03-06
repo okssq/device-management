@@ -125,7 +125,7 @@ export default {
     // 树节点点击之前事件
     const beforeClick = (treeId, treeNode) => {
       const {type} = treeNode;
-      if (type !== 3) {
+      if (type !== '3') {
         return false;
       } else {
         return true;

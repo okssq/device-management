@@ -3,7 +3,6 @@
     flat
     hide-pagination
     binary-state-sort
-    align="left"
     separator="cell"
     :rows="rows"
     :columns="columns"
@@ -16,7 +15,7 @@
   >
     <!-- 自定义表header -->
     <template #header="props">
-      <q-tr :props="props">
+      <q-tr :props="props" class="bg-grey-1">
         <q-th auto-width v-if="expand" />
         <q-th auto-width v-if="index">序号</q-th>
         <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -63,7 +62,7 @@
     </template>
     <!-- 自定义表bottom-->
     <template #bottom>
-      <div class="full-width row items-center">
+      <div class="full-width row items-center q-pa-sm">
         <span class="text-subtitle2 text-grey-7">
           共搜索到
           <span class="text-primary text-bold">{{ totalCount }} </span> 条数据

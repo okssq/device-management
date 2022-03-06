@@ -2,11 +2,11 @@
   <q-dialog persistent ref="dialogRef">
     <q-card
       class="relative-position overflow-hidden"
-      style="width: 342px; max-width: 98vw"
+      style="width: 380px; max-width: 98vw"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-text-subtitle2 text-bold">
-          开关配置
+          {{templateName}}开关配置
         </div>
         <div class="q-gutter-xs">
           <q-btn flat round size="12px" icon="add" title="新增开关配置" @click="onInsertItem"/>
@@ -69,8 +69,16 @@ import addSwitchDialog from './seat-switch-config-add'
 
 export default {
   emits: [...useDialogPluginComponent.emits],
-  components: {},
-  props: {},
+  props: {
+    templateId: {
+      type: Number,
+      default: 0
+    },
+    templateName:{
+      type: String,
+      default: ''
+    }
+  },
   setup(props) {
     const {dialogRef, onDialogHide} = useDialogPluginComponent();
     const $q = useQuasar();
@@ -84,8 +92,8 @@ export default {
     })
     let realSwitchList = []
 
-
-    const getSwitchList = () => TEMPLATE.switchList({templateId: 1})
+    console.log('props',props)
+    const getSwitchList = () => TEMPLATE.switchList({templateId: props.templateId})
     const renderSwitchList = () => {
       loading.value = true
       getSwitchList().then(res => {
@@ -126,8 +134,7 @@ export default {
     const onInsertItem = () => {
       const index = switchList.value.length+1;
       const data = {
-        id: 1,
-        templateId: 1,
+        templateId: props.templateId,
         index,
         indexName: `开关${index}`
       }

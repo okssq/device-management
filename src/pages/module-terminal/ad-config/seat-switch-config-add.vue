@@ -65,10 +65,9 @@ export default {
   setup(props) {
     const {dialogRef, onDialogHide,onDialogOK} = useDialogPluginComponent();
     const formData = reactive({
-      id: 1,
       index: props.formData.index,
       indexName: props.formData.indexName,
-      templateId: 1,
+      templateId:  props.formData.templateId,
     });
     const loading = ref(false);
 

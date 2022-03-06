@@ -17,7 +17,7 @@ export default {
     provide('mapTeleportTo',mapTeleportTo)
     provide('loginInfo',loginInfo)
 
-    
+
     const localLoginInfo = $q.localStorage.getItem("loginInfo");
     const routerPath = $q.localStorage.getItem("router-path");
     loginInfo.value = localLoginInfo

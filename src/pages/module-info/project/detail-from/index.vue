@@ -4,7 +4,7 @@
       <div class="absolute-center bg-white column no-wrap z-top">
         <q-card
           class="relative-position overflow-hidden"
-          style="width: 690px; max-width: 98vw"
+          style="width: 710px; max-width: 98vw"
         >
           <div class="row q-px-md q-py-xs items-center justify-between">
             <div class="text-subtitle2 text-bold">
@@ -19,8 +19,8 @@
             />
           </div>
           <q-separator />
-          <q-scroll-area style="max-height: 50vh; padding: 16px; height: 280px">
-            <q-form class="row q-gutter-md items-center">
+          <q-scroll-area style="max-height: 50vh; padding: 16px; height: 276px">
+            <q-form class="row q-gutter-md items-start">
               <input-filter-company
                 style="width: 310px"
                 label-text="所属公司"

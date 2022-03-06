@@ -4,8 +4,8 @@ import router from "src/router";
 export const notifyWarn = (message) => {
   Notify.create({
     message,
-    icon: "privacy_tip",
-    color: "orange-8",
+    icon: "o_error_outlinerecycling",
+    color: "orange",
     position: "top",
   });
 };

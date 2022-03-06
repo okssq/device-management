@@ -22,12 +22,20 @@
         </q-card-section>
         <q-separator/>
         <q-card-actions>
-          <template v-if="item.id === 2">
-            <q-btn flat color="primary" @click="onSetTemplateLocker(item)">
+          <template v-if="item.id === 3">
+            <q-btn flat color="primary">
               自定义样式
             </q-btn>
           </template>
-          <template v-if="item.id === 1">
+          <template v-else-if="item.id === 2">
+            <q-btn flat color="primary" @click="onSetTemplateLocker(item)">
+              自定义样式
+            </q-btn>
+            <q-btn flat color="primary" @click="onSetSeatSwitch(item)">
+              配置开关
+            </q-btn>
+          </template>
+          <template v-else-if="item.id === 1">
             <q-btn flat color="primary" @click="onSetSeatSwitch(item)">
               配置开关
             </q-btn>
@@ -37,6 +45,7 @@
     </div>
     <q-inner-loading :showing="loading" style="z-index: 100">
       <q-spinner-tail color="primary" size="2em"/>
+      <div class="q-pa-md text-primary">加载中...</div>
     </q-inner-loading>
   </div>
 </template>
@@ -71,10 +80,15 @@ export default {
     const onSetTemplateLocker = () => {
       router.push({name:'template-locker'})
     }
-    // 智能座椅配置开关按钮事件
-    const onSetSeatSwitch = () => {
+    // 配置开关按钮事件
+    const onSetSeatSwitch = (item) => {
+      console.log('item',item)
       $q.dialog({
-        component: SeatSwitchConfig
+        component: SeatSwitchConfig,
+        componentProps:{
+          templateId:item.id,
+          templateName: item.templateName
+        }
       })
     }
 
