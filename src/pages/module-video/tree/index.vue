@@ -327,7 +327,7 @@ export default {
 
     watch(() => props.treeNode.length, (val) => {
       if(val){
-        console.log('渲染树！')
+        // console.log('渲染树！')
         fnTree(props.treeNode);
       }
     })

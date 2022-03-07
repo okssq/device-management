@@ -9,7 +9,7 @@
         <q-btn flat round size="12px" icon="clear" @click="onDialogHide"/>
       </div>
       <q-separator/>
-      <q-scroll-area style="height: 290px; max-height: 50vh; padding: 16px">
+      <q-scroll-area style="height: 370px; max-height: 50vh; padding: 16px">
         <q-form class="row q-gutter-md items-center">
           <q-select
             dense
@@ -55,7 +55,6 @@
                 @removed="onRemoved"
                 url="/web/file/image_upload.json"
               />
-              <!-- <q-btn color="primary">上传文件</q-btn> -->
               <q-input
                 class="q-mt-xs"
                 outlined
@@ -70,6 +69,9 @@
             dense
             outlined
             lazy-rules
+            autogrow
+            maxlength="50"
+            hint="最多输入50个字符"
             class="my-form-item"
             v-model="descMsg"
           >
@@ -94,7 +96,7 @@
 import {useDialogPluginComponent} from "quasar";
 import {reactive, ref, toRaw, toRefs} from "vue";
 import {RESOURCE} from "src/api/module";
-import {notifyWarn} from "src/util/common";
+import {notifySuccess, notifyWarn} from "src/util/common";
 
 export default {
   emits: [...useDialogPluginComponent.emits],
@@ -113,12 +115,12 @@ export default {
     const refUploader = ref(null)
 
     // 增加按钮事件
-    const onAdded = (info) => {
+    const onAdded = () => {
       formData.fileSize = 0;
       formData.resource = "";
     };
     // 删除按钮事件
-    const onRemoved = (info) => {
+    const onRemoved = () => {
       formData.fileSize = 0;
       formData.resource = "";
     };
@@ -131,12 +133,11 @@ export default {
         const res = JSON.parse(responseText)
         const {code, msg} = res
         if (code === 2000) {
-          console.log('info',info)
+          notifySuccess('上传成功')
           const [file] = info.files
           const { result} = res
           formData.resource = result.resource
-          // formData.fileSize = file['__sizeLabel'];
-          formData.fileSize = 0;
+          formData.fileSize = file['__sizeLabel'];
         } else {
           notifyWarn(msg || '上传失败')
           refUploader.value.reset()

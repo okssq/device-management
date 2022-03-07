@@ -1,6 +1,6 @@
 <template>
   <q-separator/>
-  <div class="relative-position bg-grey-2" :class="{'drag-enter':dragging}" style="height: 18%" id="ad"
+  <div class="relative-position bg-grey-2" :class="{'drag-enter':dragging}" style="height: 20%" id="ad"
        @dragenter="onDragEnter"
        @dragover="onDragOver" @dragleave="onDragLeave" @drop="onDrop">
     <div class="absolute-center text-grey-6 text-subtitle1">
@@ -24,11 +24,22 @@
       <q-carousel-slide v-for="(item,index) in adList" :key="index" :name="index"
                         class="q-pa-none column no-wrap flex-center">
         <q-img
-          src="http://mms2.baidu.com/it/u=1895335407,2753497845&fm=253"
+          v-if="['jpeg','png','jpg'].includes(item.split('.').pop().toLowerCase())"
+          :src="item"
           spinner-color="white"
           fit="fill"
           class="fit"
         />
+        <video
+          loop
+          autoplay
+          muted
+          v-else-if="['avi','mp4','wmv','mpg','mpeg','flv','swf'].includes(item.split('.').pop().toLowerCase())"
+          style="object-fit: fill"
+          class="fit"
+          :src="item"
+        />
+
         <div class="absolute-bottom custom-caption q-py-sm q-px-md row no-wrap justify-between items-center "
              style="background-color: rgba(0,0,0,.3)">
           <span class="text-caption ellipsis text-white">{{ item }}</span>
@@ -44,23 +55,34 @@
 </template>
 
 <script>
-import {ref, shallowRef, toRaw} from 'vue'
+import {ref, inject} from 'vue'
+
 
 export default {
-  emits: ['update'],
+  components: {},
+
   props: {
+    page:{
+      type: String,
+      page: '0'
+    },
     rowId: {
       type: String,
       default: '1'
     }
   },
-  setup(props, {emit}) {
+  setup(props) {
+
+    const templateData = inject('templateData')
+    const item = templateData.value.find(el=> el.page == props.page)
+
     const carouselValue = ref(0)
-    const adList = ref([])
+    const adList = ref((item ? JSON.parse(JSON.stringify(item.obj.id1)) : [] )|| [])
     const dragging = ref(false)
 
     const onRemove = (i) => {
       adList.value = adList.value.filter((el, index) => i !== index)
+      item.obj.id1 = item.obj.id1.filter((el, index) => i !== index)
       carouselValue.value = 0
     }
     const onDragEnter = (e) => {
@@ -71,7 +93,7 @@ export default {
       e.preventDefault()
       dragging.value = true
     }
-    const onDragLeave = (e) => {
+    const onDragLeave = () => {
       dragging.value = false
     }
     const onDrop = (e) => {
@@ -79,12 +101,10 @@ export default {
       const str = e.dataTransfer.getData("dragStr");
       if (!str) return
       const obj = JSON.parse(str)
-      // if(!carouselValue.value){
-      //   carouselValue.value = 0
-      // }
+
       adList.value.push(obj.resource)
-      emit('update', {id: props.rowId, value: toRaw(adList.value)})
-      // console.log('onDrop', str)
+      item.obj.id1.push(obj.resource)
+      carouselValue.value = adList.value.length -1;
     }
 
     return {

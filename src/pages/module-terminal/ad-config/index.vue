@@ -2,7 +2,7 @@
   <div class="flex1 q-pa-md bg-grey-1 relative-position overflow-auto">
     <div class="q-gutter-md row">
       <q-card style="width: 240px" v-for="item in templateList" :key="item.id">
-        <q-img :src="imgObj[item.id]" style="width: 240px; height: 140px"/>
+        <q-img fit="contain"  :src="item.templatePhoto" style="width: 240px; height: 140px"/>
         <q-separator/>
         <q-card-section>
           <div class="row no-wrap items-center justify-between">
@@ -23,12 +23,12 @@
         <q-separator/>
         <q-card-actions>
           <template v-if="item.id === 3">
-            <q-btn flat color="primary">
+            <q-btn flat color="primary" to="/terminal/adconfig/template/3">
               自定义样式
             </q-btn>
           </template>
           <template v-else-if="item.id === 2">
-            <q-btn flat color="primary" @click="onSetTemplateLocker(item)">
+            <q-btn flat color="primary" to="/terminal/adconfig/template/2">
               自定义样式
             </q-btn>
             <q-btn flat color="primary" @click="onSetSeatSwitch(item)">
@@ -69,7 +69,6 @@ export default {
     const renderTemplateList = () => {
       loading.value = true;
       TEMPLATE.list({page: 1, pageSize: 999}).then(res => {
-        console.log('模板列表', res)
         const {results} = res;
         templateList.value = (results || []);
       }).finally(() => {
@@ -82,7 +81,6 @@ export default {
     }
     // 配置开关按钮事件
     const onSetSeatSwitch = (item) => {
-      console.log('item',item)
       $q.dialog({
         component: SeatSwitchConfig,
         componentProps:{

@@ -4,7 +4,7 @@ import router from "src/router";
 export const notifyWarn = (message) => {
   Notify.create({
     message,
-    icon: "o_error_outlinerecycling",
+    icon: "o_error_outline",
     color: "orange",
     position: "top",
   });

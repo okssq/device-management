@@ -25,7 +25,6 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from, failure) => {
   if (!failure) {
     if (to.path === "/login") return;
-    console.log("failure", failure);
     LocalStorage.set("router-path", to.path);
   }
 });

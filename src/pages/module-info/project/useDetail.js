@@ -1,9 +1,9 @@
-import { ref, shallowRef, inject } from "vue";
+import { ref, shallowRef, inject, toRaw } from "vue";
 import { fn3001, notifySuccess, notifyWarn } from "src/util/common";
 
 const useDetail = (onSearch, getList, treeList) => {
   const loginInfo = inject("loginInfo");
-  const loginCompanyId = loginInfo.value ? loginInfo.value.companyId : "";
+  const loginCompanyId = loginInfo.value ? loginInfo.value.companyId + "" : "";
   const loginCompanyName = ref("");
   const detailVisible = ref(false);
   const detailType = ref("inset");
@@ -39,7 +39,7 @@ const useDetail = (onSearch, getList, treeList) => {
     const result = setLoginCompanyName();
     if (!result) return;
 
-    detailData.value = row;
+    detailData.value = toRaw(row);
     detailType.value = "edit";
     detailVisible.value = true;
   };

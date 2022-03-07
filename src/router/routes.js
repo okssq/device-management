@@ -138,13 +138,12 @@ const routes = [
             },
           },
           {
-            name: "template-locker",
-            path: "/template/locker",
-            component: () =>
-              import("pages/module-terminal/ad-config/template/locker"),
+            path: "/terminal/adconfig/template/:templateId",
+            props: true,
+            component: () => import("pages/module-terminal/ad-config/template"),
             meta: {
               routerKeys: ["04", "04-06"],
-              crumbs: ["设备管理", "广告资源配置", "智能桌椅自定义样式配置"],
+              crumbs: ["设备管理", "广告资源配置", "自定义样式"],
             },
           },
         ],

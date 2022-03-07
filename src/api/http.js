@@ -48,11 +48,11 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    console.log("*** Request Fail *** ", error);
     if (axios.isCancel(error)) {
-      console.log("cancel request!");
+      console.log("Cancel request!");
       return Promise.reject(false);
     }
+    console.log("*** Request Fail *** ", error);
     const { response } = error;
     if (response) {
       console.log("response", response);

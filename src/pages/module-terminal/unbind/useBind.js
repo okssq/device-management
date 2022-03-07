@@ -21,7 +21,7 @@ const useBind = (companyList, selectCompanyId, selectCompanyName, getList) => {
     const { id, label } = item;
     selectCompanyId.value = id + "";
     selectCompanyName.value = label;
-    console.log("onBind", row);
+    // console.log("onBind", row);
     bindData.value = row;
     bindDialogVisible.value = true;
   };

@@ -91,15 +91,12 @@ export default {
       return '56px'
     })
     let realSwitchList = []
-
-    console.log('props',props)
     const getSwitchList = () => TEMPLATE.switchList({templateId: props.templateId})
     const renderSwitchList = () => {
       loading.value = true
       getSwitchList().then(res => {
         realSwitchList = JSON.parse(JSON.stringify(res))
         switchList.value = res;
-        console.log('res111', res)
       }).finally(() => {
         loading.value = false
       })
@@ -113,7 +110,6 @@ export default {
       }).finally(() => {
         loading.value = false
       })
-      console.log('item', data)
     }
     // 删除单个开关配置
     const onRemoveItem = (item) => {

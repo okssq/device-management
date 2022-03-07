@@ -21,7 +21,6 @@ export default {
     const routerPath = $q.localStorage.getItem("router-path");
     loginInfo.value = localLoginInfo
     router.push(!!localLoginInfo ? (routerPath === '/' ? '/map/terminal' : routerPath) : "/login");
-    console.log('1111', routerPath)
   },
 };
 </script>

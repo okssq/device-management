@@ -126,7 +126,7 @@ export default {
     });
     const loading = ref(false);
     if (props.type === "insert") {
-      formData.companyId = props.selectCompanyId.toString();
+      formData.companyId = props.selectCompanyId+'';
     } else {
       const { id, companyId, companyName, remark, roleName } = toRaw(
         props.formData

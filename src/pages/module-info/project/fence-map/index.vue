@@ -4,7 +4,7 @@
       <div class="absolute-center bg-white column no-wrap z-top">
         <q-card
           class="relative-position overflow-hidden"
-          style="width: 800px; max-width: 98vw"
+          style="width: 960px; max-width: 98vw"
         >
           <div class="row q-px-md q-py-xs items-center justify-between">
             <div class="text-subtitle2 text-bold">项目所属区域</div>
@@ -17,14 +17,14 @@
             />
           </div>
           <q-separator />
-          <div style="width:100%;height: 400px">
+          <div style="width:100%;height: 600px">
             <global-map  @load-success="onMapLoadSuccess" />
           </div>
           <q-separator />
 
           <section
             class="absolute-top-left bg-white rounded-borders shadow-2"
-            style="top: 50px; left: 10px; width: 240px"
+            style="top: 54px; left: 10px; width: 240px"
           >
             <div v-if="row" class="text-capitalize text-bold q-pa-md">
              <div class="row items-center no-wrap">
@@ -79,11 +79,13 @@ export default {
           path,
           map: map.value,
           draggable: false,
-          strokeColor: "#FF0000",
-          strokeOpacity: 0.8,
-          strokeWeight: 3,
-          fillColor: "#FF0000",
-          fillOpacity: 0.35,
+          fillColor: '#7bccc4',
+          strokeOpacity: 1,
+          fillOpacity: 0.3,
+          strokeColor: '#2b8cbe',
+          strokeWeight: 2,
+          strokeStyle: 'dashed',
+          strokeDasharray: [5, 5],
         });
       } else {
         polygon.setPath(path);

@@ -57,7 +57,6 @@ export default {
     const loading = ref(false);
     const options = ref([]);
     const fnSwitch = (res) => {
-      console.log('res',res)
       options.value = res || []
     };
     const getInfo = () => {
@@ -78,7 +77,6 @@ export default {
         status: item.useStatus ? 0 : 1,
       })
         .then((res) => {
-          console.log('resss1111',res)
           item.useStatus = item.useStatus ? 0 : 1
           notifySuccess('设置成功')
         })

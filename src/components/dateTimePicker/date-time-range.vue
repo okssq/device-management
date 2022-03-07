@@ -176,7 +176,6 @@ export default {
       const innerFrom = fullDateTime.value ? fullDateTime.value.from : "";
       const innerTo = fullDateTime.value ? fullDateTime.value.to : "";
       if (outFrom !== innerFrom || outTo !== innerTo) {
-        console.log("需要调整时间");
         if (!outFrom) {
           date.value = null;
           startTime.value = ["00", "00", "00"];

@@ -25,10 +25,10 @@
             :draggable="true"
             @dragstart="onDragStart"
           >
-            <img :draggable="false" class="fit" v-if="item.resource.includes('jpg')"
-                 :src="'http://mms2.baidu.com/it/u=1895335407,2753497845&fm=253' || item.resource"/>
-            <video  class="fit" autoplay loop v-else style="object-fit: fill"
-                    :src="'https://www.w3school.com.cn/example/html5/mov_bbb.mp4' || item.resource"/>
+            <img :draggable="false" class="fit" v-if="item.type===1"
+                 :src="item.resource"/>
+            <video  class="fit" autoplay loop v-if="item.type===2" style="object-fit: fill"
+                    :src="item.resource"/>
           </div>
           <div :draggable="false"  class="absolute-bottom q-py-xs q-px-sm row items-center justify-between" style="background-color: rgba(0, 0, 0, 0.25);">
             <div :draggable="false"  class="text-white text-caption">{{ item.descMsg }}</div>
@@ -45,6 +45,9 @@
           </div>
         </div>
       </template>
+      <div class="q-pa-md text-grey-7" v-if="!resourceList.length">
+        暂无资源数据！
+      </div>
     </q-scroll-area>
     <q-inner-loading :showing="loading" style="z-index: 100">
       <q-spinner-tail color="primary" size="2em"/>
@@ -71,7 +74,6 @@ export default {
       RESOURCE.list({page: 1, pageSize: 999})
         .then((res) => {
           resourceList.value = res.results || [];
-          console.log("getResourceList", res);
         })
         .finally(() => {
           loading.value = false

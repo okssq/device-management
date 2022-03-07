@@ -4,7 +4,7 @@
       <div class="absolute-center bg-white column no-wrap z-top">
         <q-card
           class="relative-position overflow-hidden"
-          style="width: 600px; max-width: 98vw"
+          style="width: 800px; max-width: 98vw"
         >
           <div class="row q-px-md q-py-xs items-center justify-between">
             <div class="text-subtitle2 text-bold">查看设备定位信息</div>
@@ -16,9 +16,9 @@
               @click="$emit('cancel')"
             />
           </div>
-          <q-separator />
-          <div style="height: 400px">
-            <global-map @load-success="onMapLoadSuccess" />
+          <q-separator/>
+          <div style="height: 450px">
+            <global-map @load-success="onMapLoadSuccess"/>
           </div>
         </q-card>
       </div>
@@ -27,7 +27,10 @@
 </template>
 <script>
 import GlobalMap from "components/map";
-import { inject, onBeforeUnmount, toRaw } from "@vue/runtime-core";
+import {inject, onBeforeUnmount, toRaw} from "vue";
+import {TERMINAL_MAP} from 'src/api/module'
+import {notifyWarn} from "src/util/common";
+
 export default {
   emits: ["cancel"],
   components: {
@@ -98,14 +101,14 @@ export default {
     };
     // 渲染自定义小车
     const fnMaker = () => {
-      const {type,onlineStatus} = toRaw(props.gpsData)
+      const {type, onlineStatus} = toRaw(props.gpsData)
       icon = new AMap.Icon({
         size: new AMap.Size(36, 40),
-        image:`./images/type${type}-status${onlineStatus}.png`,
-        imageSize: new AMap.Size(36,40),
+        image: `./images/type${type}-status${onlineStatus}.png`,
+        imageSize: new AMap.Size(36, 40),
       });
       const row = toRaw(props.gpsData);
-      const { gpsInfo } = row;
+      const {gpsInfo} = row;
       const gpsArr = gpsInfo.split(",");
       const arr = [Number(gpsArr[0]), Number(gpsArr[1])];
       position = new AMap.LngLat(arr[0], arr[1]);
@@ -122,7 +125,7 @@ export default {
       }
       marker.off("click", openInfoWindow);
       marker.on("click", openInfoWindow);
-      map.value.setCenter(position,true,false);
+      // map.value.setCenter(position, true, false);
     };
     // 渲染自定义卡片
     const fnInfoWindow = () => {
@@ -143,12 +146,55 @@ export default {
       infoWindow.open(map.value);
       getFormatContent();
     };
+    // 渲染围栏
+    const fnPolygon = () => {
+      const item = toRaw(props.gpsData)
+      const {projectId} = item
+      TERMINAL_MAP.projectBounds({
+        list: [projectId]
+      }).then(res => {
+        if (!(res || []).length) return
+        const {mapStr} = res[0]
+        if (mapStr) {
+          const [gpsStr, fenceStr] = mapStr.split(";");
+          if (!fenceStr) {
+            notifyWarn('项目围栏地址不存在!')
+            return;
+          }
+          try {
+            const path = JSON.parse(fenceStr).map((el) => {
+              const {longitude, latitude} = el;
+              return new AMap.LngLat(longitude, latitude);
+            });
 
-    const onMapLoadSuccess =() => {
+            new window.AMap.Polygon({
+              path,
+              map: map.value,
+              draggable: false,
+              fillColor: '#7bccc4',
+              strokeOpacity: 1,
+              fillOpacity: 0.3,
+              strokeColor: '#2b8cbe',
+              strokeWeight: 2,
+              strokeStyle: 'dashed',
+              strokeDasharray: [5, 5],
+            });
+            setTimeout(() => {
+              map.value.setFitView(false, true)
+            });
+          } catch (e) {
+            console.log("error", e);
+            notifyWarn('渲染项目围栏错误!')
+          }
+        }
+        console.log('查询项目边界', mapStr)
+      })
+    }
+    const onMapLoadSuccess = () => {
       fnMaker();
       fnInfoWindow();
+      fnPolygon()
     };
-
 
 
     onBeforeUnmount(() => {

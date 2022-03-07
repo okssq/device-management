@@ -229,7 +229,7 @@ export default {
         page:1,
         terminalType:props.formData.type
       }).then(res=> {
-        console.log('res',res)
+        // console.log('res',res)
         const {results} = res
         const arr = results.map((el) => {
           const {id, templateName} = el;

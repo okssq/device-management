@@ -101,14 +101,16 @@
 import SearchBar from "./search-bar.vue";
 import ResultTable from "components/table";
 import DelConfirm from "components/del-confirm.vue";
-import { reactive, ref, shallowRef, toRefs } from "vue";
+import DetailForm from "./detail-from";
+import fenceMap from "./fence-map";
+
 import { PROJECT } from "src/api/module.js";
+import { reactive, ref, shallowRef, toRefs } from "vue";
 import { notifySuccess } from "src/util/common";
 import { useQuasar } from "quasar";
 import { useCompanyTree } from "components/company/useCompayTree";
-import DetailForm from "./detail-from/index.vue";
+
 import useDetail from "./useDetail";
-import fenceMap from "./fence-map/index.vue";
 import useFenceMap from "./fence-map/useFenceMap";
 export default {
   components: {
@@ -202,6 +204,7 @@ export default {
       getList();
     };
 
+    // 删除按钮事件
     const onDel = (row) => {
       $q.dialog({
         component: DelConfirm,
@@ -220,8 +223,10 @@ export default {
       });
     };
 
+    // 查看围栏事件
     const { fenceMapDialogVisible, fenceMapData, onFenceMap } = useFenceMap();
 
+    // 新建或编辑项目事件
     const {
       detailVisible,
       loginCompanyId,

@@ -234,7 +234,7 @@ export default {
       }
     };
     if (props.type === "insert") {
-      formData.companyId = props.selectCompanyId.toString();
+      formData.companyId = props.selectCompanyId+'';
       getRoleList(props.selectCompanyId);
     } else {
       const { createTime, updateTime, userId, ...param } = toRaw(
