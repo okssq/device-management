@@ -38,10 +38,9 @@ export default {
   },
   setup() {
     const templateData = inject('templateData')
-    const item = templateData.value.find(el=> el.page === 1)
+    const item = templateData.value.find(el=> el.page == 1)
     const id8Value = ref(item.obj.id8)
     const id9Value = ref(item.obj.id9)
-
     // 每个可修改数据统一保存到要发送的数据
     const onUpdateTemplate = (data) => {
       const {id, value} = data

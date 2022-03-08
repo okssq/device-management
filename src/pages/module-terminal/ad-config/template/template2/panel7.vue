@@ -22,7 +22,7 @@
 <script>
 import Top from "./top.vue";
 import Bottom from "./bottom.vue";
-import {inject, ref, toRaw} from "vue";
+import {inject, ref} from "vue";
 export default {
   components: {
     Top,
@@ -30,17 +30,13 @@ export default {
   },
   setup() {
     const templateData = inject('templateData')
-    const data = toRaw(templateData.value)
-    const item = data.find(el=> el.page === 7)
+    const item = templateData.value.find(el=> el.page==7)
     const id8Value = ref(item.obj.id8 || '')
 
     // 每个可修改数据统一保存到要发送的数据
     const onUpdateTemplate = (data) => {
       const {id, value} = data
-      const item = templateData.value.find(el=> el.page===7)
       item.obj[`id${id}`] = value
-      console.log('data',data,templateData.value)
-      // console.log('templateData', templateData)
     }
 
     return {

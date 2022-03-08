@@ -11,7 +11,7 @@
           </div>
           <q-btn unelevated color="primary" icon="save" label="保存" @click="onSave"/>
         </div>
-        <component :is="currentPanel"/>
+        <component :is="currentPanel" v-if="!loading"/>
       </div>
       <q-resize-observer @resize="onResize"/>
     </div>
@@ -354,45 +354,38 @@ export default {
     const getPageInfo = () => {
       loading.value = true
       UI.templateInfo({templateId: 2}).then(res => {
-        const arr = []
-        for (let i = 0; i < 16; i++) {
-          const item = res[i]
-          const localItm = templateData.value[i]
-          if (!item) {
-            arr.push(localItm)
-          } else {
-            const {id, page, templateId, txt} = item
-            const newItem = {}
-            if (id) {
-              newItem['id'] = id || localItm['id']
-            }
-            if (page) {
-              newItem['page'] = page || localItm['page']
-            }
-            if (templateId) {
-              newItem['templateId'] = templateId || localItm['templateId']
-            }
+
+        const newTemplateData = []
+        const arr = JSON.parse(JSON.stringify(templateData.value))
+        arr.forEach(el=> {
+          const { page, obj} = el
+          const findItem = (res||[]).find(el=> page == el.page)
+          if(findItem){
+            const {id,txt,templateId} = findItem
+            const item = { id,page,templateId }
             if (txt) {
               try{
                 let newObj = {}
-                const obj = JSON.parse(txt)
-                Object.keys(localItm['obj']).forEach(key=>{
-                  newObj[key] = obj[key] || localItm['obj'][key]
+                const serverObj = JSON.parse(txt)
+                Object.keys(obj).forEach(key=>{
+                  newObj[key] = serverObj[key] || obj['key']
                 })
-                newItem['obj'] = newObj
+                item['obj'] = newObj
               }catch{
-                newItem['obj'] = localItm['obj']
+                item['obj'] = obj
               }
             } else {
-              newItem['obj'] = localItm['obj']
+              item['obj'] = obj
             }
-            arr.push(newItem)
+            newTemplateData.push(item)
+          }else{
+            newTemplateData.push(el)
           }
-        }
-        serverTemplateData = JSON.parse(JSON.stringify(arr));
-        templateData.value = arr;
+        })
+        serverTemplateData = JSON.parse(JSON.stringify(newTemplateData));
+        templateData.value = newTemplateData;
         console.log('获取模板2配置数据', res);
-        console.log('生成新数据', arr)
+        console.log('生成新数据', newTemplateData)
       }).finally(() => {
         loading.value = false
       })
@@ -402,13 +395,13 @@ export default {
     // tab页面改变事件，恢复默认值
     const onTabChange = () => {
       templateData.value = JSON.parse(JSON.stringify(serverTemplateData))
-      console.log('onTabChange')
     }
     // 保存页面按钮事件
     const onSave = () => {
       loading.value = true
       const page = currentTab.value.slice(-1);
-      const findItem = JSON.parse(JSON.stringify(templateData.value.find(el=> el.page = page)))
+      const findItem = JSON.parse(JSON.stringify(templateData.value.find(el=> el.page == page)))
+      // console.log('findItem',findItem)
       const {id} = findItem
       if(id){ // 存在ID，使用更新接口
         const {page,templateId,obj} = findItem
@@ -416,8 +409,11 @@ export default {
           id,
           page,
           templateId,
-          txt: JSON.stringify(obj)
+          txt: JSON.stringify(obj),
+          obj
         }
+        // console.log('更新param',param)
+        // return
         UI.update(param).then(()=> {
           notifySuccess('保存成功')
           getPageInfo()
@@ -429,8 +425,11 @@ export default {
         const param = {
           page,
           templateId,
-          txt: JSON.stringify(obj)
+          txt: JSON.stringify(obj),
+          obj,
         }
+        // console.log('新增param',param)
+        // return
         UI.insert(param).then(()=> {
           notifySuccess('保存成功')
           getPageInfo()

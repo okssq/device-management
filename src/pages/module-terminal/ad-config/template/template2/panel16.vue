@@ -15,7 +15,7 @@
           v-for="(item, index) in options"
           :key="index"
         >
-          <q-checkbox dense size="xs" v-model="select" :val="item" :label="item"/>
+          <q-checkbox dense size="xs" :model-value="false" :label="item"/>
           <q-btn
             dense
             round
@@ -61,7 +61,6 @@ export default {
     Bottom,
   },
   setup() {
-    const select = ref([]);
     const options = ref([
       "柜门无法关闭",
       "柜门关闭后还有物品在柜",
@@ -69,29 +68,11 @@ export default {
       "使用未超过4小时被扣除文明分",
       "无法支付绿色能量",
     ]);
-    const inputText = ref("新添加的选项");
-    const remove = (index) => {
-      const str = options.value[index];
-      options.value = options.value.filter((el, _index) => {
-        return _index !== index;
-      });
-      select.value = select.value.filter((el) => {
-        return el !== str;
-      });
-    };
-    const save = (scope) => {
-      options.value.push(inputText.value);
-      scope.set();
-    };
+
+
+
     return {
-
-
-      select,
       options,
-
-      inputText,
-      remove,
-      save,
     };
   },
 };
