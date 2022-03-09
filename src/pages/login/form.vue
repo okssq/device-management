@@ -1,71 +1,72 @@
 <template>
   <div class="login-form-wrap">
-    <q-form @submit="onSubmit" class="q-gutter-xs login-form">
+    <q-form class="q-gutter-xs login-form" @submit="onSubmit">
       <div class="q-ma-none q-pb-md q-pt-xs text-center text-subtitle1 text-grey-9 text-bold">
         智慧设备管控平台
       </div>
       <q-input
-        dense
-        outlined
         v-model="name"
-        lazy-rules
-        autofocus
         :rules="[(val) => (val && val.length > 0) || '用户名不能为空']"
+        autofocus
+        dense
+        lazy-rules
+        outlined
       >
         <template #prepend>
-          <q-icon name="person_outline" size="16px" />
+          <q-icon name="person_outline" size="16px"/>
           <div class="text-caption text-grey-7 text-bold">用户名:</div>
         </template>
       </q-input>
       <q-input
+        v-model="pass"
+        :rules="[(val) => (val && val.length > 0) || '密码不能为空']"
         dense
+        lazy-rules
         outlined
         type="password"
-        v-model="pass"
-        lazy-rules
-        :rules="[(val) => (val && val.length > 0) || '密码不能为空']"
       >
         <template #prepend>
-          <q-icon name="o_lock" size="14px" />
+          <q-icon name="o_lock" size="14px"/>
           <div class="text-caption text-grey-7 text-bold">密码:</div>
         </template>
       </q-input>
       <div class="row no-wrap">
         <q-btn
           :loading="loading"
-          unelevated
           class="flex1"
+          color="primary"
           label="登录"
           type="submit"
-          color="primary"
+          unelevated
         />
       </div>
     </q-form>
   </div>
 </template>
 <script>
-import { ref, inject } from "vue";
-import { useQuasar } from "quasar";
-import { useRouter } from "vue-router";
-import { login } from "src/api/module";
-import { notifySuccess } from "src/util/common";
+import {inject, ref} from "vue";
+import {useQuasar} from "quasar";
+import {useRouter} from "vue-router";
+import {login} from "src/api/module";
+import {notifySuccess} from "src/util/common";
+
 export default {
   emits: ["ok"],
   setup() {
     const $q = useQuasar();
     const router = useRouter();
-    const loginInfo = inject('loginInfo')
+    const loginInfo = inject('loginInfo');
+    loginInfo.value = null;
+
     const name = ref("");
     const pass = ref("");
     const loading = ref(false);
 
-    loginInfo.value = null
 
     const fnLogin = (res) => {
       $q.localStorage.set("loginInfo", res);
       loginInfo.value = res
-      const routerPath = $q.localStorage.getItem("router-path");
-      router.push( routerPath ? (routerPath+'') : '/map/terminal');
+      router.push('/');
       notifySuccess("登录成功！");
     };
     const onSubmit = () => {
@@ -103,6 +104,7 @@ export default {
   box-sizing: content-box;
   width: 300px;
 }
+
 .login-form {
   background: #fff;
   width: 100%;

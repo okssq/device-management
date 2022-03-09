@@ -92,7 +92,13 @@ module.exports = configure(function (ctx) {
       config: {},
       iconSet: "material-icons", // Quasar icon set
       lang: "zh-CN", // Quasar language pack
-      plugins: ["LocalStorage", "AppFullscreen", "Notify", "Dialog"],
+      plugins: [
+        "SessionStorage",
+        "LocalStorage",
+        "AppFullscreen",
+        "Notify",
+        "Dialog",
+      ],
     },
 
     // https://quasar.dev/options/animations

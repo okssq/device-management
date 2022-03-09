@@ -1,4 +1,5 @@
 import { h, resolveComponent } from "vue";
+
 const renderRouterView = () => h(resolveComponent("router-view"));
 
 const routes = [
@@ -8,15 +9,16 @@ const routes = [
     component: () => import("pages/login"),
   },
   {
-    path: "",
+    path: "/",
+    redirect: "/map/terminal",
     component: () => import("pages/layout"),
     children: [
       {
-        path: "",
+        path: "map",
         component: { render: renderRouterView },
         children: [
           {
-            path: "/map/terminal",
+            path: "terminal",
             component: () => import("pages/module-map/terminal"),
             meta: {
               routerKeys: ["01", "01-01"],
@@ -24,7 +26,7 @@ const routes = [
             },
           },
           {
-            path: "/map/project",
+            path: "project",
             component: () => import("pages/module-map/project"),
             meta: {
               routerKeys: ["01", "01-02"],
@@ -34,11 +36,11 @@ const routes = [
         ],
       },
       {
-        path: "",
+        path: "data",
         component: { render: renderRouterView },
         children: [
           {
-            path: "/data/screen",
+            path: "screen",
             component: () => import("pages/module-data/screen"),
             meta: {
               routerKeys: ["02", "02-01"],
@@ -46,7 +48,7 @@ const routes = [
             },
           },
           {
-            path: "/data/dashboard",
+            path: "dashboard",
             component: () => import("pages/module-data/dashboard"),
             meta: {
               routerKeys: ["02", "02-02"],
@@ -54,7 +56,7 @@ const routes = [
             },
           },
           {
-            path: "/data/analyze",
+            path: "analyze",
             component: () => import("pages/module-data/analyze"),
             meta: {
               routerKeys: ["02", "02-03"],
@@ -64,11 +66,11 @@ const routes = [
         ],
       },
       {
-        path: "",
+        path: "video",
         component: { render: renderRouterView },
         children: [
           {
-            path: "/video/live",
+            path: "live",
             component: () => import("pages/module-video/live"),
             meta: {
               routerKeys: ["03", "03-01"],
@@ -76,7 +78,7 @@ const routes = [
             },
           },
           {
-            path: "/video/history",
+            path: "history",
             component: () => import("pages/module-video/history"),
             meta: {
               routerKeys: ["03", "03-02"],
@@ -86,11 +88,11 @@ const routes = [
         ],
       },
       {
-        path: "",
+        path: "terminal",
         component: { render: renderRouterView },
         children: [
           {
-            path: "/terminal/seat",
+            path: "seat",
             component: () => import("pages/module-terminal/seat"),
             meta: {
               routerKeys: ["04", "04-01"],
@@ -98,7 +100,7 @@ const routes = [
             },
           },
           {
-            path: "/terminal/recycle",
+            path: "recycle",
             component: () => import("pages/module-terminal/recycle"),
             meta: {
               routerKeys: ["04", "04-02"],
@@ -106,7 +108,7 @@ const routes = [
             },
           },
           {
-            path: "/terminal/locker",
+            path: "locker",
             component: () => import("pages/module-terminal/locker"),
             meta: {
               routerKeys: ["04", "04-03"],
@@ -114,7 +116,7 @@ const routes = [
             },
           },
           {
-            path: "/terminal/screen",
+            path: "screen",
             component: () => import("pages/module-terminal/screen"),
             meta: {
               routerKeys: ["04", "04-04"],
@@ -122,7 +124,7 @@ const routes = [
             },
           },
           {
-            path: "/terminal/unbind",
+            path: "unbind",
             component: () => import("pages/module-terminal/unbind"),
             meta: {
               routerKeys: ["04", "04-05"],
@@ -130,7 +132,7 @@ const routes = [
             },
           },
           {
-            path: "/terminal/adconfig",
+            path: "adconfig",
             component: () => import("pages/module-terminal/ad-config"),
             meta: {
               routerKeys: ["04", "04-06"],
@@ -138,7 +140,7 @@ const routes = [
             },
           },
           {
-            path: "/terminal/adconfig/template/:templateId",
+            path: "adconfig/template/:templateId",
             props: true,
             component: () => import("pages/module-terminal/ad-config/template"),
             meta: {
@@ -149,11 +151,11 @@ const routes = [
         ],
       },
       {
-        path: "",
+        path: "info",
         component: { render: renderRouterView },
         children: [
           {
-            path: "/info/project",
+            path: "project",
             component: () => import("pages/module-info/project"),
             meta: {
               routerKeys: ["05", "05-01"],
@@ -161,7 +163,7 @@ const routes = [
             },
           },
           {
-            path: "/info/company",
+            path: "company",
             component: () => import("pages/module-info/company"),
             meta: {
               routerKeys: ["05", "05-02"],
@@ -171,11 +173,11 @@ const routes = [
         ],
       },
       {
-        path: "",
+        path: "sys",
         component: { render: renderRouterView },
         children: [
           {
-            path: "/sys/user",
+            path: "user",
             component: () => import("pages/module-system/user"),
             meta: {
               routerKeys: ["06", "06-01"],
@@ -183,7 +185,7 @@ const routes = [
             },
           },
           {
-            path: "/sys/role",
+            path: "role",
             component: () => import("pages/module-system/role"),
             meta: {
               routerKeys: ["06", "06-02"],
@@ -191,11 +193,11 @@ const routes = [
             },
           },
           {
-            path: "",
+            path: "log",
             component: { render: renderRouterView },
             children: [
               {
-                path: "/sys/log/login",
+                path: "login",
                 component: () => import("pages/module-system/module-log/login"),
                 meta: {
                   routerKeys: ["06", "06-03", "06-03-01"],
@@ -203,7 +205,7 @@ const routes = [
                 },
               },
               {
-                path: "/sys/log/action",
+                path: "action",
                 component: () =>
                   import("pages/module-system/module-log/action"),
                 meta: {
@@ -212,7 +214,7 @@ const routes = [
                 },
               },
               {
-                path: "/sys/log/order",
+                path: "order",
                 component: () => import("pages/module-system/module-log/order"),
                 meta: {
                   routerKeys: ["06", "06-03", "06-03-03"],

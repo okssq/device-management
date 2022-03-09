@@ -26,7 +26,6 @@ export default {
     const renderSetBell = () => {
       const localSetting = $q.localStorage.getItem("setting");
       if (!localSetting) {
-        console.log('setting', toRaw(setting))
         $q.localStorage.set('setting', toRaw(setting))
       } else {
         setting.bell = !!localSetting['bell']
@@ -37,9 +36,9 @@ export default {
 
     const renderLogin = () => {
       const localLoginInfo = $q.localStorage.getItem("loginInfo");
-      const routerPath = $q.localStorage.getItem("router-path");
+      const routerPath = $q.sessionStorage.getItem("router-path");
       loginInfo.value = localLoginInfo
-      router.push(!!localLoginInfo ? (routerPath === '/' ? '/map/terminal' : routerPath) : "/login");
+      router.push(localLoginInfo ? (routerPath || '/map/terminal') : "/login");
     }
 
     renderSetBell()
