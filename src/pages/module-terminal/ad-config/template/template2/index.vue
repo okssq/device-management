@@ -4,12 +4,12 @@
       <div :style="{ width: height / 1.4 + 'px', height: height + 'px' }" class="scene column no-wrap">
         <div class="q-ma-sm row no-wrap items-center justify-between">
           <div class="text-red-4 ">
-            <q-badge color="red-5" align="middle" transparent class="q-pa-xs">
-              <q-icon name="sim_card_alert" color="white" size="18px"/>
+            <q-badge align="middle" class="q-pa-xs" color="red-5" transparent>
+              <q-icon color="white" name="sim_card_alert" size="18px"/>
               红色部分表示可编辑
             </q-badge>
           </div>
-          <q-btn unelevated color="primary" icon="save" label="保存" @click="onSave"/>
+          <q-btn color="primary" icon="save" label="保存" unelevated @click="onSave"/>
         </div>
         <component :is="currentPanel" v-if="!loading"/>
       </div>
@@ -17,25 +17,26 @@
     </div>
     <q-separator vertical/>
     <q-tabs
-      class="full-height text-grey-7"
-      style="width: 200px;min-width: 200px;"
       v-model="currentTab"
+      active-bg-color="blue-1"
+      active-color="black"
       align="left"
+      class="full-height text-grey-7"
+      indicator-color="transparent"
+      inline-label
+      mobile-arrows
+      no-caps
+      outside-arrows
+      style="width: 200px;min-width: 200px;"
       switch-indicator
       vertical
-      outside-arrows
-      mobile-arrows
-      inline-label
-      active-color="black"
-      active-bg-color="blue-1"
-      indicator-color="transparent"
       @update:model-value="onTabChange"
     >
       <q-tab
         v-for="item in tabs"
         :key="item.name"
+        :label="item.label+`——${item.name}`"
         :name="item.name"
-        :label="item.label"
       />
     </q-tabs>
     <q-inner-loading :showing="loading" style="z-index: 100">
@@ -45,69 +46,69 @@
 </template>
 
 <script>
-import Panel1 from "./panel1.vue";
-import Panel2 from "./panel2.vue";
-import Panel3 from "./panel3.vue";
-import Panel4 from "./panel4.vue";
-import Panel5 from "./panel5.vue";
-import Panel6 from "./panel6.vue";
-import Panel7 from "./panel7.vue";
-import Panel8 from "./panel8.vue";
-import Panel9 from "./panel9.vue";
-import Panel10 from "./panel10.vue";
-import Panel11 from "./panel11.vue";
-import Panel12 from "./panel12.vue";
-import Panel13 from "./panel13.vue";
-import Panel14 from "./panel14.vue";
-import Panel15 from "./panel15.vue";
-import Panel16 from "./panel16.vue";
-import {ref, computed, provide, shallowRef} from 'vue'
+import page1 from "./page1.vue";
+import page2 from "./page2.vue";
+import page3 from "./page3.vue";
+import page4 from "./page4.vue";
+import page5 from "./page5.vue";
+import page6 from "./page6.vue";
+import page7 from "./page7.vue";
+import page8 from "./page8.vue";
+import page9 from "./page9.vue";
+import page10 from "./page10.vue";
+import page11 from "./page11.vue";
+import page12 from "./page12.vue";
+import page13 from "./page13.vue";
+import page14 from "./page14.vue";
+import page15 from "./page15.vue";
+import page16 from "./page16.vue";
+import {computed, provide, ref, shallowRef} from 'vue'
 import {UI} from "src/api/module";
 import {notifySuccess} from "src/util/common";
 
 export default {
   components: {
-    Panel1,
-    Panel2,
-    Panel3,
-    Panel4,
-    Panel5,
-    Panel6,
-    Panel7,
-    Panel8,
-    Panel9,
-    Panel10,
-    Panel11,
-    Panel12,
-    Panel13,
-    Panel14,
-    Panel15,
-    Panel16,
+    page1,
+    page2,
+    page3,
+    page4,
+    page5,
+    page6,
+    page7,
+    page8,
+    page9,
+    page10,
+    page11,
+    page12,
+    page13,
+    page14,
+    page15,
+    page16,
   },
   setup() {
     const loading = ref(false)
     const tabs = [
-      {name: "panel1", label: "首页"},
-      {name: "panel2", label: "1.1存"},
-      {name: "panel3", label: "1.1.1无法开始状态1"},
-      {name: "panel4", label: "1.1.1无法开始状态2"},
-      {name: "panel5", label: "1.2使用须知"},
-      {name: "panel6", label: "1.2.1确认弹窗"},
-      {name: "panel7", label: "1.3.1开柜"},
-      {name: "panel8", label: "1.3.2开柜失败状态1"},
-      {name: "panel9", label: "1.3.3开柜失败状态2"},
-      {name: "panel10", label: "2.1取"},
-      {name: "panel11", label: "2.1.1无法开柜状态"},
-      {name: "panel12", label: "2.2.1开柜提示1"},
-      {name: "panel13", label: "2.2.2开柜提示2"},
-      {name: "panel14", label: "2.3开柜成功"},
-      {name: "panel15", label: "3.1问题反馈"},
-      {name: "panel16", label: "3.1问题反馈-1"},
+      {name: "page1", label: "首页"},
+      {name: "page2", label: "存"},
+      {name: "page3", label: "无法开始状态(1)"},
+      {name: "page4", label: "无法开始状态(2)"},
+      {name: "page5", label: "使用须知"},
+      {name: "page6", label: "确认使用弹窗"},
+      {name: "page7", label: "开柜成功"},
+      {name: "page8", label: "开柜失败状态(1)"},
+      {name: "page9", label: "开柜失败状态(2)"},
+      {name: "page10", label: "取"},
+      {name: "page11", label: "无法开柜状态"},
+      {name: "page12", label: "开柜提示(1)"},
+      {name: "page13", label: "开柜提示(2)"},
+      {name: "page14", label: "开柜成功"},
+      {name: "page15", label: "问题反馈"},
+      {name: "page16", label: "问题反馈(1)"},
     ];
-    const currentTab = ref("panel1");
+    const currentTab = ref("page1");
     const currentPanel = computed(() => {
       const findItem = tabs.find((el) => el.name === currentTab.value);
-      return findItem ? findItem.name : "panel1";
+      return findItem ? findItem.name : "page1";
     });
     const height = ref("1");
     const onResize = (report) => {
@@ -124,7 +125,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
           id8: '您好，',
@@ -139,7 +140,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
           id8: '扫描二维码即可开柜',
@@ -153,10 +154,10 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
-          id8: '园区资源有限，带来的不变请您谅解！',
+          id8: '园区资源有限，带来的不便请您谅解！',
         }
       },
       {
@@ -167,7 +168,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
           id8: '一个账号只能同时使用一个储物柜，请您谅解！',
@@ -181,7 +182,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
           id8: '单次使用储物柜需要消耗',
@@ -194,16 +195,9 @@ export default {
         templateId: 2,
         page: 6,
         obj: {
-          id1: [],
-          id2: '西湖公园游客服务中心',
-          id3: '12345678',
-          id4: '08:00-18:00',
-          id5: '福州西湖公园',
-          id6: 'https://www.baidu.com',
-          id7: '智慧西湖小程序',
-          id8: '是否要消耗',
-          id9: '50绿色能量',
-          id10: '使用储物柜？',
+          id1: '是否要消耗',
+          id2: '50绿色能量',
+          id3: '使用储物柜？',
         }
       },
       {
@@ -214,7 +208,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
           id8: '存储超过4小时将扣减文明分，请留意使用时间。',
@@ -228,7 +222,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
           id8: '您可在西湖游园小程序上获取更多绿色能量。',
@@ -242,7 +236,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
           id8: '您可在西湖游园小程序上获取更多文明分。',
@@ -256,7 +250,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
         }
@@ -269,7 +263,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
         }
@@ -282,7 +276,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
         }
@@ -295,7 +289,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
         }
@@ -308,10 +302,9 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
-          id8: '您可在手机小程序上"我的-储物柜使用"中找到订单相关信息'
         }
       },
       {
@@ -322,7 +315,7 @@ export default {
           id2: '西湖公园游客服务中心',
           id3: '12345678',
           id4: '08:00-18:00',
-          id5: '福州西湖公园',
+          id5: '福州市鼓楼区左海湖滨路70号',
           id6: 'https://www.baidu.com',
           id7: '智慧西湖小程序',
           id8: '若有其他问题请直接致电西湖游客服务中心',
@@ -338,15 +331,7 @@ export default {
       {
         templateId: 2,
         page: 16,
-        obj: {
-          id1: [],
-          id2: '西湖公园游客服务中心',
-          id3: '12345678',
-          id4: '08:00-18:00',
-          id5: '福州西湖公园',
-          id6: 'https://www.baidu.com',
-          id7: '智慧西湖小程序',
-        }
+        obj: {}
       },
     ])
     provide('templateData', templateData)
@@ -357,28 +342,28 @@ export default {
 
         const newTemplateData = []
         const arr = JSON.parse(JSON.stringify(templateData.value))
-        arr.forEach(el=> {
-          const { page, obj} = el
-          const findItem = (res||[]).find(el=> page == el.page)
-          if(findItem){
-            const {id,txt,templateId} = findItem
-            const item = { id,page,templateId }
+        arr.forEach(el => {
+          const {page, obj} = el
+          const findItem = (res || []).find(el => page == el.page)
+          if (findItem) {
+            const {id, txt, templateId} = findItem
+            const item = {id, page, templateId}
             if (txt) {
-              try{
+              try {
                 let newObj = {}
                 const serverObj = JSON.parse(txt)
-                Object.keys(obj).forEach(key=>{
+                Object.keys(obj).forEach(key => {
                   newObj[key] = serverObj[key] || obj['key']
                 })
                 item['obj'] = newObj
-              }catch{
+              } catch {
                 item['obj'] = obj
               }
             } else {
               item['obj'] = obj
             }
             newTemplateData.push(item)
-          }else{
+          } else {
             newTemplateData.push(el)
           }
         })
@@ -399,38 +384,38 @@ export default {
     // 保存页面按钮事件
     const onSave = () => {
       loading.value = true
-      const page = currentTab.value.slice(-1);
-      const findItem = JSON.parse(JSON.stringify(templateData.value.find(el=> el.page == page)))
+      const page = currentTab.value.slice(4);
+      const findItem = JSON.parse(JSON.stringify(templateData.value.find(el => el.page == page)))
       // console.log('findItem',findItem)
       const {id} = findItem
-      if(id){ // 存在ID，使用更新接口
-        const {page,templateId,obj} = findItem
+      if (id) { // 存在ID，使用更新接口
+        const {page, templateId, obj} = findItem
         const param = {
           id,
           page,
           templateId,
           txt: JSON.stringify(obj),
-          obj
+          // obj
         }
-        // console.log('更新param',param)
+        // console.log('更新param', param)
         // return
-        UI.update(param).then(()=> {
+        UI.update(param).then(() => {
           notifySuccess('保存成功')
           getPageInfo()
         }).catch(() => {
           loading.value = false
         })
-      }else{  // 不存在ID，使用增加接口
-        const {page,templateId,obj} = findItem
+      } else {  // 不存在ID，使用增加接口
+        const {page, templateId, obj} = findItem
         const param = {
           page,
           templateId,
           txt: JSON.stringify(obj),
-          obj,
+          // obj,
         }
-        // console.log('新增param',param)
+        // console.log('新增param', param)
         // return
-        UI.insert(param).then(()=> {
+        UI.insert(param).then(() => {
           notifySuccess('保存成功')
           getPageInfo()
         }).catch(() => {

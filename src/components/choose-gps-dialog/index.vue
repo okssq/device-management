@@ -10,9 +10,9 @@
             <div class="text-subtitle2 text-bold">选取设备位置</div>
             <q-btn
               flat
+              icon="clear"
               round
               size="12px"
-              icon="clear"
               @click="$emit('cancel')"
             />
           </div>
@@ -24,11 +24,11 @@
           <div class="q-pa-md">
             <q-form class="row items-center">
               <q-input
-                dense
-                outlined
-                lazy-rules
-                class="flex1 my-form-item"
                 v-model="address"
+                class="flex1 my-form-item"
+                dense
+                lazy-rules
+                outlined
               >
                 <template #prepend>
                   <span class="text-subtitle2 text-grey-8 text-bold"
@@ -37,13 +37,13 @@
                 </template>
               </q-input>
               <q-btn
-                flat
                 class="q-mx-md"
-                label="取消"
                 color="primary"
+                flat
+                label="取消"
                 @click="$emit('cancel')"
               />
-              <q-btn label="确定" color="primary" @click="onSubmit"/>
+              <q-btn color="primary" label="确定" @click="onSubmit"/>
             </q-form>
           </div>
           <section
@@ -51,28 +51,28 @@
             style="top: 60px; left: 15px"
           >
             <q-input
-              dense
-              borderless
-              rounded
-              placeholder="搜索地址"
               v-model="inputFilter"
+              borderless
+              dense
+              placeholder="搜索地址"
+              rounded
               style="width: 240px"
               @focus="listVisible = true"
               @update:model-value="onInputChange"
             >
               <template #prepend>
-                <q-icon name="search" class="q-ml-sm"/>
+                <q-icon class="q-ml-sm" name="search"/>
               </template>
               <q-menu
                 v-model="listVisible"
+                anchor="bottom left"
                 fit
+                no-focus
                 no-parent-event
                 no-refocus
-                no-focus
-                anchor="bottom left"
                 self="top left"
               >
-                <q-list padding dense bordered v-show="filterList.length">
+                <q-list v-show="filterList.length" bordered dense padding>
                   <template v-for="(item, index) in filterList" :key="index">
                     <q-item clickable @click="filterSelectItem(item)">
                       <q-item-section>
@@ -91,9 +91,9 @@
             </q-input>
           </section>
           <section
+            v-if="lng && lat"
             class="absolute-top-right bg-white q-pa-sm rounded-borders shadow-2 text-bold text-capitalize"
             style="top: 60px; right: 15px"
-            v-if="lng && lat"
           >
             <div>经度：{{ lng || "-" }}</div>
             <div>纬度：{{ lat || "-" }}</div>
@@ -105,13 +105,7 @@
 </template>
 <script>
 import GlobalMap from "components/map/index.vue";
-import {
-  ref,
-  inject,
-  onBeforeUnmount,
-  toRaw,
-  shallowRef,
-} from "vue";
+import {inject, onBeforeUnmount, ref, shallowRef, toRaw,} from "vue";
 // import {PROJECT} from "src/api/module";
 export default {
   emits: ["cancel", "ok"],
@@ -140,7 +134,7 @@ export default {
       if (!marker) return;
       marker.remove();
       marker.add(map.value);
-      map.value.setCenter(location, true, false); // 加上这个人生倍儿爽，把当前定位设成中心点
+      map.value.setZoomAndCenter(30, location, true, false); // 加上这个人生倍儿爽，把当前定位设成中心点
       marker.setPosition(location);
     };
     const fnAddress = (location, addressStr) => {
@@ -167,14 +161,16 @@ export default {
         geolocation.getCurrentPosition((status, result) => {
           if ((status === 'complete') && result && result.info === "SUCCESS") {
             const {position} = result
-            map.value.setZoomAndCenter(17, position, true, false)
+            map.value.setZoomAndCenter(30, position, true, false)
           }
         })
       });
     }
     const onMapLoadSuccess = () => {
       AMap.plugin(["AMap.AutoComplete"], function () {
+        console.log(111)
         autoComplete = new AMap.AutoComplete({city: "全国"});
+        console.log(333)
       });
       AMap.plugin("AMap.Geocoder", () => {
         geocoder = new AMap.Geocoder({
@@ -184,13 +180,16 @@ export default {
       });
       AMap.plugin("AMap.DistrictSearch", function () {
         // 创建行政区查询对象
+        console.log(4444)
         district = new AMap.DistrictSearch({
           // 返回行政区边界坐标等具体信息
           extensions: "all",
           // 设置查询行政区级别为区
           level: "district",
         });
+        console.log(5555)
       });
+      console.log(222)
       marker = new AMap.Marker();
       map.value.on("click", onMapClick);
       if (props.row) {

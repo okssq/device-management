@@ -1,7 +1,8 @@
 <template>
-  <q-breadcrumbs v-show="crumbs" gutter="sm" class="gt-xs text-grey-7">
+
+  <q-breadcrumbs v-show="crumbs" class="gt-sm text-grey-7" gutter="sm">
     <template #separator>
-      <q-icon size="1em" name="navigate_next" color="grey-7" />
+      <q-icon color="grey-7" name="navigate_next" size="1em"/>
     </template>
     <q-breadcrumbs-el
       v-for="(item, index) in crumbs"
@@ -9,11 +10,12 @@
       :label="item"
     />
   </q-breadcrumbs>
+
 </template>
 
 <script>
-import { useRoute } from "vue-router";
-import { computed } from "vue";
+import {useRoute} from "vue-router";
+import {computed} from "vue";
 
 export default {
   setup() {

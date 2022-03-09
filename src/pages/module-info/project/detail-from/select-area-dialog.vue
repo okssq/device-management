@@ -16,9 +16,9 @@
             </div>
             <q-btn
               flat
+              icon="clear"
               round
               size="12px"
-              icon="clear"
               @click="$emit('cancel')"
             />
           </div>
@@ -30,11 +30,11 @@
           <div class="q-pa-md">
             <q-form class="row q-gutter-md items-center">
               <q-input
-                dense
-                outlined
-                lazy-rules
-                class="flex1 q-mt-md"
                 v-model="address"
+                class="flex1 q-mt-md"
+                dense
+                lazy-rules
+                outlined
               >
                 <template #prepend>
                   <span class="text-subtitle2 text-grey-8 text-bold"
@@ -43,12 +43,12 @@
                 </template>
               </q-input>
               <q-btn
+                color="primary"
                 flat
                 label="取消"
-                color="primary"
                 @click="$emit('cancel')"
               />
-              <q-btn label="确定" color="primary" @click="onSubmit"/>
+              <q-btn color="primary" label="确定" @click="onSubmit"/>
             </q-form>
           </div>
           <section
@@ -56,31 +56,31 @@
             style="top: 60px; left: 15px"
           >
             <q-input
-              dense
-              borderless
-              rounded
-              placeholder="搜索地址"
               v-model="inputFilter"
+              borderless
+              dense
+              placeholder="搜索地址"
+              rounded
               style="width: 240px"
               @focus="listVisible = true"
               @update:model-value="onInputChange"
             >
               <template #prepend>
-                <q-icon name="search" class="q-ml-sm"/>
+                <q-icon class="q-ml-sm" name="search"/>
               </template>
               <template #append>
                 <div class="q-mr-sm"/>
               </template>
               <q-menu
                 v-model="listVisible"
+                anchor="bottom left"
                 fit
+                no-focus
                 no-parent-event
                 no-refocus
-                no-focus
-                anchor="bottom left"
                 self="top left"
               >
-                <q-list padding dense bordered v-show="filterList.length">
+                <q-list v-show="filterList.length" bordered dense padding>
                   <template v-for="(item, index) in filterList" :key="index">
                     <q-item clickable @click="filterSelectItem(item)">
                       <q-item-section>
@@ -99,9 +99,9 @@
             </q-input>
           </section>
           <section
+            v-if="lng && lat"
             class="absolute-top-right bg-white q-pa-sm rounded-borders shadow-2 text-bold text-capitalize"
             style="top: 60px; right: 15px"
-            v-if="lng && lat"
           >
             <div>经度：{{ lng || "-" }}</div>
             <div>纬度：{{ lat || "-" }}</div>
@@ -112,14 +112,8 @@
   </teleport>
 </template>
 <script>
+import {inject, onBeforeUnmount, ref, shallowRef, toRaw,} from "vue";
 import GlobalMap from "components/map";
-import {
-  ref,
-  inject,
-  onBeforeUnmount,
-  toRaw,
-  shallowRef,
-} from "vue";
 import {notifyWarn} from "src/util/common";
 
 export default {
@@ -134,7 +128,6 @@ export default {
     },
   },
   setup(props, {emit}) {
-    console.log('row---', props.row)
     let autoComplete, geocoder, marker, polygon, polygonEditor;
     const map = inject("map");
     const inputFilter = ref("");
@@ -289,50 +282,50 @@ export default {
 
     const onMapLoadSuccess = () => {
       initMap();
-      if (props.row) {
-        const obj = toRaw(props.row);
-        const {mapStr, province, city, district, township, projectAddress} =
-          obj;
-        const addressObj = {
-          province,
-          city,
-          district,
-          township,
-          projectAddress,
-        };
-        // 编辑回显项目围栏
-        if (mapStr && projectAddress) {
-          const [gpsStr, fenceStr] = mapStr.split(";");
-          if (!gpsStr || !fenceStr) return;
-          const gpsArr = gpsStr.split(",");
-          const position = new AMap.LngLat(gpsArr[0], gpsArr[1]);
-          try {
-            const path = JSON.parse(fenceStr).map((el) => {
-              const {longitude, latitude} = el;
-              return new AMap.LngLat(longitude, latitude);
-            });
-            fnMarker(position);
-            fnAddress(position, addressObj);
-            fnPolygon(path);
-          } catch (e) {
-            console.log("error", e);
-            notifyWarn('渲染项目围栏错误，请重新编辑围栏!')
-          }
-        }
-        // 新建项目围栏 - 根据浏览器定位到当前地图中心
-        else{
-          AMap.plugin("AMap.Geolocation", () => {
-            const geolocation = new AMap.Geolocation();
-            geolocation.getCurrentPosition((status ,result )=> {
-              if( (status === 'complete') && result && result.info==="SUCCESS"){
-                const { position } = result
 
-                map.value.setZoomAndCenter(17, position, true, false)
-              }
-            })
+      const obj = toRaw(props.row);
+      console.log('obj', obj)
+      const {mapStr, province, city, district, township, projectAddress} =
+        obj;
+      const addressObj = {
+        province,
+        city,
+        district,
+        township,
+        projectAddress,
+      };
+      // 编辑回显项目围栏
+      if (mapStr && projectAddress) {
+        const [gpsStr, fenceStr] = mapStr.split(";");
+        if (!gpsStr || !fenceStr) return;
+        const gpsArr = gpsStr.split(",");
+        const position = new AMap.LngLat(gpsArr[0], gpsArr[1]);
+        try {
+          const path = JSON.parse(fenceStr).map((el) => {
+            const {longitude, latitude} = el;
+            return new AMap.LngLat(longitude, latitude);
           });
+          fnMarker(position);
+          fnAddress(position, addressObj);
+          fnPolygon(path);
+        } catch (e) {
+          console.log("error", e);
+          notifyWarn('渲染项目围栏错误，请重新编辑围栏!')
         }
       }
+      // 新建项目围栏 - 根据浏览器定位到当前地图中心
+      else {
+        AMap.plugin("AMap.Geolocation", () => {
+          const geolocation = new AMap.Geolocation();
+          geolocation.getCurrentPosition((status, result) => {
+            if ((status === 'complete') && result && result.info === "SUCCESS") {
+              const {position} = result
+              map.value.setZoomAndCenter(30, position, true, false)
+            }
+          })
+        });
+      }
+
     }
     const onSubmit = () => {
       let mapStr = `${lng.value},${lat.value};`;

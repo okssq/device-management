@@ -1,9 +1,9 @@
 <template>
   <q-separator/>
-  <div id="ad" :class="{'drag-enter':dragging}" class="relative-position bg-grey-1" style="height: 20%"
+  <div id="ad" :class="{'drag-enter':dragging}" class="relative-position bg-grey-1" style="height: 22%"
        @dragenter="onDragEnter"
        @dragleave="onDragLeave" @dragover="onDragOver" @drop="onDrop">
-    <div class="absolute-center text-grey-6 text-no-wrap text-subtitle1">
+    <div class="absolute-center text-grey-6 text-no-wrap  text-subtitle1">
       <q-badge align="middle" color="red-5" label="1" transparent/>
       拖动左侧资源可添加广告
     </div>
@@ -49,9 +49,6 @@
     </q-carousel>
   </div>
   <q-separator/>
-  <div class="q-pa-xs">
-    <q-btn color="grey-7" dense disable flat icon="chevron_left">返回</q-btn>
-  </div>
 </template>
 
 <script>
@@ -61,7 +58,7 @@ import {inject, ref} from 'vue'
 export default {
   props: {
     page: {
-      type: String,
+      type: [String, Number],
       page: '0'
     },
   },
@@ -69,6 +66,7 @@ export default {
 
     const templateData = inject('templateData')
     const item = templateData.value.find(el => el.page == props.page)
+
     const carouselValue = ref(0)
     const adList = ref((item ? JSON.parse(JSON.stringify(item.obj.id1)) : []) || [])
     const dragging = ref(false)
@@ -119,6 +117,4 @@ export default {
 .drag-enter {
   outline: 4px dashed orange;
 }
-
-
 </style>

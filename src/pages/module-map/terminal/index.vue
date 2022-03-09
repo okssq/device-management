@@ -2,10 +2,10 @@
   <div class="absolute-full">
     <global-map @load-success="onMapLoadSuccess"/>
     <info-window
-      ref="refInfoWindow"
       v-show="infoWindowVisible"
-      :loading="infoWindowLoading"
+      ref="refInfoWindow"
       :data="infoWindowData"
+      :loading="infoWindowLoading"
       @close="infoWindowVisible = false"
     />
     <tab-tree
@@ -32,12 +32,7 @@ import TabTree from "./tree/index.vue";
 import InfoWindow from "./info-window.vue";
 import {LEVEL, TERMINAL_MAP} from "src/api/module";
 import {notifyWarn} from "src/util/common";
-import {
-  ref,
-  shallowRef,
-  inject,
-  onBeforeUnmount,
-} from "vue";
+import {inject, onBeforeUnmount, ref, shallowRef,} from "vue";
 
 
 export default {
@@ -53,9 +48,12 @@ export default {
     let infoWindow = null; // 信息窗口地图对象
     let width = 0;   // 地图宽度
     let height = 0; // 地图高度
+    let firstProjectId = null //第一个项目ID
 
+    const currentTerminalId = ref('')
     const loading = ref(true)
     const map = inject("map");
+    const loginInfo = inject('loginInfo')
 
     const tab = ref(0);
     const treeList = shallowRef([]);
@@ -79,6 +77,9 @@ export default {
         if (type == 1 || type == 2) {
           const _index =
             pIndex === undefined ? `${index}` : `${pIndex}-${index}`;
+          if (type == 2 && !firstProjectId) {
+            firstProjectId = id
+          }
           treeItem["id"] = `${type == 1 ? "com" : "prj"}_${id}`;
           treeItem["index"] = _index;
           treeItem["count"] = 0;
@@ -133,7 +134,7 @@ export default {
     };
     // 渲染tab页面对应[全部/在线/离线]GPS点
     const renderTabGps = (type) => {
-      map.value.setZoomAndCenter(5, [110.850831, 36.86837],true,false);
+      map.value.setZoomAndCenter(5, [110.850831, 36.86837], true, false);
       let data = []
       if (type === 0) {
         data = JSON.parse(JSON.stringify(allPoints))
@@ -152,15 +153,18 @@ export default {
     const renderInfoWindow = (row) => {
       const {id} = row;
       const tId = id.slice(5);
+
       const findItem = allPoints.find(el => el.terminalId === tId)
-      if(!findItem) {
+      if (!findItem) {
         notifyWarn('没有查询到设备坐标')
         return false
       }
+      currentTerminalId.value = tId
       infoWindowLoading.value = true
       infoWindowVisible.value = true;
       const {lnglat} = findItem
       const position = JSON.parse(JSON.stringify(lnglat));
+      console.log('定位到设备ID：', tId, '坐标：', position)
       if (!infoWindow) {
         infoWindow = new window.AMap.InfoWindow({
           isCustom: true,
@@ -172,11 +176,12 @@ export default {
       }
       infoWindow.close()
 
+
       setTimeout(function () {
-        infoWindow.open(map.value, position, 20);
+        infoWindow.open(map.value, position, 30);
       }, 400);
 
-      map.value.setZoomAndCenter(18, position, true, false)
+      map.value.setZoomAndCenter(30, position, true, false)
       // (树列表宽度340+树列表左右各15+卡片320+卡片左右各12 = 914)
       // (卡片高度250+marker高度40 = 300)
       // (height/2) - (( height - 300 ) / 2 )
@@ -187,6 +192,9 @@ export default {
 
       TERMINAL_MAP.gpsList({terminalIds: [tId],})
         .then((res) => {
+          if (currentTerminalId.value && res[0]['terminalId'] !== currentTerminalId.value) {
+            return false
+          }
           infoWindowData.value = res[0];
           console.log("获取当前设备详情信息", res[0]);
         }).finally(() => {
@@ -201,6 +209,10 @@ export default {
         const {tree, vList} = formatTreeData([res]);
         treeList.value = vList;
         treeNode.value = tree;
+        if (firstProjectId && allFenceObj[firstProjectId] && loginInfo.value.companyId != 1) {
+          console.log('定位到第一个项目ID围栏：', firstProjectId)
+          map.value.setFitView(allFenceObj[firstProjectId], true, [60, 60, 60, 400], 20);
+        }
       }).catch(err => {
         console.log('<<getTreeData err>>', err)
       }).finally(() => {
@@ -209,17 +221,19 @@ export default {
     }
     // 渲染所有gps点
     const renderAllGps = (list) => {
-       list.forEach((el) => {
+      console.log('list', list);
+      list.forEach((el) => {
+        console.log('el', el)
         const {gpsInfo} = el;
-         if(gpsInfo){
-           const gpsArr = gpsInfo.split(",");
-           if(gpsArr.length === 2){
-             allPoints.push({
-               ...el,
-               lnglat: gpsArr
-             })
-           }
-         }
+        if (gpsInfo) {
+          const gpsArr = gpsInfo.split(",");
+          if (gpsArr.length === 2) {
+            allPoints.push({
+              ...el,
+              lnglat: gpsArr
+            })
+          }
+        }
       });
       const renderMarker = (context) => {
         const {type, onlineStatus} = context["data"][0];
@@ -233,22 +247,23 @@ export default {
           map.value,
           JSON.parse(JSON.stringify(allPoints)),
           {
-            gridSize: 40, // 聚合网格像素大小
+            gridSize: 80, // 聚合网格像素大小
             maxZoom: 20,
             renderMarker, // 自定义非聚合点样式
           }
         );
         cluster.on("click", function (obj) {
           const {clusterData} = obj;
-          if (clusterData.length !== 1) return;
-          const row = clusterData[0];
-          renderInfoWindow({id: `term_${row["terminalId"]}`});
+          if (clusterData.length === 1) {
+            const row = clusterData[0];
+            renderInfoWindow({id: `term_${row["terminalId"]}`});
+          }
         });
       });
     }
     // 渲染所有项目围栏
     const renderAllFence = (list) => {
-      list.map(el => {
+      list.map((el, index) => {
         const {projectId, mapStr} = el
         const [gps, fenceStr] = mapStr.split(";");
         if (!fenceStr) return
@@ -297,11 +312,13 @@ export default {
     };
     // 地图加载完成事件
     const onMapLoadSuccess = () => {
-      map.value.setZoomAndCenter(5, [110.850831, 36.86837],true,false);
+
+      console.log('定位到5层级地图！')
       Promise.all([getAllGps(), getAllFence()])
         .then(([gpsData, fenceData]) => {
           // console.log('gpsData', gpsData)
           // console.log('fenceData', fenceData)
+          map.value.setZoomAndCenter(5, [110.850831, 36.86837], true, false);
           renderAllGps(gpsData)
           renderAllFence(fenceData)
           renderTree()

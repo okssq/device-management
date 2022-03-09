@@ -2,10 +2,10 @@
   <div class="absolute-full">
     <global-map @load-success="onMapLoadSuccess"/>
     <q-select
-      v-bind="baseSelectProps"
-      style="top: 15px"
       v-model="province"
       :options="provinceOptions"
+      style="top: 15px"
+      v-bind="baseSelectProps"
       @update:model-value="onProvinceChange"
     >
       <template #no-option>
@@ -21,11 +21,11 @@
       </template>
     </q-select>
     <q-select
-      v-bind="baseSelectProps"
-      :clearable="!(city === '直辖市' || city === '特别行政区')"
-      style="top: 69px"
       v-model="city"
+      :clearable="!(city === '直辖市' || city === '特别行政区')"
       :options="cityOptions"
+      style="top: 69px"
+      v-bind="baseSelectProps"
       @update:model-value="onCityChange"
     >
       <template #no-option>
@@ -41,10 +41,10 @@
       </template>
     </q-select>
     <q-select
-      v-bind="baseSelectProps"
-      style="top: 123px"
       v-model="district"
       :options="districtOptions"
+      style="top: 123px"
+      v-bind="baseSelectProps"
       @update:model-value="onDistrictChange"
     >
       <template #no-option>
@@ -64,12 +64,12 @@
       style="width: 260px; top: 177px; right: 15px; border-radius: 2px"
     >
       <q-input
-        dense
-        borderless
-        debounce="500"
-        placeholder="请输入项目名称"
-        class="q-mx-md q-my-xs"
         v-model="filterText"
+        borderless
+        class="q-mx-md q-my-xs"
+        debounce="500"
+        dense
+        placeholder="请输入项目名称"
       >
         <template #before>
           <q-icon name="search"></q-icon>
@@ -79,8 +79,8 @@
       <q-list class="overflow-auto" style="max-height: calc(100vh - 292px)">
         <template v-for="item in filterList" :key="item.id">
           <q-item
-            clickable
             :active="selectProjectId === item.id"
+            clickable
             @click="onSelectProjectItem(item)"
           >
             <q-item-section>
@@ -107,7 +107,7 @@
 </template>
 <script>
 import {PROJECT, TERMINAL_MAP} from "src/api/module.js";
-import {computed, inject, ref, shallowRef, onBeforeUnmount} from "vue";
+import {computed, inject, onBeforeUnmount, ref, shallowRef} from "vue";
 import GlobalMap from "components/map";
 import {notifyWarn} from "src/util/common";
 
@@ -121,8 +121,8 @@ export default {
     let projectFenceObj = {} //存储所有项目围栏对象 {围栏ID：地图围栏对象}
     let hasRenderMarkerFenceIds = []; //存储已经加载过项目设备坐标集的项目ID
     let provincePolygons = [], //存取省级围栏[Polygon,Polygon,..]
-        cityPolygons = [],     //存取市级围栏[Polygon,Polygon,..]
-        districtPolygons = []; //存取县级围栏[Polygon,Polygon,..]
+      cityPolygons = [],     //存取市级围栏[Polygon,Polygon,..]
+      districtPolygons = []; //存取县级围栏[Polygon,Polygon,..]
 
     const listLoading = ref(false)
     const map = inject("map");
@@ -183,17 +183,20 @@ export default {
         provincePolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && map.value.setFitView(provincePolygons, true, [20, 20, 20, 300],22);
+        flag && map.value.setFitView(provincePolygons, true, [20, 20, 20, 300], 22);
+        console.log(`${flag ? '显示' : '隐藏'}了省级`)
       } else if (type === "city") {
         cityPolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && map.value.setFitView(cityPolygons, true, [20, 20, 20, 300],22);
+        flag && map.value.setFitView(cityPolygons, true, [20, 20, 20, 300], 22);
+        console.log(`${flag ? '显示' : '隐藏'}了市级`)
       } else if (type === "district") {
         districtPolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
-        flag && map.value.setFitView(districtPolygons, true, [20, 20, 20, 300],22);
+        flag && map.value.setFitView(districtPolygons, true, [20, 20, 20, 300], 22);
+        console.log(`${flag ? '显示' : '隐藏'}了县级`)
       }
     };
     // 销毁地区围栏
@@ -204,18 +207,21 @@ export default {
           el.destroy();
         });
         provincePolygons = []
+        console.log('销毁了省级')
       } else if (type === "city") {
         cityPolygons.forEach((el) => {
           map.value.remove(el)
           el.destroy();
         });
         cityPolygons = []
+        console.log('销毁了市级')
       } else if (type === "district") {
         districtPolygons.forEach((el) => {
           map.value.remove(el)
           el.destroy();
         });
-        cityPolygons = []
+        districtPolygons = []
+        console.log('销毁了县级')
       }
     };
     // 渲染生成地区围栏
@@ -233,15 +239,18 @@ export default {
             path: bounds[i],
           });
           arr.push(polygon);
-          if (type === "province") {
-            provincePolygons = arr;
-          } else if (type === "city") {
-            cityPolygons = arr;
-          } else if (type === "district") {
-            districtPolygons = arr;
-          }
         }
-        map.value.setFitView(arr, true, [20, 20, 20, 300],22); //地图自适应
+        if (type === "province") {
+          provincePolygons = arr;
+          console.log('生成了省级')
+        } else if (type === "city") {
+          cityPolygons = arr;
+          console.log('生成了市级')
+        } else if (type === "district") {
+          console.log('生成了县级')
+          districtPolygons = arr;
+        }
+        map.value.setFitView(arr, true, [20, 20, 20, 300], 22); //地图自适应
       }
     };
     // 省级选择改变
@@ -263,6 +272,7 @@ export default {
           if (status == "complete") {
             const data = result.districtList[0];
             const {districtList, boundaries, citycode} = data;
+            console.log('获取到省级数据', data)
             if (Array.isArray(citycode)) {
               cityOptions.value = districtList.map((el) => el.name);
             } else {
@@ -275,15 +285,24 @@ export default {
                     arr.push(_el["name"]);
                   });
                 });
+                cityOptions.value = ['直辖市'];
+                city.value = '直辖市';
+                districtOptions.value = arr;
               } else {
-                // 特别行政区
-                districtList.forEach((el) => {
-                  arr.push(el["name"]);
-                });
+                if (districtList) { // 特别行政区
+                  districtList.forEach((el) => {
+                    arr.push(el["name"]);
+                  });
+                  cityOptions.value = ["特别行政区"];
+                  city.value = "特别行政区";
+                  districtOptions.value = arr;
+                } else { // 台湾省
+                  cityOptions.value = [];
+                  city.value = '';
+                  districtOptions.value = [];
+                }
               }
-              cityOptions.value = length === 3 ? ["直辖市"] : ["特别行政区"];
-              city.value = length === 3 ? "直辖市" : "特别行政区";
-              districtOptions.value = arr;
+
             }
             renderAreaFence("province", boundaries);
           }
@@ -303,13 +322,13 @@ export default {
       } else {
         districtSearch.setLevel("city");
         districtSearch.setSubdistrict(1);
+        fnToggleAreas("province", false);
         districtSearch.search(val, function (status, result) {
           if (status == "complete") {
             // console.log("根据市级查找信息", result);
             const data = result.districtList[0];
             const {districtList, boundaries} = data;
             districtOptions.value = districtList.map((el) => el.name);
-            fnToggleAreas("province", false);
             renderAreaFence("city", boundaries);
           }
         });
@@ -322,13 +341,18 @@ export default {
       destroyFence("district");
       if (!val) {
         if (["直辖市", "特别行政区"].includes(city.value)) {
+          // console.log(1)
           destroyFence("city");
           fnToggleAreas("province", true);
         } else {
+          // console.log(2)
           fnToggleAreas("province", false);
           fnToggleAreas("city", true);
         }
       } else {
+        // console.log(3)
+        fnToggleAreas("province", false);
+        fnToggleAreas("city", false);
         districtSearch.setLevel("district");
         districtSearch.setSubdistrict(1);
         districtSearch.search(val, function (status, result) {
@@ -336,8 +360,6 @@ export default {
             // console.log("根据区县查找信息", result);
             const data = result.districtList[0];
             const {boundaries} = data;
-            fnToggleAreas("province", false);
-            fnToggleAreas("city", false);
             renderAreaFence("district", boundaries);
           }
         });
@@ -347,17 +369,17 @@ export default {
     // 渲染所有设备定位图标通过项目
     const renderTerminalsByProject = (projectId) => {
       if (hasRenderMarkerFenceIds.includes(projectId)) {
-        console.log('不需要发送请求项目的所有设备了。')
+        // console.log('不需要发送请求项目的所有设备了。')
         projectFenceObj[projectId].clearEvents()
         return;
       }
       TERMINAL_MAP.gpsList({projectId})
         .then((res) => {
-          console.log('根据项目id查询到所有设备定位信息:', res)
+          // console.log('根据项目id查询到所有设备定位信息:', res)
           hasRenderMarkerFenceIds.push(projectId);
           projectFenceObj[projectId].clearEvents();
-          (res || []).forEach(el=> {
-            const {type,onlineStatus,terminalId,gpsInfo} = el
+          (res || []).forEach(el => {
+            const {type, onlineStatus, terminalId, gpsInfo} = el
             const gpsArr = gpsInfo.split(',');
             const position = new AMap.LngLat(+gpsArr[0], +gpsArr[1])
             // 新建自定义图标
@@ -469,12 +491,12 @@ export default {
       const {id} = row;
       selectProjectId.value = id;
       const polygon = projectFenceObj[id]
-      if(!polygon) {
+      if (!polygon) {
         notifyWarn('地图资源加载中，请稍后重试！')
         return
       }
       renderTerminalsByProject(id)
-      map.value.setFitView([projectFenceObj[id]], true, [20, 20, 20, 300],22);
+      map.value.setFitView([projectFenceObj[id]], true, [20, 20, 20, 300], 22);
     };
     // 地图加载成功事件
     const onMapLoadSuccess = () => {
@@ -484,7 +506,7 @@ export default {
 
 
     onBeforeUnmount(() => {
-      if(!map.value) return
+      if (!map.value) return
       if (cluster) {
         map.value.remove(cluster)
         cluster = null;

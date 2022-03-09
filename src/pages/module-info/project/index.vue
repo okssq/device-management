@@ -1,27 +1,27 @@
 <template>
   <div class="my-box column no-wrap">
     <search-bar
-      :tree-list="treeList"
       :searching="searching"
-      @search="onSearch"
+      :tree-list="treeList"
       @insert="onInsert"
+      @search="onSearch"
     />
-    <q-separator />
+    <q-separator/>
     <div class="flex1 overflow-hidden">
       <result-table
-        expand
-        row-key="id"
-        :rows="rows"
         :columns="columns"
         :loading="searching"
         :page="page"
         :page-size="pageSize"
+        :rows="rows"
         :total-count="totalCount"
         :total-page="totalPage"
+        expand
+        row-key="id"
         @page="onPageChange"
       >
         <template #expand="{ row }">
-          <div class="q-gutter-sm q-ml-sm text-body2">
+          <div class="q-py-md q-gutter-sm q-ml-sm text-body2">
             <div class="item row">
               <div class="label">项目ID:</div>
               <div class="value">{{ row.id }}</div>
@@ -40,7 +40,7 @@
             </div>
             <div class="item row">
               <div class="label">最后更新时间:</div>
-              <div class="value">{{ row.createTime }}</div>
+              <div class="value">{{ row.updateTime }}</div>
             </div>
           </div>
         </template>
@@ -49,29 +49,29 @@
             class="text-primary cursor-pointer"
             style="text-decoration: underline"
             @click="onFenceMap(row)"
-            >{{ row.projectAddress || "-" }}</span
+          >{{ row.projectAddress || "-" }}</span
           >
         </template>
         <template #op="{ row }">
           <div class="q-gutter-sm">
             <q-btn
-              title="编辑"
-              flat
-              dense
-              size="10px"
-              round
               color="blue-5"
+              dense
+              flat
               icon="edit"
+              round
+              size="10px"
+              title="编辑"
               @click.stop="onEdit(row)"
             />
             <q-btn
-              title="删除"
-              flat
-              dense
-              size="10px"
-              round
               color="red-5"
+              dense
+              flat
               icon="clear"
+              round
+              size="10px"
+              title="删除"
               @click.stop="onDel(row)"
             />
           </div>
@@ -81,11 +81,11 @@
   </div>
   <detail-form
     v-if="detailVisible"
+    :form-data="detailData"
     :select-company-id="loginCompanyId"
     :select-company-name="loginCompanyName"
     :tree-list="treeList"
     :type="detailType"
-    :form-data="detailData"
     @cancel="detailVisible = false"
     @ok="onConfirmDetail"
   />
@@ -104,14 +104,15 @@ import DelConfirm from "components/del-confirm.vue";
 import DetailForm from "./detail-from";
 import fenceMap from "./fence-map";
 
-import { PROJECT } from "src/api/module.js";
-import { reactive, ref, shallowRef, toRefs } from "vue";
-import { notifySuccess } from "src/util/common";
-import { useQuasar } from "quasar";
-import { useCompanyTree } from "components/company/useCompayTree";
+import {PROJECT} from "src/api/module.js";
+import {reactive, ref, shallowRef, toRefs} from "vue";
+import {notifySuccess} from "src/util/common";
+import {useQuasar} from "quasar";
+import {useCompanyTree} from "components/company/useCompayTree";
 
 import useDetail from "./useDetail";
 import useFenceMap from "./fence-map/useFenceMap";
+
 export default {
   components: {
     SearchBar,
@@ -120,7 +121,7 @@ export default {
     fenceMap,
   },
   setup() {
-    const { treeList } = useCompanyTree();
+    const {treeList} = useCompanyTree();
     const $q = useQuasar();
     const columns = [
       {
@@ -175,12 +176,13 @@ export default {
       searching.value = true;
       PROJECT.list(searchData)
         .then((res) => {
-          const { results, totalCount, totalPage } = res;
+          const {results, totalCount, totalPage} = res;
           rows.value = results;
           pagination.totalCount = totalCount;
           pagination.totalPage = totalPage;
         })
-        .catch(() => {})
+        .catch(() => {
+        })
         .finally(() => {
           searching.value = false;
         });
@@ -197,10 +199,10 @@ export default {
     };
     // 表格pagination改变回调
     const onPageChange = (val) => {
-      const { pageSize, page } = val;
+      const {pageSize, page} = val;
       page && (pagination.page = page);
       pageSize && (pagination.pageSize = pageSize);
-      searchData && (searchData = { ...searchData, ...val });
+      searchData && (searchData = {...searchData, ...val});
       getList();
     };
 
@@ -211,12 +213,13 @@ export default {
 
       }).onOk(() => {
         searching.value = true;
-        PROJECT.del({ id: row.id })
+        PROJECT.del({id: row.id})
           .then(() => {
             notifySuccess("删除成功");
             getList();
           })
-          .catch(() => {})
+          .catch(() => {
+          })
           .finally(() => {
             searching.value = false;
           });
@@ -224,7 +227,7 @@ export default {
     };
 
     // 查看围栏事件
-    const { fenceMapDialogVisible, fenceMapData, onFenceMap } = useFenceMap();
+    const {fenceMapDialogVisible, fenceMapData, onFenceMap} = useFenceMap();
 
     // 新建或编辑项目事件
     const {

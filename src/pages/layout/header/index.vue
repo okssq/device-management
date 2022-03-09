@@ -5,53 +5,39 @@
         src="~assets/images/logo.jpg"
         style="width: 40px; margin: 0 3px 0 9px"
       />
-      <img src="~assets/images/logo-text.jpg" />
+      <img src="~assets/images/logo-text.jpg"/>
     </div>
-    <div class="bd" />
-    <crumbs />
-    <q-space />
-    <q-btn-dropdown
-      flat
-      icon="account_circle"
-      color="grey-7"
-      :label="loginInfo ? loginInfo.realName : ''"
-    >
-      <div class="q-pa-sm text-right">
-        <q-btn
-          class="full-width"
-          color="primary"
-          label="退出"
-          push
-          size="sm"
-          v-close-popup
-          @click="onLoginOut"
-        />
-      </div>
-    </q-btn-dropdown>
+    <div class="bd gt-sm"/>
+    <crumbs/>
+    <q-space/>
+    <div class="q-px-xs text-grey-7 row no-wrap">
+      <!--二维码-->
+      <qrcode/>
+      <!--铃铛与设置-->
+      <set-bell/>
+      <!--用户名-->
+      <user/>
+    </div>
+
   </div>
 </template>
 <script>
+
 import Crumbs from "./crumbs.vue";
-import { useQuasar } from "quasar";
-import { useRouter } from "vue-router";
-import { inject } from "vue";
+import Qrcode from './qrcode.vue'
+import SetBell from "./set-bell.vue";
+import User from "./user.vue";
+
+
 export default {
   components: {
-    Crumbs
+    User,
+    SetBell,
+    Crumbs,
+    Qrcode,
   },
   setup() {
-    const $q = useQuasar();
-    const router = useRouter();
-    const loginInfo = inject("loginInfo");
-    const onLoginOut = () => {
-      $q.localStorage.remove("loginInfo");
-      loginInfo.value = null
-      router.push("/login");
-    };
-    return {
-      loginInfo,
-      onLoginOut,
-    };
+
   },
 };
 </script>
@@ -60,6 +46,7 @@ export default {
   height: 56px;
   z-index: 11;
 }
+
 .bd {
   width: 1px;
   background-color: #75757590;

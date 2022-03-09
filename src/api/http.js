@@ -1,6 +1,6 @@
 import axios from "axios";
 import qs from "qs";
-import { notifyWarn, fn3001 } from "src/util/common";
+import {fn3001, notifyWarn} from "src/util/common";
 
 // 当前正在请求的数组集合
 const requestArr = [];

@@ -3,55 +3,55 @@
   <div class="flex1 q-px-lg column no-wrap items-center justify-between">
     <div class="text-h6 text-grey-10">问题反馈</div>
     <div style="width: 94%">
-      <div class="text-subtitle2">
+      <div class="text-subtitle1">
         选择您遇到的问题(可多选)
       </div>
       <div class="text-caption q-mb-md">
-        <q-badge color="red" align="middle" label="8" transparent/>
+        <q-badge align="middle" color="red" label="8" transparent/>
         {{ id8Value }}
-        <q-popup-edit v-model="id8Value" auto-save v-slot="scope" @save="onUpdateTemplate({id:8,value:$event})">
-          <q-input  v-model="scope.value" dense autofocus counter @keyup.enter="scope.set"/>
+        <q-popup-edit v-slot="scope" v-model="id8Value" auto-save @save="onUpdateTemplate({id:8,value:$event})">
+          <q-input v-model="scope.value" autofocus counter dense @keyup.enter="scope.set"/>
         </q-popup-edit>
 
       </div>
       <div class="q-pa-md row no-wrap items-center justify-between" style="margin-lef:0;outline: 1px dashed #ccc">
         <div class="q-mr-md">
           <div
-            class="row no-wrap items-center"
             v-for="(item, index) in options"
             :key="index"
+            class="row no-wrap items-center"
           >
-            <q-checkbox dense :model-value="false" />
+            <q-checkbox :model-value="false" dense/>
             <div class="row no-wrap items-center">
               <span>{{ item }}</span>
-              <q-popup-edit :model-value="item" v-slot="scope" >
+              <q-popup-edit v-slot="scope" :model-value="item">
                 <q-input
                   :model-value="item"
-                  dense
                   autofocus
                   counter
+                  dense
                   @change="onOptionsLabelChange(index,$event)"
                   @keyup.enter="scope.set"
                 />
               </q-popup-edit>
             </div>
             <q-btn
-              dense
-              round
-              flat
-              size="12px"
               color="red"
+              dense
+              flat
               icon="close"
+              round
+              size="12px"
               @click="remove(index)"
             />
           </div>
         </div>
         <div class="">
-          <q-btn color="red" class="text-no-wrap" size="14px" label="9-添加选项" transparent/>
-          <q-popup-edit v-model="inputText" auto-save v-slot="scope">
-            <q-input v-model="inputText" dense autofocus counter>
+          <q-btn class="text-no-wrap" color="red" label="9-添加选项" size="14px" transparent/>
+          <q-popup-edit v-slot="scope" v-model="inputText" auto-save>
+            <q-input v-model="inputText" autofocus counter dense>
               <template #append>
-                <q-btn flat dense icon="save" @click="onAdd(scope)"></q-btn>
+                <q-btn dense flat icon="save" @click="onAdd(scope)"></q-btn>
               </template>
             </q-input>
           </q-popup-edit>
@@ -61,13 +61,13 @@
       </div>
     </div>
 
-    <q-btn size="14px" disable unelevated color="grey-6">提交</q-btn>
+    <q-btn color="grey-6" disable size="14px" unelevated>提交</q-btn>
   </div>
   <bottom page="15"/>
 </template>
 
 <script>
-import {ref, inject, toRaw} from "vue";
+import {inject, ref} from "vue";
 import Top from "./top.vue";
 import Bottom from "./bottom.vue";
 
@@ -78,9 +78,9 @@ export default {
   },
   setup() {
     const templateData = inject('templateData')
-    const item = templateData.value.find(el=> el.page == 15)
+    const item = templateData.value.find(el => el.page == 15)
     const id8Value = ref(item.obj.id8 || '')
-    const options = ref((item ? JSON.parse(JSON.stringify(item.obj.id9)) : [] )|| []);
+    const options = ref((item ? JSON.parse(JSON.stringify(item.obj.id9)) : []) || []);
     const inputText = ref("新添加的选项");
 
     // 每个可修改数据统一保存到要发送的数据
@@ -99,10 +99,9 @@ export default {
       item.obj.id9.push(inputText.value)
     };
 
-    const onOptionsLabelChange = (index,value) => {
+    const onOptionsLabelChange = (index, value) => {
       options.value[index] = value
       item.obj.id9[index] = value
-      console.log('index',index,'value',value)
     }
     return {
       id8Value,

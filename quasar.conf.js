@@ -91,7 +91,6 @@ module.exports = configure(function (ctx) {
     framework: {
       config: {},
       iconSet: "material-icons", // Quasar icon set
-      plugins: [],
       lang: "zh-CN", // Quasar language pack
       plugins: ["LocalStorage", "AppFullscreen", "Notify", "Dialog"],
     },

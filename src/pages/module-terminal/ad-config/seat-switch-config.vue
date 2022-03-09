@@ -1,26 +1,26 @@
 <template>
-  <q-dialog persistent ref="dialogRef">
+  <q-dialog ref="dialogRef" persistent>
     <q-card
       class="relative-position overflow-hidden"
       style="width: 380px; max-width: 98vw"
     >
       <div class="row q-px-md q-py-xs items-center justify-between">
         <div class="text-text-subtitle2 text-bold">
-          {{templateName}}开关配置
+          {{ templateName }}开关配置
         </div>
         <div class="q-gutter-xs">
-          <q-btn flat round size="12px" icon="add" title="新增开关配置" @click="onInsertItem"/>
-          <q-btn flat round size="12px" icon="clear" @click="onDialogHide"/>
+          <q-btn flat icon="add" round size="12px" title="新增开关配置" @click="onInsertItem"/>
+          <q-btn flat icon="clear" round size="12px" @click="onDialogHide"/>
         </div>
       </div>
       <q-separator/>
 
       <q-scroll-area :style="{'max-height':maxHeight,height:maxHeight}">
-        <q-list padding v-if="switchList.length">
+        <q-list v-if="switchList.length" padding>
           <template v-for="(item,index) in switchList" :key="item.index">
             <q-item>
               <q-item-section class="relative-position">
-                <q-input dense outlined v-model="item.indexName">
+                <q-input v-model="item.indexName" dense outlined>
                   <template #prepend>
                     <div class="text-caption text-grey-8  text-bold">开关名称：</div>
                   </template>
@@ -36,10 +36,10 @@
 
               <q-item-section side>
                 <div class="text-grey-8 q-gutter-xs">
-                  <q-btn class="gt-xs" size="12px" color="green" flat dense round icon="save" title="保存"
+                  <q-btn class="gt-xs" color="green" dense flat icon="save" round size="12px" title="保存"
                          @click="onSaveItem(item)"/>
-                  <q-btn class="gt-xs" size="12px" color="red" flat dense round icon="clear" title="删除"
-                         v-if="index === switchList.length-1" @click="onRemoveItem(item)"/>
+                  <q-btn v-if="index === switchList.length-1" class="gt-xs" color="red" dense flat icon="clear" round size="12px"
+                         title="删除" @click="onRemoveItem(item)"/>
                 </div>
               </q-item-section>
             </q-item>
@@ -48,7 +48,7 @@
 
 
         </q-list>
-        <div class="q-pa-md text-grey-7" v-else>
+        <div v-else class="q-pa-md text-grey-7">
           暂无配置信息
         </div>
       </q-scroll-area>
@@ -74,7 +74,7 @@ export default {
       type: Number,
       default: 0
     },
-    templateName:{
+    templateName: {
       type: String,
       default: ''
     }
@@ -86,7 +86,8 @@ export default {
     const switchList = ref([])
     const maxHeight = computed(() => {
       if (switchList.value.length) {
-        return switchList.value.length * 56 + 20 + 'px'
+        const height = switchList.value.length * 56 + 20;
+        return height > 350 ? '350px' : `${height}px`
       }
       return '56px'
     })
@@ -128,7 +129,7 @@ export default {
     }
     // 新增单个开关配置
     const onInsertItem = () => {
-      const index = switchList.value.length+1;
+      const index = switchList.value.length + 1;
       const data = {
         templateId: props.templateId,
         index,

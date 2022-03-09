@@ -1,8 +1,8 @@
 <template>
   <div class="flex1 q-pa-md bg-grey-1 relative-position overflow-auto">
     <div class="q-gutter-md row">
-      <q-card style="width: 240px" v-for="item in templateList" :key="item.id">
-        <q-img fit="contain"  :src="item.templatePhoto" style="width: 240px; height: 140px"/>
+      <q-card v-for="item in templateList" :key="item.id" style="width: 240px">
+        <q-img :src="item.templatePhoto" fit="contain" style="width: 240px; height: 140px"/>
         <q-separator/>
         <q-card-section>
           <div class="row no-wrap items-center justify-between">
@@ -13,33 +13,21 @@
         <q-card-section class="q-pt-none">
           <div class="row items-center no-wrap text-caption text-grey-6">
             <div class="text-no-wrap">备注：</div>
-            <div class="ellipsis" :title="item.remark">{{ item.remark }}</div>
+            <div :title="item.remark" class="ellipsis">{{ item.remark }}</div>
           </div>
           <div class="row items-center no-wrap text-caption text-grey-6">
             <div class="text-no-wrap">创建时间：</div>
-            <div class="ellipsis" :title="item.createTime">{{ item.createTime }}</div>
+            <div :title="item.createTime" class="ellipsis">{{ item.createTime }}</div>
           </div>
         </q-card-section>
         <q-separator/>
         <q-card-actions>
-          <template v-if="item.id === 3">
-            <q-btn flat color="primary" to="/terminal/adconfig/template/3">
-              自定义样式
-            </q-btn>
-          </template>
-          <template v-else-if="item.id === 2">
-            <q-btn flat color="primary" to="/terminal/adconfig/template/2">
-              自定义样式
-            </q-btn>
-            <q-btn flat color="primary" @click="onSetSeatSwitch(item)">
-              配置开关
-            </q-btn>
-          </template>
-          <template v-else-if="item.id === 1">
-            <q-btn flat color="primary" @click="onSetSeatSwitch(item)">
-              配置开关
-            </q-btn>
-          </template>
+          <q-btn v-if="[2,3].includes(item.id)" :to="`/terminal/adconfig/template/${item.id}`" color="primary" flat>
+            自定义样式
+          </q-btn>
+          <q-btn color="primary" flat @click="onSetSeatSwitch(item)">
+            配置开关
+          </q-btn>
         </q-card-actions>
       </q-card>
     </div>
@@ -52,9 +40,10 @@
 <script>
 import {ref, shallowRef} from "vue";
 import {TEMPLATE} from 'src/api/module'
-import { useRouter } from 'vue-router'
+import {useRouter} from 'vue-router'
 import SeatSwitchConfig from "./seat-switch-config";
 import {useQuasar} from "quasar";
+
 export default {
   setup() {
     const $q = useQuasar()
@@ -77,14 +66,14 @@ export default {
     }
     // 储物柜自定义样式事件
     const onSetTemplateLocker = () => {
-      router.push({name:'template-locker'})
+      router.push({name: 'template-locker'})
     }
     // 配置开关按钮事件
     const onSetSeatSwitch = (item) => {
       $q.dialog({
         component: SeatSwitchConfig,
-        componentProps:{
-          templateId:item.id,
+        componentProps: {
+          templateId: item.id,
           templateName: item.templateName
         }
       })
