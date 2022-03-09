@@ -1,11 +1,11 @@
 <template>
-  <div class="relative-position fit" id="component-map">
-    <div class="absolute-center" v-if="!mapLoad">
+  <div id="component-map" class="relative-position fit">
+    <div v-if="!mapLoad" class="absolute-center">
       <q-btn
-        icon="sync"
-        color="primary"
         :disable="loading"
         :loading="loading"
+        color="primary"
+        icon="sync"
         @click="loadMap"
       >地图资源加载失败，请重试！
       </q-btn
@@ -15,7 +15,7 @@
 </template>
 <script>
 import AMapLoader from "@amap/amap-jsapi-loader";
-import {inject, onMounted, onBeforeUnmount, ref, computed, watch} from "vue";
+import {computed, inject, onBeforeUnmount, onMounted, ref, watch} from "vue";
 
 export default {
   emits: ["load-success"],
@@ -39,15 +39,7 @@ export default {
           const mapObj = new AMap.Map("global-map", {
             zoom: 11, // 级别
             viewMode: "2D",
-            animateEnable: false,
-            isHotspot: false,
-            jogEnable: false,
-            indoorMap: false,
-            showIndoorMap: false,
-            doubleClickZoom: false,
-            keyboardEnable: false,
-            showBuildingBlock: false,
-            buildingAnimation: false,
+            zooms: [5, 20],
           });
           mapObj.on("complete", () => {
             console.log("全局地图加载完成");
@@ -87,7 +79,7 @@ export default {
       map.value.remove(overlays)
       map.value.clearMap();
       map.value.clearInfoWindow();
-      console.log("执行清除地图内部组件完毕",map.value.getAllOverlays());
+      console.log("执行清除地图内部组件完毕", map.value.getAllOverlays());
     });
 
     return {

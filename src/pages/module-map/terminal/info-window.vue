@@ -62,7 +62,7 @@
             @click="onSwitch"
           >
             <q-tooltip :offset="[10, 10]" class="bg-orange text-black shadow-4">
-              开关设置
+              设备使用状态
             </q-tooltip>
           </q-btn>
           <q-btn
@@ -123,19 +123,6 @@
               文本下发
             </q-tooltip>
           </q-btn>
-
-          <q-btn
-            v-if="data && [2,3].includes(+data.type)"
-            dense
-            flat
-            icon="o_feed"
-            round
-          >
-            <q-tooltip :offset="[10, 10]" class="bg-orange text-black shadow-4">
-              设备使用状态
-            </q-tooltip>
-          </q-btn>
-
           <q-btn
             v-if="data && [2,3].includes(+data.type)"
             dense

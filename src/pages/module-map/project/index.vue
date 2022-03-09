@@ -184,19 +184,19 @@ export default {
           flag ? el.show() : el.hide();
         });
         flag && map.value.setFitView(provincePolygons, true, [20, 20, 20, 300], 22);
-        console.log(`${flag ? '显示' : '隐藏'}了省级`)
+        // console.log(`${flag ? '显示' : '隐藏'}了省级`)
       } else if (type === "city") {
         cityPolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
         flag && map.value.setFitView(cityPolygons, true, [20, 20, 20, 300], 22);
-        console.log(`${flag ? '显示' : '隐藏'}了市级`)
+        // console.log(`${flag ? '显示' : '隐藏'}了市级`)
       } else if (type === "district") {
         districtPolygons.forEach((el) => {
           flag ? el.show() : el.hide();
         });
         flag && map.value.setFitView(districtPolygons, true, [20, 20, 20, 300], 22);
-        console.log(`${flag ? '显示' : '隐藏'}了县级`)
+        // console.log(`${flag ? '显示' : '隐藏'}了县级`)
       }
     };
     // 销毁地区围栏
@@ -207,21 +207,21 @@ export default {
           el.destroy();
         });
         provincePolygons = []
-        console.log('销毁了省级')
+        // console.log('销毁了省级')
       } else if (type === "city") {
         cityPolygons.forEach((el) => {
           map.value.remove(el)
           el.destroy();
         });
         cityPolygons = []
-        console.log('销毁了市级')
+        // console.log('销毁了市级')
       } else if (type === "district") {
         districtPolygons.forEach((el) => {
           map.value.remove(el)
           el.destroy();
         });
         districtPolygons = []
-        console.log('销毁了县级')
+        // console.log('销毁了县级')
       }
     };
     // 渲染生成地区围栏
@@ -242,12 +242,12 @@ export default {
         }
         if (type === "province") {
           provincePolygons = arr;
-          console.log('生成了省级')
+          // console.log('生成了省级')
         } else if (type === "city") {
           cityPolygons = arr;
-          console.log('生成了市级')
+          // console.log('生成了市级')
         } else if (type === "district") {
-          console.log('生成了县级')
+          // console.log('生成了县级')
           districtPolygons = arr;
         }
         map.value.setFitView(arr, true, [20, 20, 20, 300], 22); //地图自适应
@@ -272,7 +272,7 @@ export default {
           if (status == "complete") {
             const data = result.districtList[0];
             const {districtList, boundaries, citycode} = data;
-            console.log('获取到省级数据', data)
+            // console.log('获取到省级数据', data)
             if (Array.isArray(citycode)) {
               cityOptions.value = districtList.map((el) => el.name);
             } else {
@@ -341,16 +341,13 @@ export default {
       destroyFence("district");
       if (!val) {
         if (["直辖市", "特别行政区"].includes(city.value)) {
-          // console.log(1)
           destroyFence("city");
           fnToggleAreas("province", true);
         } else {
-          // console.log(2)
           fnToggleAreas("province", false);
           fnToggleAreas("city", true);
         }
       } else {
-        // console.log(3)
         fnToggleAreas("province", false);
         fnToggleAreas("city", false);
         districtSearch.setLevel("district");

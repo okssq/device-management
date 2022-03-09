@@ -1,8 +1,9 @@
 import { inject } from "vue";
 import AMapLoader from "@amap/amap-jsapi-loader";
+
 const useLayout = () => {
-  const map = inject('map')
-  const mapTeleportTo = inject('mapTeleportTo')
+  const map = inject("map");
+  const mapTeleportTo = inject("mapTeleportTo");
 
   const loadMap = () => {
     AMapLoader.load({
@@ -11,17 +12,18 @@ const useLayout = () => {
     })
       .then((AMap) => {
         const mapObj = new AMap.Map("global-map", {
-          zoom: 11, // 级别
+          zoom: 5, // 级别
           viewMode: "2D",
+          zooms: [5, 20],
         });
         mapObj.on("complete", () => {
           console.log("全局地图加载成功！");
-          map.value = mapObj
+          map.value = mapObj;
         });
       })
       .catch((err) => {
-        map.value = null
-        console.log('全局地图加载失败',err);
+        map.value = null;
+        console.log("全局地图加载失败", err);
       });
   };
 

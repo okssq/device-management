@@ -181,7 +181,7 @@ export default {
         infoWindow.open(map.value, position, 30);
       }, 400);
 
-      map.value.setZoomAndCenter(22, position, true, false)
+      map.value.setZoomAndCenter(30, position, true, false)
       // (树列表宽度340+树列表左右各15+卡片320+卡片左右各12 = 914)
       // (卡片高度250+marker高度40 = 300)
       // (height/2) - (( height - 300 ) / 2 )
@@ -196,7 +196,7 @@ export default {
             return false
           }
           infoWindowData.value = res[0];
-          // console.log("获取当前设备详情信息", res[0]);
+          console.log("获取当前设备详情信息", res[0]);
         }).finally(() => {
         infoWindowLoading.value = false
       });
@@ -210,28 +210,26 @@ export default {
         treeList.value = vList;
         treeNode.value = tree;
         if (firstProjectId && allFenceObj[firstProjectId] && loginInfo.value.companyId != 1) {
-          // console.log('定位到第一个项目ID围栏：', firstProjectId)
+          console.log('定位到第一个项目ID围栏：', firstProjectId)
           map.value.setFitView(allFenceObj[firstProjectId], true, [60, 60, 60, 400], 20);
         }
       }).catch(err => {
-        console.log('<<getTreeData error ...>>')
-        console.error(err)
+        console.log('<<getTreeData err>>', err)
       }).finally(() => {
         loading.value = false
       })
     }
     // 渲染所有gps点
     const renderAllGps = (list) => {
-      list.forEach((el, index) => {
-        // console.log('el', el)
+      console.log('list', list);
+      list.forEach((el) => {
+        console.log('el', el)
         const {gpsInfo} = el;
         if (gpsInfo) {
           const gpsArr = gpsInfo.split(",");
-          console.log('gpsArr', gpsArr, 'gpsInfo', gpsInfo)
           if (gpsArr.length === 2) {
             allPoints.push({
               ...el,
-              weight: index + 1,
               lnglat: gpsArr
             })
           }
@@ -250,17 +248,14 @@ export default {
           JSON.parse(JSON.stringify(allPoints)),
           {
             gridSize: 80, // 聚合网格像素大小
-            maxZoom: 15,
+            maxZoom: 20,
             renderMarker, // 自定义非聚合点样式
           }
         );
         cluster.on("click", function (obj) {
-          const {clusterData, cluster} = obj;
+          const {clusterData} = obj;
           if (clusterData.length === 1) {
             const row = clusterData[0];
-            renderInfoWindow({id: `term_${row["terminalId"]}`});
-          } else if (clusterData.length === 0) {
-            const row = cluster.p;
             renderInfoWindow({id: `term_${row["terminalId"]}`});
           }
         });
@@ -317,6 +312,8 @@ export default {
     };
     // 地图加载完成事件
     const onMapLoadSuccess = () => {
+
+      console.log('定位到5层级地图！')
       Promise.all([getAllGps(), getAllFence()])
         .then(([gpsData, fenceData]) => {
           // console.log('gpsData', gpsData)
